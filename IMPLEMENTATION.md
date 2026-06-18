@@ -1095,3 +1095,4 @@ python3 tests/verify.py
 ---
 
 *LocalForge Confidential — Implementation Card v2.0 · June 18, 2026*
+# phase 6 complete
