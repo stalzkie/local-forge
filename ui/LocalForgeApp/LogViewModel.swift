@@ -43,22 +43,28 @@ final class LogViewModel: ObservableObject {
     private var outputPipe: Pipe?
 
     private var binaryURL: URL {
-        // When bundled: .app/Contents/MacOS/localforge-core
-        // During development: project root target/release/localforge
+        // 1. Production: binary bundled inside .app at Contents/MacOS/localforge-core
         let bundled = Bundle.main.bundleURL
             .appendingPathComponent("Contents/MacOS/localforge-core")
         if FileManager.default.fileExists(atPath: bundled.path) {
             return bundled
         }
-        // Dev fallback: walk up from the bundle to find the project root
-        var url = Bundle.main.bundleURL
-        for _ in 0..<6 {
-            url = url.deletingLastPathComponent()
-            let candidate = url.appendingPathComponent("target/release/localforge")
-            if FileManager.default.fileExists(atPath: candidate.path) {
-                return candidate
+
+        // 2. Development: SOURCE_ROOT baked into Info.plist by Xcode as LFSourceRoot
+        //    Points to the project root (ui/../ = local-forge/)
+        if let sourceRoot = Bundle.main.object(forInfoDictionaryKey: "LFSourceRoot") as? String {
+            let devRelease = URL(fileURLWithPath: sourceRoot)
+                .appendingPathComponent("target/release/localforge")
+            if FileManager.default.fileExists(atPath: devRelease.path) {
+                return devRelease
+            }
+            let devDebug = URL(fileURLWithPath: sourceRoot)
+                .appendingPathComponent("target/debug/localforge")
+            if FileManager.default.fileExists(atPath: devDebug.path) {
+                return devDebug
             }
         }
+
         return bundled
     }
 
