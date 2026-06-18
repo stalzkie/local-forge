@@ -26,6 +26,7 @@ cp -r "$APP_PATH" "$STAGING/"
 echo "==> Creating DMG..."
 create-dmg \
     --volname "LocalForge" \
+    --volicon "$REPO_ROOT/ui/LocalForgeApp/Assets.xcassets/AppIcon.appiconset/icon_512.png" \
     --window-pos 200 120 \
     --window-size 580 380 \
     --icon-size 100 \

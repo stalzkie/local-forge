@@ -21,9 +21,11 @@ struct ContentView: View {
 
     private var headerBar: some View {
         HStack(spacing: 10) {
-            Image(systemName: "shield.lefthalf.filled.badge.checkmark")
-                .font(.title2)
-                .foregroundColor(.blue)
+            Image("LocalForgeLogo")
+                .resizable()
+                .renderingMode(.template)
+                .foregroundColor(.white)
+                .frame(width: 28, height: 28)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text("LocalForge Security Shield")

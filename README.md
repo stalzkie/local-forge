@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/LocalForge-v2.0-blue?style=for-the-badge&logo=shield&logoColor=white" alt="LocalForge v2.0" />
+<img src="ui/assets/localforge logo.svg" alt="LocalForge" width="100" height="100" />
 
 # LocalForge
 
@@ -213,7 +213,7 @@ CV F1 score:     0.496 ± 0.229
 Verification:    10/10 cases passed
 ```
 
-### Layer 3 — Qwen2.5-Coder via MLX (`~5–8s`)
+### Layer 3 — Qwen2.5-Coder via MLX (`~3.8s`)
 
 A 1.5B parameter code model running locally via Apple's MLX framework. Reviews the full diff for three categories:
 
@@ -221,7 +221,7 @@ A 1.5B parameter code model running locally via Apple's MLX framework. Reviews t
 - **Bug Risk** — off-by-one errors, unhandled exceptions, null dereferences, race conditions
 - **Code Quality** — dead/orphan functions, unused variables, overly complex logic
 
-Findings are written to `~/.localforge/advisory_log/advisory_<timestamp>_<hash>.json` and displayed in the app. **Layer 3 never blocks a commit** — it advises.
+Findings are appended to `~/.localforge/reports/commit_<timestamp>.txt` — one file per commit, all findings in plain text. Click the folder icon in the app to open reports in Finder. **Layer 3 never blocks a commit** — it advises.
 
 ---
 
@@ -304,29 +304,74 @@ src/ast_validator.rs
 
 ## Advisory Reports
 
-Every Layer 3 run writes a full JSON report to `~/.localforge/advisory_log/`. Click the folder icon in the app to open it in Finder.
+Every commit with Layer 3 enabled writes a human-readable `.txt` report to `~/.localforge/reports/`. One file per commit — all findings appended. Click the folder icon in the app to open it in Finder.
 
-```json
-{
-  "generated_at": "2026-06-18T12:22:45Z",
-  "model": "Qwen2.5-Coder-1.5B-Instruct-4bit",
-  "layer": 3,
-  "diff_hash": "851e0c2323",
-  "analysis": {
-    "severity": "medium",
-    "summary": "SQL injection risk in fetch_records() — user input concatenated into query string",
-    "findings": [
-      {
-        "category": "security",
-        "type": "sql_injection",
-        "line_hint": "query = \"SELECT * FROM users WHERE id = \" + user_id",
-        "explanation": "user_id is concatenated directly into the SQL string without sanitization",
-        "remediation": "Use parameterised queries: cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,))"
-      }
-    ]
-  }
-}
 ```
+======================================================================
+  LocalForge Code Assessment
+  2026-06-18 12:23:03 UTC  |  diff: 4d06522c65  |  model: Qwen2.5-Coder-1.5B
+======================================================================
+  Severity : MEDIUM
+  Summary  : SQL injection risk in fetch_records() — user input concatenated into query string
+
+  [1] [SECURITY] sql_injection
+      Code    : query = "SELECT * FROM users WHERE id = " + user_id
+      Issue   : user_id is concatenated directly into the SQL string without sanitization
+      Fix     : Use parameterised queries: cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,))
+======================================================================
+```
+
+Toggle Layer 3 on/off at any time using the **Code Review** switch in the app header. When off, Qwen is skipped and no report is written.
+
+---
+
+## Benchmark Results
+
+80-sample benchmark across clean, security, bug_risk, and quality categories in Python, Rust, and JavaScript. Run with `python3 tests/benchmark.py`.
+
+### Layer 1 — AST Regex
+
+| Metric | Result |
+|---|---|
+| Average latency | **40.81 µs** |
+| p99 latency | 156.08 µs |
+| Secret detection rate | 4/20 security samples blocked (20%) |
+| False positive rate | **0%** — zero clean samples blocked |
+
+Layer 1 operates entirely in-process with no subprocess overhead. The 20% detection rate is by design: it only catches the seven explicit secret patterns (AWS keys, GitHub PATs, etc.) — not general security issues.
+
+### Layer 2 — CoreML / ANE
+
+| Metric | Result |
+|---|---|
+| Average latency | **2,083 ms** (model load + inference) |
+| Security detection rate | 3/20 flagged (≥ 0.5 threshold) |
+| False positive rate | 2/20 clean samples flagged (10%) |
+
+The CoreML classifier is a statistical model trained on 81 samples. Its risk score complements Layer 1 — it catches patterns that aren't literal secrets but look statistically similar to known bad code.
+
+### Layer 3 — Qwen Advisory
+
+| Metric | Result |
+|---|---|
+| Average inference | **3.8 s** |
+| Actionable findings (high/medium) | 78/80 samples |
+| Clean code advisory rate | 18/20 — L3 is advisory-only, never blocks |
+
+Layer 3's high advisory rate on clean code is intentional — it surfaces quality and best-practice suggestions even when code is safe. It is a code reviewer, not a blocker.
+
+### Benchmark Graphs
+
+| Graph | What It Shows |
+|---|---|
+| `01_layer1_latency.png` | Histogram + box plot of L1 latency per category (µs) |
+| `02_layer2_accuracy.png` | Confusion matrix + risk score distribution |
+| `03_layer3_quality.png` | Severity pie + detection rate + inference time |
+| `04_pipeline_timing.png` | Per-sample L2 bars + avg per layer (log scale) |
+| `05_security_coverage.png` | 7×5 heatmap of pattern × obfuscation variant |
+| `06_false_positive_rate.png` | FP rate per layer + per language |
+
+All graphs are saved to `tests/benchmark_results/`.
 
 ---
 
@@ -338,6 +383,12 @@ cargo test
 
 # End-to-end validation suite
 python3 tests/verify.py
+
+# 80-sample performance benchmark (all 3 layers)
+python3 tests/benchmark.py
+
+# Skip Qwen for a faster L1+L2-only run
+python3 tests/benchmark.py --skip-qwen
 
 # Manual smoke test — should exit 1 and print BLOCKED
 echo 'token = "AKIAIOSFODNN7EXAMPLE"' | ./target/release/localforge --scan
@@ -386,7 +437,9 @@ local-forge/
 │   ├── build_release.sh      # Build Rust + archive .app
 │   └── package_dmg.sh        # Wrap .app into distributable DMG
 ├── tests/
-│   └── verify.py             # End-to-end validation suite
+│   ├── verify.py             # End-to-end validation suite
+│   ├── benchmark.py          # 80-sample 3-layer performance benchmark
+│   └── benchmark_results/    # Benchmark graphs (PNG)
 └── .localforgeignore         # Paths excluded from scanning
 ```
 
@@ -453,7 +506,7 @@ MIT — see [LICENSE](LICENSE)
 
 <div align="center">
 
-Built by [StalWrites](https://github.com/stalzkie) · Apple Silicon M4 · June 2026
+Built by [Stalingrad Dollosa](https://github.com/stalzkie) · Apple Silicon M4 · June 2026
 
 *LocalForge — your last line of defence before git history.*
 

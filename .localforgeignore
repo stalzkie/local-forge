@@ -11,6 +11,7 @@ IMPLEMENTATION.md
 
 # Test suite contains mock diffs with fake keys
 tests/verify.py
+tests/benchmark.py
 
 # Config/ignore files contain glob patterns that trigger false positives
 .gitignore
