@@ -23,8 +23,7 @@ struct ContentView: View {
         HStack(spacing: 10) {
             Image("LocalForgeLogo")
                 .resizable()
-                .renderingMode(.template)
-                .foregroundColor(.white)
+                .renderingMode(.original)
                 .frame(width: 28, height: 28)
 
             VStack(alignment: .leading, spacing: 1) {
