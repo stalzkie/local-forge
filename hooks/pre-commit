@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+BINARY="$REPO_ROOT/target/release/localforge"
+IGNORE_FILE="$REPO_ROOT/.localforgeignore"
+
+if [ ! -x "$BINARY" ]; then
+  echo "[LocalForge] WARNING: release binary not found. Run: cargo build --release"
+  exit 0
+fi
+
+# Build a filtered diff: strip hunks whose file path matches .localforgeignore patterns
+DIFF=$(git diff --cached --unified=0)
+
+if [ -f "$IGNORE_FILE" ]; then
+  # Read ignore patterns (ignore blank lines and # comments)
+  while IFS= read -r pattern || [[ -n "$pattern" ]]; do
+    [[ "$pattern" =~ ^#.*$ || -z "$pattern" ]] && continue
+    # Remove diff hunks for files matching this pattern
+    DIFF=$(echo "$DIFF" | awk -v pat="$pattern" '
+      /^diff --git/ { skip = ($0 ~ pat) }
+      !skip { print }
+    ')
+  done < "$IGNORE_FILE"
+fi
+
+if [ -z "$DIFF" ]; then
+  echo "[LocalForge] No diff to scan after ignore rules — committing."
+  exit 0
+fi
+
+if echo "$DIFF" | "$BINARY" --scan; then
+  echo "[LocalForge] Scan passed — committing."
+  exit 0
+else
+  echo ""
+  echo "[LocalForge] Commit BLOCKED — a secret was detected in the staged diff."
+  echo "             To suppress a false positive, add the file path to .localforgeignore"
+  echo "             Remove the real secret, stage the fix, then commit again."
+  exit 1
+fi

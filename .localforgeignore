@@ -1,0 +1,17 @@
+# LocalForge ignore file — paths listed here are excluded from secret scanning.
+# Use for test fixtures and source files that intentionally contain fake/example keys.
+# Syntax: one pattern per line, matched against the diff file path (supports simple substring match).
+
+# Rust source — contains regex patterns and test fixture keys, not real secrets
+src/ast_validator.rs
+src/mcp_server.rs
+
+# Implementation doc contains example keys in code blocks
+IMPLEMENTATION.md
+
+# Test suite contains mock diffs with fake keys
+tests/verify.py
+
+# Config/ignore files contain glob patterns that trigger false positives
+.gitignore
+.localforgeignore
