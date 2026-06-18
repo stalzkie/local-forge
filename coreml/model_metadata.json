@@ -1,0 +1,96 @@
+{
+  "built_at": "2026-06-18T11:43:48.059049+00:00",
+  "model_version": "2.0.0",
+  "layer": 2,
+  "architecture": "TF-IDF (char_wb 3-5gram, 512 features) + Inner Product + Sigmoid (CoreML)",
+  "compute_unit": "CPU_AND_NE",
+  "n_training_samples": 81,
+  "n_risky": 50,
+  "n_clean": 31,
+  "train_accuracy": 0.9383,
+  "cv_f1_mean": 0.4963,
+  "cv_f1_std": 0.229,
+  "threshold": 0.5,
+  "verification": {
+    "n_cases": 10,
+    "passed": 10,
+    "accuracy": 1.0,
+    "cases": [
+      {
+        "text": "password = 'hunter2'",
+        "score": 0.7358,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "def add(a, b): return a + b",
+        "score": 0.1649,
+        "label": 0,
+        "expected": 0,
+        "pass": true
+      },
+      {
+        "text": "eval(request.GET['cmd'])",
+        "score": 0.6732,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "api_key = os.getenv('API_KEY')",
+        "score": 0.375,
+        "label": 0,
+        "expected": 0,
+        "pass": true
+      },
+      {
+        "text": "verify=False",
+        "score": 0.7529,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "let x: u32 = 42;",
+        "score": 0.4094,
+        "label": 0,
+        "expected": 0,
+        "pass": true
+      },
+      {
+        "text": "requests.get(url, verify=False)",
+        "score": 0.5671,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "ssl.create_default_context()",
+        "score": 0.3921,
+        "label": 0,
+        "expected": 0,
+        "pass": true
+      },
+      {
+        "text": "jwt_secret = 'not-very-secret'",
+        "score": 0.809,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "secrets.token_hex(32)",
+        "score": 0.4973,
+        "label": 0,
+        "expected": 0,
+        "pass": true
+      }
+    ]
+  },
+  "artifacts": {
+    "model": "LocalForgeModel.mlpackage",
+    "vectorizer": "tfidf_vectorizer.pkl",
+    "metadata": "model_metadata.json"
+  }
+}
