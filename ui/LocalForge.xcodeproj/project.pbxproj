@@ -19,6 +19,7 @@
 		A2000003 /* LogViewModel.swift */    = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewModel.swift; sourceTree = "<group>"; };
 		A2000004 /* Assets.xcassets */       = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A2000005 /* LocalForge.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LocalForge.entitlements; sourceTree = "<group>"; };
+		A2000006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A3000001 /* LocalForge.app */        = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LocalForge.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -48,6 +49,7 @@
 				A2000003 /* LogViewModel.swift */,
 				A2000004 /* Assets.xcassets */,
 				A2000005 /* LocalForge.entitlements */,
+			A2000006 /* Info.plist */,
 			);
 			path = LocalForgeApp;
 			sourceTree = "<group>";
@@ -141,11 +143,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = LocalForge;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 StalWrites";
-				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
-				INFOPLIST_KEY_LFSourceRoot = "$(SOURCE_ROOT)/..";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LocalForgeApp/Info.plist;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.stalwrites.localforge;
@@ -168,11 +167,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = LocalForge;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 StalWrites";
-				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
-				INFOPLIST_KEY_LFSourceRoot = "$(SOURCE_ROOT)/..";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LocalForgeApp/Info.plist;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.stalwrites.localforge;
