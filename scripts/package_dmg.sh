@@ -32,7 +32,6 @@ create-dmg \
     --icon "LocalForge.app" 150 180 \
     --hide-extension "LocalForge.app" \
     --app-drop-link 420 180 \
-    --background-color "161616" \
     "$DMG_OUT" \
     "$STAGING/"
 

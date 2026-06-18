@@ -4,9 +4,19 @@ set -euo pipefail
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 BINARY="$REPO_ROOT/target/release/localforge"
 IGNORE_FILE="$REPO_ROOT/.localforgeignore"
+HOOK_LOG="$HOME/.localforge/hook.log"
+REPORTS_DIR="$HOME/.localforge/reports"
+COMMIT_TS=$(date -u +"%Y%m%dT%H%M%SZ")
+COMMIT_REPORT="$REPORTS_DIR/commit_${COMMIT_TS}.txt"
+
+# Append a line to the shared hook log so the GUI monitor can display it
+lf_log() {
+  mkdir -p "$(dirname "$HOOK_LOG")"
+  echo "[LocalForge] $1" | tee -a "$HOOK_LOG"
+}
 
 if [ ! -x "$BINARY" ]; then
-  echo "[LocalForge] WARNING: release binary not found. Run: cargo build --release"
+  lf_log "WARNING: release binary not found. Run: cargo build --release"
   exit 0
 fi
 
@@ -25,18 +35,82 @@ if [ -f "$IGNORE_FILE" ]; then
   done < "$IGNORE_FILE"
 fi
 
+STAGED_FILES=$(git diff --cached --name-only | tr '\n' ' ')
+lf_log "Scanning commit — files: ${STAGED_FILES:-<none>}"
+
 if [ -z "$DIFF" ]; then
-  echo "[LocalForge] No diff to scan after ignore rules — committing."
+  lf_log "No diff to scan after ignore rules — committing."
   exit 0
 fi
 
-if echo "$DIFF" | "$BINARY" --scan; then
-  echo "[LocalForge] Scan passed — committing."
-  exit 0
-else
+set +e
+SCAN_OUTPUT=$(echo "$DIFF" | "$BINARY" --scan 2>&1)
+SCAN_EXIT=$?
+set -e
+
+# Forward every line the scanner printed to the shared log (strip existing [LocalForge] prefix)
+while IFS= read -r line; do
+  [ -n "$line" ] && lf_log "${line#\[LocalForge\] }"
+done <<< "$SCAN_OUTPUT"
+
+if [ $SCAN_EXIT -ne 0 ]; then
+  lf_log "Commit BLOCKED — a secret was detected in the staged diff."
+  lf_log "To suppress a false positive, add the file path to .localforgeignore"
   echo ""
   echo "[LocalForge] Commit BLOCKED — a secret was detected in the staged diff."
   echo "             To suppress a false positive, add the file path to .localforgeignore"
   echo "             Remove the real secret, stage the fix, then commit again."
   exit 1
 fi
+
+# ── Layer 3: Qwen code review — runs on every clean commit, never blocks ──────
+PREFS_FILE="$HOME/.localforge/prefs"
+CODE_REVIEW_ON="1"
+[ -f "$PREFS_FILE" ] && CODE_REVIEW_ON=$(cat "$PREFS_FILE")
+
+ADVISORY_SCRIPT="$REPO_ROOT/coreml/advisory.py"
+if [ "$CODE_REVIEW_ON" = "1" ] && command -v python3 &>/dev/null && [ -f "$ADVISORY_SCRIPT" ]; then
+  lf_log "Scan passed — running Qwen code review (async)..."
+  mkdir -p "$REPORTS_DIR"
+  # Write commit header into the shared report file before spawning background job
+  {
+    echo "LocalForge Assessment Report"
+    echo "Commit  : $(git log --oneline -1 HEAD 2>/dev/null || echo '(pending)')"
+    echo "Files   : $STAGED_FILES"
+    echo "Started : $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+    echo ""
+  } >> "$COMMIT_REPORT"
+
+  (
+    ADV_OUTPUT=$(python3 "$ADVISORY_SCRIPT" "$DIFF" \
+      --log-dir "$REPORTS_DIR" \
+      --report-file "$COMMIT_REPORT" 2>/dev/null)
+    if [ -n "$ADV_OUTPUT" ]; then
+      SEVERITY=$(echo "$ADV_OUTPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('severity','unknown'))" 2>/dev/null || echo "unknown")
+      SUMMARY=$(echo "$ADV_OUTPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('summary',''))" 2>/dev/null || echo "")
+      FINDINGS=$(echo "$ADV_OUTPUT" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+for f in d.get('findings', []):
+    cat = f.get('category', 'general').upper()
+    print(f\"[{cat}] {f.get('type','')} — {f.get('explanation','')} | Fix: {f.get('remediation','')}\")" 2>/dev/null || echo "")
+
+      echo "[LocalForge] Qwen [$SEVERITY] $SUMMARY" >> "$HOOK_LOG"
+      if [ -n "$FINDINGS" ]; then
+        while IFS= read -r finding; do
+          [ -n "$finding" ] && echo "[LocalForge]   $finding" >> "$HOOK_LOG"
+        done <<< "$FINDINGS"
+      fi
+      echo "[LocalForge]   Assessment saved: $COMMIT_REPORT" >> "$HOOK_LOG"
+    fi
+  ) &
+  disown
+else
+  if [ "$CODE_REVIEW_ON" != "1" ]; then
+    lf_log "Scan passed — code review disabled."
+  else
+    lf_log "Scan passed — committing."
+  fi
+fi
+
+exit 0

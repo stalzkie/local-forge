@@ -4,3 +4,6 @@ __pycache__/
 .DS_Store
 # Qwen MLX model weights — download with: python3 coreml/advisory.py
 coreml/qwen2.5-coder-1.5b-4bit/
+build/
+tests/review_target.py
+tests/bad_credential.py

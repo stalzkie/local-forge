@@ -34,13 +34,28 @@ struct LogLine: Identifiable {
 @MainActor
 final class LogViewModel: ObservableObject {
 
-    @Published var lines:     [LogLine] = []
-    @Published var isRunning: Bool      = false
-    @Published var blockedCount: Int    = 0
-    @Published var scannedCount: Int    = 0
+    @Published var lines:            [LogLine] = []
+    @Published var isRunning:        Bool      = false
+    @Published var blockedCount:     Int       = 0
+    @Published var scannedCount:     Int       = 0
+    @Published var codeReviewEnabled: Bool     = true {
+        didSet {
+            UserDefaults.standard.set(codeReviewEnabled, forKey: "codeReviewEnabled")
+            writeReviewPref()
+        }
+    }
 
     private var process:    Process?
     private var outputPipe: Pipe?
+
+    private static let prefFile: URL = {
+        let home = FileManager.default.homeDirectoryForCurrentUser
+        return home.appendingPathComponent(".localforge/prefs")
+    }()
+
+    init() {
+        codeReviewEnabled = UserDefaults.standard.object(forKey: "codeReviewEnabled") as? Bool ?? true
+    }
 
     private var binaryURL: URL {
         // 1. Production: binary bundled inside .app at Contents/MacOS/localforge-core
@@ -73,12 +88,14 @@ final class LogViewModel: ObservableObject {
     func start() {
         guard !isRunning else { return }
 
+        writeReviewPref()
         append("LocalForge v2.0 starting…", level: .info)
         append("Binary: \(binaryURL.path)", level: .info)
+        append("Code review: \(codeReviewEnabled ? "enabled" : "disabled")", level: .info)
 
         let p = Process()
         p.executableURL = binaryURL
-        p.arguments     = []   // no args → TUI mode; stdout/stderr go to the pipe
+        p.arguments     = ["--monitor"]
 
         let pipe = Pipe()
         p.standardOutput = pipe
@@ -88,14 +105,20 @@ final class LogViewModel: ObservableObject {
 
         pipe.fileHandleForReading.readabilityHandler = { [weak self] handle in
             let data = handle.availableData
-            guard !data.isEmpty, let text = String(data: data, encoding: .utf8) else { return }
+            if data.isEmpty {
+                handle.readabilityHandler = nil
+                return
+            }
+            guard let text = String(data: data, encoding: .utf8) else { return }
             Task { @MainActor [weak self] in self?.ingest(text) }
         }
 
-        p.terminationHandler = { [weak self] _ in
+        let pipeHandle = pipe.fileHandleForReading
+        p.terminationHandler = { [weak self] proc in
+            pipeHandle.readabilityHandler = nil
             Task { @MainActor [weak self] in
                 self?.isRunning = false
-                self?.append("LocalForge process exited.", level: .warn)
+                self?.append("LocalForge process exited (code \(proc.terminationStatus)).", level: .warn)
             }
         }
 
@@ -111,8 +134,10 @@ final class LogViewModel: ObservableObject {
     }
 
     func stop() {
+        outputPipe?.fileHandleForReading.readabilityHandler = nil
         process?.terminate()
         process    = nil
+        outputPipe = nil
         isRunning  = false
         append("Engine stopped.", level: .warn)
     }
@@ -140,28 +165,30 @@ final class LogViewModel: ObservableObject {
 
     private func classify(_ line: String) -> (LogLevel, String) {
         let l = line.lowercased()
-        // Strip the "[LocalForge] " prefix for cleaner display
         let text = line.hasPrefix("[LocalForge] ") ? String(line.dropFirst(13)) : line
 
-        if l.contains("blocked") || l.contains("err") || l.contains("failed") {
-            return (.error, text)
-        }
-        if l.contains("layer 1") || l.contains("l1") || l.contains("ast") {
-            return (.layer1, text)
-        }
-        if l.contains("layer 2") || l.contains("l2") || l.contains("ane") || l.contains("coreml") {
-            return (.layer2, text)
-        }
-        if l.contains("layer 3") || l.contains("l3") || l.contains("qwen") || l.contains("advisory") || l.contains("adv") {
-            return (.layer3, text)
-        }
-        if l.contains("ok") || l.contains("passed") || l.contains("success") || l.contains("clean") {
-            return (.success, text)
-        }
-        if l.contains("warn") {
-            return (.warn, text)
-        }
+        if l.contains("blocked") || l.contains("failed") { return (.error, text) }
+        if l.contains("[security]")                       { return (.error, text) }
+        if l.contains("[bug_risk]")                       { return (.warn,  text) }
+        if l.contains("[quality]")                        { return (.advisory, text) }
+        if l.contains("layer 1") || l.contains("  l1  ") || l.contains("ast") { return (.layer1, text) }
+        if l.contains("layer 2") || l.contains("  l2  ") || l.contains("ane") || l.contains("coreml") { return (.layer2, text) }
+        if l.contains("layer 3") || l.contains("  l3  ") || l.contains("qwen") || l.contains("advisory") { return (.layer3, text) }
+        if l.contains("full report:")                     { return (.advisory, text) }
+        if l.contains("passed") || l.contains("clean") || l.contains("  ok  ") { return (.success, text) }
+        if l.contains("warn")                             { return (.warn, text) }
+        if l.contains("err")                              { return (.error, text) }
         return (.info, text)
+    }
+
+    private func writeReviewPref() {
+        let url = Self.prefFile
+        try? FileManager.default.createDirectory(
+            at: url.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        let value = codeReviewEnabled ? "1" : "0"
+        try? value.write(to: url, atomically: true, encoding: .utf8)
     }
 
     private func append(_ text: String, level: LogLevel) {

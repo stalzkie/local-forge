@@ -39,7 +39,25 @@ struct ContentView: View {
             // Layer status pills
             layerPill("L1", subtitle: "AST",    color: .cyan)
             layerPill("L2", subtitle: "ANE",    color: .blue)
-            layerPill("L3", subtitle: "Qwen",   color: .purple)
+            layerPill("L3", subtitle: "Qwen",   color: vm.codeReviewEnabled ? .purple : .gray)
+
+            Divider().frame(height: 28)
+
+            // Code review toggle
+            Toggle(isOn: $vm.codeReviewEnabled) {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Code Review")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(vm.codeReviewEnabled ? .purple : .gray)
+                    Text(vm.codeReviewEnabled ? "ON" : "OFF")
+                        .font(.system(size: 8, design: .monospaced))
+                        .foregroundColor(vm.codeReviewEnabled ? .purple.opacity(0.8) : .gray.opacity(0.6))
+                }
+            }
+            .toggleStyle(.switch)
+            .controlSize(.mini)
+            .tint(.purple)
+            .help("Toggle Qwen L3 code quality assessment on every commit")
 
             Divider().frame(height: 28)
 
@@ -91,11 +109,11 @@ struct ContentView: View {
             statChip(label: "Scanned", value: "\(vm.scannedCount)", color: .cyan)
             statChip(label: "Blocked", value: "\(vm.blockedCount)", color: .red)
             Spacer()
-            Text("Advisory reports → ~/.localforge/advisory_log/")
+            Text("Assessment reports → ~/.localforge/reports/")
                 .font(.system(size: 10, design: .monospaced))
                 .foregroundColor(.gray)
             Button {
-                let url = URL(fileURLWithPath: NSString("~/.localforge/advisory_log").expandingTildeInPath)
+                let url = URL(fileURLWithPath: NSString("~/.localforge/reports").expandingTildeInPath)
                 try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
                 NSWorkspace.shared.activateFileViewerSelecting([url])
             } label: {

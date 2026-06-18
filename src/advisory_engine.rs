@@ -41,6 +41,7 @@ impl Severity {
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Finding {
+    pub category:     Option<String>, // "security" | "quality" | "bug_risk"
     pub r#type:       String,
     pub line_hint:    String,
     pub explanation:  String,
@@ -90,13 +91,16 @@ async fn run_advisory(diff: &str) -> Option<AdvisoryResult> {
         return None;
     }
 
-    let log_dir = resolve_log_dir();
+    let log_dir    = resolve_log_dir();
+    let report_file = resolve_report_path(diff);
 
     let output = Command::new("python3")
         .arg(&shim)
         .arg(diff)
         .arg("--log-dir")
         .arg(&log_dir)
+        .arg("--report-file")
+        .arg(&report_file)
         .output()
         .await
         .ok()?;
@@ -148,7 +152,23 @@ fn resolve_shim_path() -> PathBuf {
 }
 
 fn resolve_log_dir() -> PathBuf {
-    dirs_or_home().join(".localforge").join("advisory_log")
+    dirs_or_home().join(".localforge").join("reports")
+}
+
+fn resolve_report_path(diff: &str) -> PathBuf {
+    use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
+    let mut h = DefaultHasher::new();
+    diff.hash(&mut h);
+    let hash = format!("{:x}", h.finish());
+    let ts = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    dirs_or_home()
+        .join(".localforge")
+        .join("reports")
+        .join(format!("commit_{ts}_{}.txt", &hash[..8]))
 }
 
 fn dirs_or_home() -> PathBuf {

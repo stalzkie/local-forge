@@ -17,6 +17,10 @@ struct Cli {
     /// Start the MCP JSON-RPC server on the given port
     #[arg(long)]
     mcp_port: Option<u16>,
+
+    /// Plain-text monitor mode for GUI apps — prints structured log lines to stdout, no TUI
+    #[arg(long)]
+    monitor: bool,
 }
 
 #[tokio::main]
@@ -92,7 +96,58 @@ async fn main() -> anyhow::Result<()> {
         return Ok(());
     }
 
+    if cli.monitor {
+        return run_monitor().await;
+    }
+
     tui::run_dashboard()
+}
+
+async fn run_monitor() -> anyhow::Result<()> {
+    use std::io::{BufRead, BufReader, Seek, SeekFrom};
+    use std::time::Duration;
+    use tokio::time::sleep;
+
+    println!("[LocalForge] Monitor started — LocalForge Security Shield v2.0");
+    println!("[LocalForge] 3-Layer pipeline: L1 AST  •  L2 CoreML/ANE  •  L3 Qwen/MLX");
+    println!("[LocalForge] Watching for git hook scan events...");
+    println!("[LocalForge] Layer 1 (AST regex): ready");
+
+    match ane_bridge::analyse("healthcheck") {
+        Ok(Some(_)) => println!("[LocalForge] Layer 2 (CoreML/ANE): ready"),
+        Ok(None)    => println!("[LocalForge] Layer 2 (CoreML/ANE): model not found — skipping"),
+        Err(e)      => println!("[LocalForge] Layer 2 (CoreML/ANE): unavailable ({e})"),
+    }
+
+    println!("[LocalForge] Layer 3 (Qwen/MLX): advisory engine ready");
+    println!("[LocalForge] All layers initialised. Waiting for commits...");
+
+    // Tail ~/.localforge/hook.log — forward any new lines written by the git hook
+    let log_path = {
+        let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
+        std::path::PathBuf::from(home).join(".localforge/hook.log")
+    };
+    std::fs::create_dir_all(log_path.parent().unwrap()).ok();
+
+    // Seek to end so we only show events that happen after the monitor starts
+    let mut pos: u64 = std::fs::metadata(&log_path)
+        .map(|m| m.len())
+        .unwrap_or(0);
+
+    loop {
+        sleep(Duration::from_millis(500)).await;
+
+        if let Ok(file) = std::fs::File::open(&log_path) {
+            let mut reader = BufReader::new(file);
+            reader.seek(SeekFrom::Start(pos)).ok();
+            let mut new_pos = pos;
+            for line in reader.lines().map_while(Result::ok) {
+                println!("{line}");
+                new_pos += line.len() as u64 + 1; // +1 for newline
+            }
+            pos = new_pos;
+        }
+    }
 }
 
 fn print_advisory(report: &advisory_engine::AdvisoryResult) {
@@ -102,8 +157,9 @@ fn print_advisory(report: &advisory_engine::AdvisoryResult) {
         summary  = report.summary,
     );
     for (i, f) in report.findings.iter().enumerate() {
+        let cat = f.category.as_deref().unwrap_or("general").to_uppercase();
         eprintln!(
-            "[LocalForge]   Finding {n}: {t} — {exp}",
+            "[LocalForge]   [{cat}] Finding {n}: {t} — {exp}",
             n   = i + 1,
             t   = f.r#type,
             exp = f.explanation,
