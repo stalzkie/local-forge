@@ -2,19 +2,65 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var vm = LogViewModel()
+    @State private var selectedTab: AppTab = .monitor
+
+    enum AppTab { case monitor, repos }
 
     var body: some View {
         VStack(spacing: 0) {
-            headerBar
+            tabBar
             Divider()
-            logPane
-            Divider()
-            statsBar
+            switch selectedTab {
+            case .monitor:
+                VStack(spacing: 0) {
+                    headerBar
+                    Divider()
+                    logPane
+                    Divider()
+                    statsBar
+                }
+                .onAppear { vm.start() }
+            case .repos:
+                ReposView()
+            }
         }
         .background(Color(nsColor: .black))
-        .onAppear { vm.start() }
         .onDisappear { vm.stop() }
         .onReceive(NotificationCenter.default.publisher(for: .clearLog)) { _ in vm.clear() }
+    }
+
+    // ── Tab bar ───────────────────────────────────────────────────────────────
+
+    private var tabBar: some View {
+        HStack(spacing: 0) {
+            tabButton("Monitor", icon: "terminal", tab: .monitor)
+            tabButton("Repos", icon: "folder.badge.gearshape", tab: .repos)
+            Spacer()
+        }
+        .padding(.horizontal, 14)
+        .padding(.top, 6)
+        .padding(.bottom, 0)
+        .background(Color(nsColor: NSColor(red: 0.08, green: 0.08, blue: 0.10, alpha: 1)))
+    }
+
+    private func tabButton(_ label: String, icon: String, tab: AppTab) -> some View {
+        let active = selectedTab == tab
+        return Button {
+            selectedTab = tab
+        } label: {
+            HStack(spacing: 5) {
+                Image(systemName: icon)
+                    .font(.system(size: 11))
+                Text(label)
+                    .font(.system(size: 11, weight: .medium))
+            }
+            .foregroundColor(active ? .white : .gray)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(active ? Color.white.opacity(0.08) : Color.clear)
+            .cornerRadius(6)
+        }
+        .buttonStyle(.plain)
     }
 
     // ── Header ────────────────────────────────────────────────────────────────

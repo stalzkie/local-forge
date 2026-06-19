@@ -39,6 +39,10 @@ struct Cli {
     /// List all repos registered with LocalForge and their hook status
     #[arg(long)]
     list_repos: bool,
+
+    /// Re-install the latest hook into every registered repo
+    #[arg(long)]
+    upgrade_all: bool,
 }
 
 #[tokio::main]
@@ -57,6 +61,10 @@ async fn main() -> anyhow::Result<()> {
 
     if cli.list_repos {
         return run_list_repos();
+    }
+
+    if cli.upgrade_all {
+        return run_upgrade_all();
     }
 
     if cli.scan {
@@ -393,6 +401,73 @@ fn run_list_repos() -> anyhow::Result<()> {
     }
 
     println!();
+    Ok(())
+}
+
+fn run_upgrade_all() -> anyhow::Result<()> {
+    use std::path::PathBuf;
+
+    let home       = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
+    let repos_file = PathBuf::from(&home).join(".localforge/repos");
+
+    if !repos_file.exists() {
+        println!("[LocalForge] No repos registered. Run: localforge --install");
+        return Ok(());
+    }
+
+    let content = std::fs::read_to_string(&repos_file).unwrap_or_default();
+    let repos: Vec<&str> = content.lines().filter(|l| !l.is_empty()).collect();
+
+    if repos.is_empty() {
+        println!("[LocalForge] No repos registered.");
+        return Ok(());
+    }
+
+    let hook_src = match find_hook_source() {
+        Some(p) => p,
+        None    => {
+            println!("[LocalForge] ✗ pre-commit hook source not found.");
+            println!("             Re-install LocalForge to restore it.");
+            return Ok(());
+        }
+    };
+
+    println!("[LocalForge] Upgrading hooks in {} repo(s)...", repos.len());
+    println!();
+
+    let mut upgraded = 0;
+    let mut skipped  = 0;
+
+    for repo in &repos {
+        let path     = std::path::Path::new(repo);
+        let git_hooks = path.join(".git/hooks");
+
+        if !git_hooks.exists() {
+            println!("  ✗ {} — not a git repo, skipping", repo);
+            skipped += 1;
+            continue;
+        }
+
+        let hook_dest = git_hooks.join("pre-commit");
+        match std::fs::copy(&hook_src, &hook_dest) {
+            Ok(_) => {
+                #[cfg(unix)]
+                {
+                    use std::os::unix::fs::PermissionsExt;
+                    let _ = std::fs::set_permissions(&hook_dest, std::fs::Permissions::from_mode(0o755));
+                }
+                println!("  ✓ {} — hook upgraded to v{EXPECTED_HOOK_VERSION}", repo);
+                upgraded += 1;
+            }
+            Err(e) => {
+                println!("  ✗ {} — failed: {e}", repo);
+                skipped += 1;
+            }
+        }
+    }
+
+    println!();
+    println!("[LocalForge] Done: {upgraded} upgraded, {skipped} skipped.");
     Ok(())
 }
 
