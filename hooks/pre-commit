@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LocalForge pre-commit hook
-# LOCALFORGE_HOOK_VERSION=3
+# LOCALFORGE_HOOK_VERSION=4
 set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
@@ -90,14 +90,17 @@ fi
 if [ "$CODE_REVIEW_ON" = "1" ] && command -v python3 &>/dev/null && [ -f "$ADVISORY_SCRIPT" ]; then
   lf_log "Scan passed — running Qwen code review (async)..."
   mkdir -p "$REPORTS_DIR"
-  # Write commit header into the shared report file before spawning background job
+  # Write commit header into the single shared report file before spawning advisory
+  mkdir -p "$REPORTS_DIR"
   {
-    echo "LocalForge Assessment Report"
-    echo "Commit  : $(git log --oneline -1 HEAD 2>/dev/null || echo '(pending)')"
-    echo "Files   : $STAGED_FILES"
-    echo "Started : $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+    printf '%.0s=' {1..70}; echo
+    echo "  LocalForge Security & Code Assessment"
+    echo "  $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+    echo "  Commit  : $(git log --oneline -1 HEAD 2>/dev/null || echo '(pending)')"
+    echo "  Files   : $STAGED_FILES"
+    printf '%.0s=' {1..70}; echo
     echo ""
-  } >> "$COMMIT_REPORT"
+  } > "$COMMIT_REPORT"
 
   (
     ADV_OUTPUT=$(python3 "$ADVISORY_SCRIPT" "$DIFF" \

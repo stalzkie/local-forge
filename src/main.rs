@@ -9,7 +9,7 @@ use std::io::Read;
 
 /// Bump this whenever the hook interface changes (new env vars, new exit codes,
 /// new log format). The hook embeds the same number as LOCALFORGE_HOOK_VERSION.
-const EXPECTED_HOOK_VERSION: u32 = 3;
+const EXPECTED_HOOK_VERSION: u32 = 4;
 
 #[derive(Parser)]
 #[command(name = "localforge", version = "2.0.0", about = "LocalForge Security Shield")]

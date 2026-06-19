@@ -26,5 +26,6 @@ ui/LocalForgeApp/Info.plist
 scripts/build_release.sh
 scripts/package_dmg.sh
 coreml/advisory.py
+coreml/build_model.py
 hooks/pre-commit
 README.md

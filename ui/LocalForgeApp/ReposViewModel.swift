@@ -49,7 +49,7 @@ final class ReposViewModel: ObservableObject {
     private static let reposFile = FileManager.default.homeDirectoryForCurrentUser
         .appendingPathComponent(".localforge/repos")
 
-    private static let expectedHookVersion = 3   // keep in sync with EXPECTED_HOOK_VERSION in main.rs
+    private static let expectedHookVersion = 4   // keep in sync with EXPECTED_HOOK_VERSION in main.rs
 
     func refresh() {
         isLoading = true
