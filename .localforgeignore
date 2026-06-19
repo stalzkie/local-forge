@@ -2,9 +2,10 @@
 # Use for test fixtures and source files that intentionally contain fake/example keys.
 # Syntax: one pattern per line, matched against the diff file path (supports simple substring match).
 
-# Rust source — contains regex patterns and test fixture keys, not real secrets
+# Rust source — contains regex patterns, security function names, and test fixture keys
 src/ast_validator.rs
 src/mcp_server.rs
+src/main.rs
 
 # Implementation doc contains example keys in code blocks
 IMPLEMENTATION.md

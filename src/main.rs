@@ -7,6 +7,10 @@ mod tui;
 use clap::Parser;
 use std::io::Read;
 
+/// Bump this whenever the hook interface changes (new env vars, new exit codes,
+/// new log format). The hook embeds the same number as LOCALFORGE_HOOK_VERSION.
+const EXPECTED_HOOK_VERSION: u32 = 3;
+
 #[derive(Parser)]
 #[command(name = "localforge", version = "2.0.0", about = "LocalForge Security Shield")]
 struct Cli {
@@ -58,6 +62,9 @@ async fn main() -> anyhow::Result<()> {
     if cli.scan {
         let mut diff = String::new();
         std::io::stdin().read_to_string(&mut diff)?;
+
+        // ── Hook version check — warn but never block ─────────────────────────
+        check_hook_version();
 
         // ── Layer 1: Rust AST regex — deterministic, <1 ms ───────────────────
         if ast_validator::scan(&diff) {
@@ -356,17 +363,30 @@ fn run_list_repos() -> anyhow::Result<()> {
     println!();
 
     for repo in repos {
-        let path  = std::path::Path::new(repo);
-        let hook  = path.join(".git/hooks/pre-commit");
+        let path   = std::path::Path::new(repo);
+        let hook   = path.join(".git/hooks/pre-commit");
         let exists = path.exists();
 
         let hook_status = if !exists {
-            "✗ path not found"
+            "✗ path not found".to_string()
         } else if !hook.exists() {
-            "⚠ hook missing — run: localforge --install"
+            "⚠ hook missing — run: localforge --install".to_string()
         } else {
             let content = std::fs::read_to_string(&hook).unwrap_or_default();
-            if content.contains("LocalForge") { "✓ hook active" } else { "⚠ hook replaced by another tool" }
+            if !content.contains("LocalForge") {
+                "⚠ hook replaced by another tool".to_string()
+            } else {
+                match hook_version_in_repo(path) {
+                    Some(v) if v < EXPECTED_HOOK_VERSION =>
+                        format!("⚠ hook v{v} outdated (binary expects v{EXPECTED_HOOK_VERSION}) — run: localforge --install"),
+                    Some(v) if v > EXPECTED_HOOK_VERSION =>
+                        format!("⚠ hook v{v} newer than binary v{EXPECTED_HOOK_VERSION} — update binary"),
+                    Some(v) =>
+                        format!("✓ hook active (v{v})"),
+                    None =>
+                        "✓ hook active (unversioned)".to_string(),
+                }
+            }
         };
 
         println!("  {} — {}", repo, hook_status);
@@ -374,6 +394,66 @@ fn run_list_repos() -> anyhow::Result<()> {
 
     println!();
     Ok(())
+}
+
+// ── Hook version check ────────────────────────────────────────────────────────
+
+fn check_hook_version() {
+    // Read the hook from the current repo's .git/hooks/pre-commit
+    let hook_path = match find_current_hook() {
+        Some(p) => p,
+        None    => return, // no hook found — nothing to check
+    };
+
+    let content = match std::fs::read_to_string(&hook_path) {
+        Ok(c)  => c,
+        Err(_) => return,
+    };
+
+    let installed_version = parse_hook_version(&content);
+
+    if let Some(v) = installed_version {
+        if v < EXPECTED_HOOK_VERSION {
+            eprintln!(
+                "[LocalForge] ⚠ Hook version mismatch: hook is v{v}, binary expects v{EXPECTED_HOOK_VERSION}."
+            );
+            eprintln!("[LocalForge]   Update with: localforge --install");
+        }
+        // v > EXPECTED means a newer hook with an older binary — also warn
+        if v > EXPECTED_HOOK_VERSION {
+            eprintln!(
+                "[LocalForge] ⚠ Hook version v{v} is newer than binary v{EXPECTED_HOOK_VERSION}."
+            );
+            eprintln!("[LocalForge]   Update binary: cargo build --release && localforge --install");
+        }
+    }
+    // If no version line found, hook predates versioning — silently skip
+}
+
+fn parse_hook_version(content: &str) -> Option<u32> {
+    for line in content.lines().take(10) {
+        if let Some(rest) = line.strip_prefix("# LOCALFORGE_HOOK_VERSION=") {
+            return rest.trim().parse::<u32>().ok();
+        }
+    }
+    None
+}
+
+fn find_current_hook() -> Option<std::path::PathBuf> {
+    // Walk up from cwd to find .git/hooks/pre-commit
+    let mut dir = std::env::current_dir().ok()?;
+    loop {
+        let hook = dir.join(".git/hooks/pre-commit");
+        if hook.exists() { return Some(hook); }
+        if !dir.pop() { return None; }
+    }
+}
+
+/// Extract the hook version from a repo's pre-commit hook (used by --list-repos).
+fn hook_version_in_repo(repo: &std::path::Path) -> Option<u32> {
+    let hook = repo.join(".git/hooks/pre-commit");
+    let content = std::fs::read_to_string(hook).ok()?;
+    parse_hook_version(&content)
 }
 
 // ── Install helpers ───────────────────────────────────────────────────────────
