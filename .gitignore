@@ -8,3 +8,4 @@ build/
 tests/review_target.py
 tests/bad_credential.py
 tests/benchmark_results/advisory_log/
+REDDIT_POST.md
