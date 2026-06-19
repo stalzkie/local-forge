@@ -13,6 +13,20 @@
 		A1000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A2000004 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		A7000003 /* Bundle CoreML Model */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			inputPaths = ();
+			name = "Bundle CoreML Model";
+			outputPaths = ();
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "MODEL_SRC=\"$SRCROOT/../coreml/LocalForgeModel.mlpackage\"\nINFER_SRC=\"$SRCROOT/../coreml/infer.py\"\nADVISORY_SRC=\"$SRCROOT/../coreml/advisory.py\"\nRES_DIR=\"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME.app/Contents/Resources\"\n\nmkdir -p \"$RES_DIR/coreml\"\n\nif [ -e \"$MODEL_SRC\" ]; then\n  cp -r \"$MODEL_SRC\" \"$RES_DIR/LocalForgeModel.mlpackage\"\n  echo \"[LocalForge build] Bundled CoreML model → Resources/LocalForgeModel.mlpackage\"\nelse\n  echo \"[LocalForge build] WARNING: CoreML model not found at $MODEL_SRC\"\nfi\n\nif [ -f \"$INFER_SRC\" ]; then\n  cp \"$INFER_SRC\" \"$RES_DIR/coreml/infer.py\"\n  echo \"[LocalForge build] Bundled infer.py → Resources/coreml/infer.py\"\nfi\n\nif [ -f \"$ADVISORY_SRC\" ]; then\n  cp \"$ADVISORY_SRC\" \"$RES_DIR/coreml/advisory.py\"\n  echo \"[LocalForge build] Bundled advisory.py → Resources/coreml/advisory.py\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXFileReference section */
 		A2000001 /* App.swift */             = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		A2000002 /* ContentView.swift */     = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -72,6 +86,7 @@
 				A7000001 /* Sources */,
 				A4000001 /* Frameworks */,
 				A7000002 /* Resources */,
+				A7000003 /* Bundle CoreML Model */,
 			);
 			buildRules = ();
 			dependencies = ();

@@ -20,15 +20,29 @@ pub fn analyse(diff: &str) -> anyhow::Result<Option<AneResult>> {
         return Ok(None);
     }
 
-    // Model search order: ~/.localforge/ → next to infer.py → coreml/ cwd
+    // Model search order:
+    //   1. ~/.localforge/LocalForgeModel.mlpackage  (installed)
+    //   2. <bundle>/Contents/Resources/             (bundled in .app)
+    //   3. next to infer.py                         (dev sibling)
+    //   4. coreml/ relative to cwd                 (dev context)
     let model_path = {
         let home_model = std::env::var("HOME").ok()
             .map(|h| PathBuf::from(h).join(".localforge/LocalForgeModel.mlpackage"));
+
+        let bundle_model = std::env::current_exe().ok().and_then(|exe| {
+            exe.parent().map(|macos| {
+                macos.parent().unwrap_or(macos)
+                    .join("Resources/LocalForgeModel.mlpackage")
+            })
+        });
+
         let sibling_model = shim.parent().map(|p| p.join("LocalForgeModel.mlpackage"));
         let cwd_model = PathBuf::from("coreml/LocalForgeModel.mlpackage");
 
         if home_model.as_ref().map(|p| p.exists()).unwrap_or(false) {
             home_model.unwrap()
+        } else if bundle_model.as_ref().map(|p| p.exists()).unwrap_or(false) {
+            bundle_model.unwrap()
         } else if sibling_model.as_ref().map(|p| p.exists()).unwrap_or(false) {
             sibling_model.unwrap()
         } else {
@@ -69,9 +83,10 @@ pub fn analyse(diff: &str) -> anyhow::Result<Option<AneResult>> {
 }
 
 /// Resolve coreml/infer.py using a priority chain:
-///   1. ~/.localforge/coreml/infer.py  (installed path)
-///   2. coreml/infer.py relative to cwd (dev / repo context)
-///   3. Two levels up from the binary   (legacy bundled fallback)
+///   1. ~/.localforge/coreml/infer.py        (installed via install_hook.sh)
+///   2. <app bundle>/Contents/Resources/coreml/infer.py  (bundled in .app)
+///   3. coreml/infer.py relative to cwd      (dev / repo context)
+///   4. Two levels up from the binary        (legacy fallback)
 fn resolve_shim_path() -> anyhow::Result<PathBuf> {
     // 1. Canonical installed location
     if let Ok(home) = std::env::var("HOME") {
@@ -81,13 +96,25 @@ fn resolve_shim_path() -> anyhow::Result<PathBuf> {
         }
     }
 
-    // 2. Repo-relative (dev context)
+    // 2. App bundle Resources (set by the Xcode build phase)
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(macos) = exe.parent() {
+            let bundled = macos
+                .parent().unwrap_or(macos)  // Contents/
+                .join("Resources/coreml/infer.py");
+            if bundled.exists() {
+                return Ok(bundled);
+            }
+        }
+    }
+
+    // 3. Repo-relative (dev context)
     let cwd_shim = PathBuf::from("coreml/infer.py");
     if cwd_shim.exists() {
         return Ok(cwd_shim);
     }
 
-    // 3. Legacy: two levels up from the binary
+    // 4. Legacy: two levels up from the binary
     if let Ok(exe) = std::env::current_exe() {
         if let Some(parent) = exe.parent().and_then(|p| p.parent()).and_then(|p| p.parent()) {
             let candidate = parent.join("coreml/infer.py");

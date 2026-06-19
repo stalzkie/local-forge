@@ -145,11 +145,21 @@ fn resolve_shim_path() -> PathBuf {
         if installed.exists() { return installed; }
     }
 
-    // 2. Repo-relative (dev context)
+    // 2. App bundle Resources
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(macos) = exe.parent() {
+            let bundled = macos
+                .parent().unwrap_or(macos)
+                .join("Resources/coreml/advisory.py");
+            if bundled.exists() { return bundled; }
+        }
+    }
+
+    // 3. Repo-relative (dev context)
     let cwd = PathBuf::from("coreml/advisory.py");
     if cwd.exists() { return cwd; }
 
-    // 3. Legacy: two levels up from the binary
+    // 4. Legacy: two levels up from the binary
     if let Ok(exe) = std::env::current_exe() {
         if let Some(p) = exe.parent().and_then(|p| p.parent()).and_then(|p| p.parent()) {
             let candidate = p.join("coreml/advisory.py");
