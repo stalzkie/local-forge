@@ -17,6 +17,7 @@ regex      = "1"
 tokio      = { version = "1", features = ["full"] }
 anyhow     = "1"
 clap       = { version = "4", features = ["derive"] }
+dirs       = "5"
 
 [profile.release]
 opt-level     = 3

@@ -222,12 +222,19 @@ fn run_install(repo_path: &str) -> anyhow::Result<()> {
     println!("[LocalForge] ✓ Binary installed  → {}", bin_dest.display());
 
     // ── 3. Copy CoreML model ──────────────────────────────────────────────────
-    // Search: next to binary (bundle Resources) → exe-relative → cwd-relative
+    // Search: already at dest → bundle Resources → repo-relative → cwd
     let model_dest = lf_dir.join("LocalForgeModel.mlpackage");
-    let model_src = find_bundled_resource("LocalForgeModel.mlpackage");
+    let model_src = if model_dest.exists() {
+        Some(model_dest.clone()) // already installed, skip copy
+    } else {
+        find_bundled_resource("LocalForgeModel.mlpackage")
+            .or_else(|| find_repo_resource("LocalForgeModel.mlpackage"))
+    };
     if let Some(src) = model_src {
-        if model_dest.exists() { fs::remove_dir_all(&model_dest)?; }
-        copy_dir_all(&src, &model_dest)?;
+        if src != model_dest {
+            if model_dest.exists() { fs::remove_dir_all(&model_dest)?; }
+            copy_dir_all(&src, &model_dest)?;
+        }
         println!("[LocalForge] ✓ CoreML model     → {}", model_dest.display());
     } else {
         println!("[LocalForge] ⚠ CoreML model not found. Build it with:");
@@ -236,12 +243,15 @@ fn run_install(repo_path: &str) -> anyhow::Result<()> {
 
     // ── 4. Copy Python shims ──────────────────────────────────────────────────
     for shim in ["infer.py", "advisory.py"] {
-        if let Some(src) = find_bundled_resource(&format!("coreml/{shim}")) {
-            let dest = coreml_dir.join(shim);
-            fs::copy(&src, &dest)?;
-            println!("[LocalForge] ✓ {shim:<14} → {}", dest.display());
-        } else if let Some(src) = find_repo_resource(&format!("coreml/{shim}")) {
-            let dest = coreml_dir.join(shim);
+        let dest = coreml_dir.join(shim);
+        // If already installed, skip
+        if dest.exists() {
+            println!("[LocalForge] ✓ {shim:<14} → {} (already present)", dest.display());
+            continue;
+        }
+        if let Some(src) = find_bundled_resource(&format!("coreml/{shim}"))
+            .or_else(|| find_repo_resource(&format!("coreml/{shim}")))
+        {
             fs::copy(&src, &dest)?;
             println!("[LocalForge] ✓ {shim:<14} → {}", dest.display());
         } else {
@@ -249,16 +259,29 @@ fn run_install(repo_path: &str) -> anyhow::Result<()> {
         }
     }
 
-    // ── 5. Check Qwen model ───────────────────────────────────────────────────
-    let qwen_dir = lf_dir.join("qwen2.5-coder-1.5b-4bit");
-    if !qwen_dir.exists() {
-        println!("[LocalForge] ⚠ Qwen model not found at {}", qwen_dir.display());
-        println!("             Install with:");
-        println!("               pip3 install mlx-lm");
-        println!("               python3 -c \"from mlx_lm import load; load('Qwen/Qwen2.5-Coder-1.5B-Instruct-4bit')\"");
-        println!("             Then move the model folder to: {}", qwen_dir.display());
-    } else {
+    // ── 5. Qwen model — auto-detect from repo or HuggingFace cache ───────────
+    let qwen_dir  = lf_dir.join("qwen2.5-coder-1.5b-4bit");
+    let qwen_name = "qwen2.5-coder-1.5b-4bit";
+    if qwen_dir.exists() {
         println!("[LocalForge] ✓ Qwen model found  → {}", qwen_dir.display());
+    } else {
+        // Check repo coreml/ first
+        let repo_qwen = find_repo_resource(qwen_name);
+        // Then HuggingFace cache
+        let hf_cache  = find_qwen_in_hf_cache();
+        if let Some(src) = repo_qwen.or(hf_cache) {
+            // Use rename (same volume usually), fall back to copy
+            if fs::rename(&src, &qwen_dir).is_err() {
+                copy_dir_all(&src, &qwen_dir)?;
+            }
+            println!("[LocalForge] ✓ Qwen model moved  → {}", qwen_dir.display());
+        } else {
+            println!("[LocalForge] ⚠ Qwen model not found (Layer 3 advisory will be skipped).");
+            println!("             To enable it:");
+            println!("               pip3 install mlx-lm");
+            println!("               python3 -c \"from mlx_lm import load; load('Qwen/Qwen2.5-Coder-1.5B-Instruct-4bit')\"");
+            println!("             Then re-run: localforge --install");
+        }
     }
 
     // ── 6. Install git hook ───────────────────────────────────────────────────
@@ -559,6 +582,30 @@ fn find_repo_resource(relative: &str) -> Option<std::path::PathBuf> {
     // cwd-relative fallback
     let cwd = std::path::PathBuf::from(relative);
     if cwd.exists() { return Some(cwd); }
+    None
+}
+
+/// Search the HuggingFace hub cache for the Qwen2.5-Coder snapshot directory.
+fn find_qwen_in_hf_cache() -> Option<std::path::PathBuf> {
+    let home = dirs::home_dir()?;
+    let hub  = home.join(".cache/huggingface/hub");
+    // Look for models--Qwen--Qwen2.5-Coder* directories
+    let rd = std::fs::read_dir(&hub).ok()?;
+    for entry in rd.flatten() {
+        let name = entry.file_name();
+        let name = name.to_string_lossy();
+        if name.starts_with("models--Qwen--Qwen2.5-Coder") && entry.file_type().ok()?.is_dir() {
+            // Find the snapshots/<hash>/ directory inside
+            let snapshots = entry.path().join("snapshots");
+            if let Ok(snaps) = std::fs::read_dir(&snapshots) {
+                for snap in snaps.flatten() {
+                    if snap.file_type().ok()?.is_dir() {
+                        return Some(snap.path());
+                    }
+                }
+            }
+        }
+    }
     None
 }
 

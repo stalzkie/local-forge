@@ -85,55 +85,58 @@ Layers 1 and 2 **block** the commit if they detect an issue. Layer 3 always runs
 - macOS 14+ on Apple Silicon (M1/M2/M3/M4)
 - Rust 1.78+ — [install via rustup](https://rustup.rs)
 - Python 3.11+ (ships with macOS 14)
-- Xcode 16+ (for building the app)
+- Xcode 16+ (for building the app, optional)
 
-### 1. Clone the repo
+### 1. Clone and build
 
 ```bash
 git clone https://github.com/stalzkie/local-forge.git
 cd local-forge
-```
-
-### 2. Build the Rust binary
-
-```bash
-source "$HOME/.cargo/env"
+source "$HOME/.cargo/env"   # load Rust if freshly installed
 cargo build --release
 ```
 
-### 3. Build the CoreML model (Layer 2)
+### 2. Build the CoreML model (Layer 2)
 
 ```bash
 pip3 install coremltools scikit-learn numpy
 python3 coreml/build_model.py
 ```
 
-### 4. Set up Qwen for Layer 3 (optional but recommended)
+### 3. Enable Qwen code review (Layer 3 — optional but recommended)
 
 ```bash
 pip3 install mlx-lm
 python3 -c "from mlx_lm import load; load('Qwen/Qwen2.5-Coder-1.5B-Instruct-4bit')"
-# Move the downloaded model:
-mv ~/.cache/huggingface/hub/models--Qwen--Qwen2.5-Coder-1.5B-Instruct-4bit/snapshots/*/  coreml/qwen2.5-coder-1.5b-4bit/
 ```
 
-### 5. Install the git hook into your project
+The installer will automatically detect the model from your HuggingFace cache in the next step — no manual `mv` needed.
+
+### 4. Install into your project
 
 ```bash
-# From inside the repo you want to protect:
-/path/to/local-forge/scripts/install_hook.sh
+# Protect any git repo — defaults to current directory
+./scripts/install_hook.sh /path/to/your/project
 ```
 
-Or copy manually:
+This one command:
+- Copies the binary to `~/.localforge/bin/` and adds it to your PATH
+- Installs the CoreML model and Python shims to `~/.localforge/`
+- Moves the Qwen model from your HuggingFace cache (if present)
+- Installs the pre-commit hook into your repo
+- Registers the repo for multi-repo management in the app
+
+> **Note:** After the first install, open a new terminal (or run `source ~/.zshrc`) for the `localforge` command to be available in PATH.
+
+To protect additional repos after the first install:
 
 ```bash
-cp hooks/pre-commit .git/hooks/pre-commit
-chmod +x .git/hooks/pre-commit
+localforge --install /path/to/another/project
 ```
 
-### 6. Download the macOS app (DMG)
+### 5. Download the macOS app (optional)
 
-Grab the latest release from the [Releases page](https://github.com/stalzkie/local-forge/releases) and drag **LocalForge.app** to your Applications folder.
+Grab the latest release from the [Releases page](https://github.com/stalzkie/local-forge/releases) and drag **LocalForge.app** to your Applications folder — it connects to your installed binary automatically.
 
 Or build it yourself:
 
