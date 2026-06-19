@@ -17,8 +17,21 @@ import pickle
 import numpy as np
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(SCRIPT_DIR, "LocalForgeModel.mlpackage")
-TFIDF_PATH = os.path.join(SCRIPT_DIR, "tfidf_vectorizer.pkl")
+
+def _find_artifact(name):
+    home = os.path.expanduser("~")
+    candidates = [
+        os.path.join(home, ".localforge", name),
+        os.path.join(SCRIPT_DIR, name),
+        os.path.join(SCRIPT_DIR, "..", "coreml", name),
+    ]
+    for c in candidates:
+        if os.path.exists(c):
+            return os.path.abspath(c)
+    return os.path.join(home, ".localforge", name)
+
+MODEL_PATH = _find_artifact("LocalForgeModel.mlpackage")
+TFIDF_PATH = _find_artifact("tfidf_vectorizer.pkl")
 THRESHOLD  = 0.5
 
 def main():

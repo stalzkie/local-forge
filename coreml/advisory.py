@@ -28,8 +28,24 @@ import datetime
 import hashlib
 
 SCRIPT_DIR  = os.path.dirname(os.path.abspath(__file__))
-MODEL_DIR   = os.path.join(SCRIPT_DIR, "qwen2.5-coder-1.5b-4bit")
 DEFAULT_LOG = os.path.join(os.path.expanduser("~"), ".localforge", "reports")
+
+def _find_model_dir():
+    home = os.path.expanduser("~")
+    candidates = [
+        # 1. ~/.localforge/qwen2.5-coder-1.5b-4bit  (installed via --install)
+        os.path.join(home, ".localforge", "qwen2.5-coder-1.5b-4bit"),
+        # 2. Next to this script (repo coreml/ or bundle Resources/coreml/)
+        os.path.join(SCRIPT_DIR, "qwen2.5-coder-1.5b-4bit"),
+        # 3. Repo root coreml/ when called from two levels up
+        os.path.join(SCRIPT_DIR, "..", "coreml", "qwen2.5-coder-1.5b-4bit"),
+    ]
+    for c in candidates:
+        if os.path.isdir(c):
+            return os.path.abspath(c)
+    return candidates[0]  # return preferred install path for the error message
+
+MODEL_DIR = _find_model_dir()
 
 SYSTEM_PROMPT = """You are LocalForge, an expert code reviewer embedded in a developer's git workflow.
 You review staged diffs for three categories of issues:
