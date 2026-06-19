@@ -2,8 +2,18 @@
 set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
-BINARY="$REPO_ROOT/target/release/localforge"
 IGNORE_FILE="$REPO_ROOT/.localforgeignore"
+
+# Binary resolution: installed path → repo build → PATH
+if [ -x "$HOME/.localforge/bin/localforge" ]; then
+  BINARY="$HOME/.localforge/bin/localforge"
+elif [ -x "$REPO_ROOT/target/release/localforge" ]; then
+  BINARY="$REPO_ROOT/target/release/localforge"
+elif command -v localforge &>/dev/null; then
+  BINARY="localforge"
+else
+  BINARY=""
+fi
 HOOK_LOG="$HOME/.localforge/hook.log"
 REPORTS_DIR="$HOME/.localforge/reports"
 COMMIT_TS=$(date -u +"%Y%m%dT%H%M%SZ")
@@ -15,8 +25,8 @@ lf_log() {
   echo "[LocalForge] $1" | tee -a "$HOOK_LOG"
 }
 
-if [ ! -x "$BINARY" ]; then
-  lf_log "WARNING: release binary not found. Run: cargo build --release"
+if [ -z "$BINARY" ]; then
+  lf_log "WARNING: localforge binary not found. Run: ./scripts/install_hook.sh"
   exit 0
 fi
 
@@ -68,7 +78,13 @@ PREFS_FILE="$HOME/.localforge/prefs"
 CODE_REVIEW_ON="1"
 [ -f "$PREFS_FILE" ] && CODE_REVIEW_ON=$(cat "$PREFS_FILE")
 
-ADVISORY_SCRIPT="$REPO_ROOT/coreml/advisory.py"
+# Advisory script resolution: installed → repo-relative
+if [ -f "$HOME/.localforge/coreml/advisory.py" ]; then
+  ADVISORY_SCRIPT="$HOME/.localforge/coreml/advisory.py"
+else
+  ADVISORY_SCRIPT="$REPO_ROOT/coreml/advisory.py"
+fi
+
 if [ "$CODE_REVIEW_ON" = "1" ] && command -v python3 &>/dev/null && [ -f "$ADVISORY_SCRIPT" ]; then
   lf_log "Scan passed — running Qwen code review (async)..."
   mkdir -p "$REPORTS_DIR"

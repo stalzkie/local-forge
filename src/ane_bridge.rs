@@ -20,11 +20,24 @@ pub fn analyse(diff: &str) -> anyhow::Result<Option<AneResult>> {
         return Ok(None);
     }
 
-    let model_path = shim.parent().unwrap().join("LocalForgeModel.mlpackage");
+    // Model search order: ~/.localforge/ → next to infer.py → coreml/ cwd
+    let model_path = {
+        let home_model = std::env::var("HOME").ok()
+            .map(|h| PathBuf::from(h).join(".localforge/LocalForgeModel.mlpackage"));
+        let sibling_model = shim.parent().map(|p| p.join("LocalForgeModel.mlpackage"));
+        let cwd_model = PathBuf::from("coreml/LocalForgeModel.mlpackage");
+
+        if home_model.as_ref().map(|p| p.exists()).unwrap_or(false) {
+            home_model.unwrap()
+        } else if sibling_model.as_ref().map(|p| p.exists()).unwrap_or(false) {
+            sibling_model.unwrap()
+        } else {
+            cwd_model
+        }
+    };
+
     if !model_path.exists() {
-        eprintln!(
-            "[ANE] Model not built yet. Run: python3 coreml/build_model.py"
-        );
+        eprintln!("[ANE] Model not built yet. Run: localforge --install  or  python3 coreml/build_model.py");
         return Ok(None);
     }
 
@@ -55,16 +68,26 @@ pub fn analyse(diff: &str) -> anyhow::Result<Option<AneResult>> {
     Ok(Some(AneResult { risk_score, risk_label, advisory }))
 }
 
-/// Resolve coreml/infer.py relative to the running binary's location,
-/// falling back to the current working directory.
+/// Resolve coreml/infer.py using a priority chain:
+///   1. ~/.localforge/coreml/infer.py  (installed path)
+///   2. coreml/infer.py relative to cwd (dev / repo context)
+///   3. Two levels up from the binary   (legacy bundled fallback)
 fn resolve_shim_path() -> anyhow::Result<PathBuf> {
-    // When running from the project root (dev or hook context)
+    // 1. Canonical installed location
+    if let Ok(home) = std::env::var("HOME") {
+        let installed = PathBuf::from(home).join(".localforge/coreml/infer.py");
+        if installed.exists() {
+            return Ok(installed);
+        }
+    }
+
+    // 2. Repo-relative (dev context)
     let cwd_shim = PathBuf::from("coreml/infer.py");
     if cwd_shim.exists() {
         return Ok(cwd_shim);
     }
 
-    // When running as an installed binary, look two levels up from the binary
+    // 3. Legacy: two levels up from the binary
     if let Ok(exe) = std::env::current_exe() {
         if let Some(parent) = exe.parent().and_then(|p| p.parent()).and_then(|p| p.parent()) {
             let candidate = parent.join("coreml/infer.py");
@@ -74,7 +97,7 @@ fn resolve_shim_path() -> anyhow::Result<PathBuf> {
         }
     }
 
-    Ok(cwd_shim) // return cwd path even if absent — caller checks .exists()
+    Ok(cwd_shim)
 }
 
 #[cfg(test)]

@@ -139,9 +139,17 @@ async fn run_advisory(diff: &str) -> Option<AdvisoryResult> {
 }
 
 fn resolve_shim_path() -> PathBuf {
+    // 1. Canonical installed location
+    if let Ok(home) = std::env::var("HOME") {
+        let installed = PathBuf::from(home).join(".localforge/coreml/advisory.py");
+        if installed.exists() { return installed; }
+    }
+
+    // 2. Repo-relative (dev context)
     let cwd = PathBuf::from("coreml/advisory.py");
     if cwd.exists() { return cwd; }
 
+    // 3. Legacy: two levels up from the binary
     if let Ok(exe) = std::env::current_exe() {
         if let Some(p) = exe.parent().and_then(|p| p.parent()).and_then(|p| p.parent()) {
             let candidate = p.join("coreml/advisory.py");

@@ -58,15 +58,22 @@ final class LogViewModel: ObservableObject {
     }
 
     private var binaryURL: URL {
-        // 1. Production: binary bundled inside .app at Contents/MacOS/localforge-core
+        let home = FileManager.default.homeDirectoryForCurrentUser
+
+        // 1. Canonical installed path: ~/.localforge/bin/localforge
+        let installed = home.appendingPathComponent(".localforge/bin/localforge")
+        if FileManager.default.fileExists(atPath: installed.path) {
+            return installed
+        }
+
+        // 2. Bundled inside .app at Contents/MacOS/localforge-core (DMG release)
         let bundled = Bundle.main.bundleURL
             .appendingPathComponent("Contents/MacOS/localforge-core")
         if FileManager.default.fileExists(atPath: bundled.path) {
             return bundled
         }
 
-        // 2. Development: SOURCE_ROOT baked into Info.plist by Xcode as LFSourceRoot
-        //    Points to the project root (ui/../ = local-forge/)
+        // 3. Development fallback: LFSourceRoot baked into Info.plist by Xcode
         if let sourceRoot = Bundle.main.object(forInfoDictionaryKey: "LFSourceRoot") as? String {
             let devRelease = URL(fileURLWithPath: sourceRoot)
                 .appendingPathComponent("target/release/localforge")
@@ -80,7 +87,7 @@ final class LogViewModel: ObservableObject {
             }
         }
 
-        return bundled
+        return installed // return canonical path even if absent — will fail gracefully on launch
     }
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
