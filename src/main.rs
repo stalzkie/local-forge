@@ -885,13 +885,6 @@ fn find_qwen_in_hf_cache() -> Option<std::path::PathBuf> {
 }
 
 /// Find the pre-commit hook source.
-fn find_hook_source() -> Option<std::path::PathBuf> {
-    // App bundle Resources/hooks/pre-commit
-    if let Some(p) = find_bundled_resource("hooks/pre-commit") { return Some(p); }
-    // Repo-relative
-    if let Some(p) = find_repo_resource("hooks/pre-commit") { return Some(p); }
-    None
-}
 
 /// Recursively copy a directory (used for .mlpackage which is a directory).
 fn copy_dir_all(src: &std::path::Path, dst: &std::path::Path) -> anyhow::Result<()> {

@@ -4,7 +4,7 @@ set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 APP_PATH="$REPO_ROOT/build/export/LocalForge.app"
-DMG_NAME="LocalForge-v2.0-arm64.dmg"
+DMG_NAME="LocalForge-v2.1.2-arm64.dmg"
 DMG_OUT="$REPO_ROOT/build/$DMG_NAME"
 STAGING="$REPO_ROOT/build/dmg_staging"
 

@@ -84,6 +84,24 @@ Layers 1 and 2 **block** the commit on a positive. Layer 3 always runs in the ba
 
 ---
 
+## Download
+
+| Asset | Description |
+|---|---|
+| [LocalForge-v2.1.2-arm64.dmg](https://github.com/stalzkie/local-forge/releases/latest/download/LocalForge-v2.1.2-arm64.dmg) | macOS app — drag to Applications, double-click to open |
+| [localforge-v2.1.2-macos-arm64](https://github.com/stalzkie/local-forge/releases/latest/download/localforge-v2.1.2-macos-arm64) | CLI binary only — for terminal/script installs |
+
+> **First launch:** macOS will say the app is from an unidentified developer. Right-click → Open → Open to bypass Gatekeeper once. This is standard for unsigned apps — full notarization is coming in a future release.
+
+**CLI quick-install (no clone required):**
+
+```bash
+curl -L https://github.com/stalzkie/local-forge/releases/latest/download/localforge-v2.1.2-macos-arm64 \
+  -o /tmp/localforge && chmod +x /tmp/localforge && /tmp/localforge --install
+```
+
+---
+
 ## Installation
 
 ### Requirements
@@ -144,14 +162,16 @@ localforge --install /path/to/another/project
 
 ### 5. Download the macOS app (optional)
 
-Grab the latest release from the [Releases page](https://github.com/stalzkie/local-forge/releases) and drag **LocalForge.app** to your Applications folder — it connects to your installed binary automatically.
+**Easiest:** download the DMG from the [Releases page](https://github.com/stalzkie/local-forge/releases/latest), open it, drag **LocalForge.app** to Applications, and double-click.
+
+> First launch: right-click → Open → Open to bypass Gatekeeper (unsigned app warning).
 
 Or build it yourself:
 
 ```bash
 ./scripts/build_release.sh   # bundles binary + CoreML model + shims into .app
 ./scripts/package_dmg.sh     # wraps .app into a distributable DMG
-open build/LocalForge-v2.0-arm64.dmg
+open build/LocalForge-v2.1.2-arm64.dmg
 ```
 
 ### Homebrew (coming soon)
