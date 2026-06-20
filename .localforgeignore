@@ -30,3 +30,8 @@ coreml/build_model.py
 tests/benchmark_v2.py
 hooks/pre-commit
 README.md
+
+# Generated output files
+localforge-install-org.sh
+localforge-report.json
+localforge-report.csv

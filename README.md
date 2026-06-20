@@ -35,6 +35,8 @@ It catches hardcoded secrets, SQL injection, dead functions, unhandled errors, a
 | **CoreML / ANE** | TF-IDF + logistic regression trained on 297 samples across 11 languages, running on the Apple Neural Engine — CV F1: 0.754 |
 | **Native macOS App** | Dark terminal-style SwiftUI app with Monitor tab (live scan events) and Repos tab (multi-repo management) |
 | **One-Command Install** | `localforge --install` sets up `~/.localforge/`, installs the hook, auto-detects the Qwen model, and adds itself to PATH |
+| **Team Install** | `localforge --install-org` generates a ready-to-share shell script — paste it into your dev setup doc or Makefile, every teammate runs it once |
+| **Compliance Export** | `localforge --export-report json` exports all scan results to JSON or CSV for security audits and due diligence |
 | **MCP Server** | JSON-RPC 2.0 server for IDE integrations — connect Cursor, VS Code, or any MCP-compatible tool |
 | **Zero Cloud** | All three layers — Rust, CoreML, Qwen — run fully offline on Apple Silicon |
 
@@ -265,6 +267,13 @@ localforge --list-repos
 # Upgrade hooks in all registered repos to the current version
 localforge --upgrade-all
 
+# Generate a team install script (share with your devs or paste into Makefile)
+localforge --install-org /path/to/repo
+
+# Export scan history to JSON or CSV for audits
+localforge --export-report json
+localforge --export-report csv --last 30 --out audit-q2.csv
+
 # Launch the ratatui TUI dashboard
 localforge
 
@@ -274,6 +283,37 @@ localforge --monitor
 # Start the MCP JSON-RPC server
 localforge --mcp-port 7777
 ```
+
+### Team Install
+
+For teams where one engineer mandates LocalForge for everyone:
+
+```bash
+# Generate the script (run once, in your repo)
+localforge --install-org /path/to/your/repo
+
+# Share with your team — each dev runs it once on their machine
+bash localforge-install-org.sh
+
+# Or add to your dev setup doc as a one-liner:
+curl -fsSL https://github.com/stalzkie/local-forge/releases/latest/download/localforge-install-org.sh | bash
+```
+
+The generated script downloads the binary, sets up `~/.localforge/`, adds PATH to the shell profile, and installs the hook — no admin rights required.
+
+### Compliance Export
+
+Export the full scan history to hand to an auditor or drop into a compliance folder:
+
+```bash
+# All-time JSON export
+localforge --export-report json --out localforge-audit.json
+
+# Last 30 commits as CSV
+localforge --export-report csv --last 30 --out security-audit-q2.csv
+```
+
+Each row includes: commit ID, timestamp, severity, summary, finding count, and path to the full report. Useful for SOC 2, ISO 27001, and Series A due diligence questionnaires.
 
 ---
 
@@ -442,7 +482,7 @@ echo 'token = "AKIAIOSFODNN7EXAMPLE"' | ./target/release/localforge --scan
 ```
 local-forge/
 ├── src/
-│   ├── main.rs               # CLI entry — --scan, --install, --monitor, TUI, MCP
+│   ├── main.rs               # CLI entry — --scan, --install, --install-org, --export-report, TUI, MCP
 │   ├── ast_validator.rs      # Layer 1: 26 regex patterns, once_cell compiled
 │   ├── ane_bridge.rs         # Layer 2: CoreML subprocess bridge
 │   ├── advisory_engine.rs    # Layer 3: Qwen async runner + severity types
@@ -514,6 +554,8 @@ local-forge/
 - [x] Distributable DMG with bundled CoreML model
 - [x] Homebrew formula (`brew tap stalzkie/local-forge`)
 - [x] Notarization script for Gatekeeper-free distribution
+- [x] `localforge --install-org` team install script generator
+- [x] `localforge --export-report` compliance export (JSON / CSV)
 - [ ] Configurable block thresholds per-project
 - [ ] VS Code extension
 - [ ] CI/CD mode (exit codes for GitHub Actions)
