@@ -4,6 +4,13 @@ import AppKit
 
 // ── Model ─────────────────────────────────────────────────────────────────────
 
+struct DiscoveredRepo: Identifiable {
+    let id   = UUID()
+    let path : String
+    var status: HookStatus
+    var name : String { URL(fileURLWithPath: path).lastPathComponent }
+}
+
 enum HookStatus {
     case active(version: Int?)
     case outdated(installed: Int, expected: Int)
@@ -43,8 +50,11 @@ struct ManagedRepo: Identifiable {
 
 @MainActor
 final class ReposViewModel: ObservableObject {
-    @Published var repos:     [ManagedRepo] = []
-    @Published var isLoading: Bool          = false
+    @Published var repos:           [ManagedRepo]    = []
+    @Published var discoveredRepos: [DiscoveredRepo] = []
+    @Published var isLoading:       Bool             = false
+    @Published var isScanning:      Bool             = false
+    @Published var scannedFolder:   String?          = nil
 
     private static let reposFile = FileManager.default.homeDirectoryForCurrentUser
         .appendingPathComponent(".localforge/repos")
@@ -84,9 +94,80 @@ final class ReposViewModel: ObservableObject {
         NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: repo.path)
     }
 
+    func revealDiscoveredInFinder(_ repo: DiscoveredRepo) {
+        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: repo.path)
+    }
+
+    func scanFolder(_ folderURL: URL) {
+        isScanning    = true
+        scannedFolder = folderURL.path
+        let fm        = FileManager.default
+        let registeredPaths = Set(repos.map { $0.path })
+
+        Task.detached(priority: .userInitiated) {
+            var found: [DiscoveredRepo] = []
+
+            // Walk one level deep — enough for ~/Developer or ~/Desktop
+            let contents = (try? fm.contentsOfDirectory(
+                at: folderURL,
+                includingPropertiesForKeys: [.isDirectoryKey],
+                options: [.skipsHiddenFiles]
+            )) ?? []
+
+            for url in contents {
+                guard (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true
+                else { continue }
+
+                // Check for .git directory — confirms it's a repo
+                let gitDir = url.appendingPathComponent(".git")
+                guard fm.fileExists(atPath: gitDir.path) else { continue }
+
+                // Skip repos already registered
+                let absPath = (try? fm.destinationOfSymbolicLink(atPath: url.path)) ?? url.path
+                let canonical = URL(fileURLWithPath: absPath).standardized.path
+                guard !registeredPaths.contains(canonical),
+                      !registeredPaths.contains(url.path)
+                else { continue }
+
+                let status = ReposViewModel.hookStatus(for: url.path)
+                found.append(DiscoveredRepo(path: url.path, status: status))
+            }
+
+            // Sort: repos with hooks first, then alphabetically
+            found.sort {
+                if $0.status.isHealthy != $1.status.isHealthy { return $0.status.isHealthy }
+                return $0.name < $1.name
+            }
+
+            await MainActor.run {
+                self.discoveredRepos = found
+                self.isScanning      = false
+            }
+        }
+    }
+
+    func installDiscovered(_ repo: DiscoveredRepo) {
+        guard let binary = binaryURL else { return }
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: binary)
+        p.arguments     = ["--install", repo.path]
+        try? p.run()
+        p.waitUntilExit()
+        // Re-scan folder and refresh registered list
+        if let folder = scannedFolder {
+            scanFolder(URL(fileURLWithPath: folder))
+        }
+        refresh()
+    }
+
+    func clearDiscovered() {
+        discoveredRepos = []
+        scannedFolder   = nil
+    }
+
     // ── Private ───────────────────────────────────────────────────────────────
 
-    private static func loadRepos() -> [ManagedRepo] {
+    nonisolated private static func loadRepos() -> [ManagedRepo] {
         guard let content = try? String(contentsOf: reposFile, encoding: .utf8) else {
             return []
         }
@@ -99,7 +180,7 @@ final class ReposViewModel: ObservableObject {
             }
     }
 
-    private static func hookStatus(for path: String) -> HookStatus {
+    nonisolated static func hookStatus(for path: String) -> HookStatus {
         let fm      = FileManager.default
         let repoURL = URL(fileURLWithPath: path)
 
@@ -121,7 +202,7 @@ final class ReposViewModel: ObservableObject {
         return .active(version: version)
     }
 
-    private static func parseHookVersion(_ content: String) -> Int? {
+    nonisolated private static func parseHookVersion(_ content: String) -> Int? {
         for line in content.components(separatedBy: "\n").prefix(10) {
             let prefix = "# LOCALFORGE_HOOK_VERSION="
             if line.hasPrefix(prefix) {

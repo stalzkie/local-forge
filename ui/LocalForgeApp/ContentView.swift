@@ -76,7 +76,7 @@ struct ContentView: View {
                 Text("LocalForge Security Shield")
                     .font(.headline)
                     .foregroundColor(.white)
-                Text("v2.0  ·  3-Layer Hybrid Pipeline")
+                Text("v2.1.1  ·  3-Layer Hybrid Pipeline")
                     .font(.caption)
                     .foregroundColor(.gray)
             }

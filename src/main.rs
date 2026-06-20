@@ -12,7 +12,7 @@ use std::io::Read;
 const EXPECTED_HOOK_VERSION: u32 = 4;
 
 #[derive(Parser)]
-#[command(name = "localforge", version = "2.0.0", about = "LocalForge Security Shield")]
+#[command(name = "localforge", version = "2.1.1", about = "LocalForge Security Shield")]
 struct Cli {
     /// Read a staged diff from stdin; exits 1 if blocked, 0 if clean
     #[arg(long)]

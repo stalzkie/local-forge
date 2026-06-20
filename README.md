@@ -172,7 +172,7 @@ The native SwiftUI app has two tabs:
 
 **Monitor tab** — live scan events streamed from `~/.localforge/hook.log`. Every commit triggers a real-time feed of layer results, risk scores, and advisory summaries.
 
-**Repos tab** — manage all protected repositories from one place. Shows hook status per repo (Active / Outdated / Missing / Replaced), lets you upgrade all hooks in one click, and reveals repos in Finder.
+**Repos tab** — manage all protected repositories from one place. Shows hook status per repo (Active / Outdated / Missing / Replaced), lets you upgrade all hooks in one click, and reveals repos in Finder. Includes a **Scan Folder** button that discovers all git repos in any folder you pick and lets you install LocalForge into them with one click — no terminal required.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -187,6 +187,17 @@ The native SwiftUI app has two tabs:
 │  L2     Layer 2 score: 0.322 — clean.                           │
 │  L3     Qwen [MEDIUM] SQL injection risk in fetch_records()     │
 │  L3       Fix: Use parameterised queries or an ORM              │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  🛡 LocalForge          [Monitor]  [Repos]                       │
+├─ 🔵 Protected (2) ──────────────────────────────────────────────┤
+│  ● api-service    ~/Developer/api-service    Active (v4)   📁 ✕ │
+│  ● mobile-app     ~/Developer/mobile-app     Active (v4)   📁 ✕ │
+├─ 🟡 Found in Developer (3) ────────────────────── [Scan Folder] │
+│  ○ data-pipeline  ~/Developer/data-pipeline  No hook   [Protect]│
+│  ○ infra-scripts  ~/Developer/infra-scripts  No hook   [Protect]│
+│  ○ old-monolith   ~/Developer/old-monolith   Other hook [Protect]│
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -556,6 +567,7 @@ local-forge/
 - [x] Notarization script for Gatekeeper-free distribution
 - [x] `localforge --install-org` team install script generator
 - [x] `localforge --export-report` compliance export (JSON / CSV)
+- [x] Repo discovery UI — Scan Folder in the app finds all git repos and installs with one click
 - [ ] Configurable block thresholds per-project
 - [ ] VS Code extension
 - [ ] CI/CD mode (exit codes for GitHub Actions)
