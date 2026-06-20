@@ -11,6 +11,10 @@ use std::io::Read;
 /// new log format). The hook embeds the same number as LOCALFORGE_HOOK_VERSION.
 const EXPECTED_HOOK_VERSION: u32 = 4;
 
+const EMBEDDED_HOOK:     &str = include_str!("../hooks/pre-commit");
+const EMBEDDED_INFER:    &str = include_str!("../coreml/infer.py");
+const EMBEDDED_ADVISORY: &str = include_str!("../coreml/advisory.py");
+
 #[derive(Parser)]
 #[command(name = "localforge", version = "2.1.1", about = "LocalForge Security Shield")]
 struct Cli {
@@ -269,22 +273,15 @@ fn run_install(repo_path: &str) -> anyhow::Result<()> {
         println!("             python3 coreml/build_model.py");
     }
 
-    // ── 4. Copy Python shims ──────────────────────────────────────────────────
-    for shim in ["infer.py", "advisory.py"] {
+    // ── 4. Write Python shims (embedded at compile time) ─────────────────────
+    for (shim, content) in [("infer.py", EMBEDDED_INFER), ("advisory.py", EMBEDDED_ADVISORY)] {
         let dest = coreml_dir.join(shim);
-        // If already installed, skip
         if dest.exists() {
             println!("[LocalForge] ✓ {shim:<14} → {} (already present)", dest.display());
             continue;
         }
-        if let Some(src) = find_bundled_resource(&format!("coreml/{shim}"))
-            .or_else(|| find_repo_resource(&format!("coreml/{shim}")))
-        {
-            fs::copy(&src, &dest)?;
-            println!("[LocalForge] ✓ {shim:<14} → {}", dest.display());
-        } else {
-            println!("[LocalForge] ⚠ {shim} not found");
-        }
+        fs::write(&dest, content)?;
+        println!("[LocalForge] ✓ {shim:<14} → {}", dest.display());
     }
 
     // ── 5. Qwen model — auto-detect from repo or HuggingFace cache ───────────
@@ -321,18 +318,13 @@ fn run_install(repo_path: &str) -> anyhow::Result<()> {
         println!("             localforge --install /path/to/your/repo");
     } else {
         let hook_dest = git_hooks.join("pre-commit");
-        let hook_src  = find_hook_source();
-        if let Some(src) = hook_src {
-            fs::copy(&src, &hook_dest)?;
-            #[cfg(unix)]
-            {
-                use std::os::unix::fs::PermissionsExt;
-                fs::set_permissions(&hook_dest, fs::Permissions::from_mode(0o755))?;
-            }
-            println!("[LocalForge] ✓ Hook installed   → {}", hook_dest.display());
-        } else {
-            println!("[LocalForge] ⚠ pre-commit hook source not found");
+        fs::write(&hook_dest, EMBEDDED_HOOK)?;
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&hook_dest, fs::Permissions::from_mode(0o755))?;
         }
+        println!("[LocalForge] ✓ Hook installed   → {}", hook_dest.display());
 
         // Register repo
         let repos_file = lf_dir.join("repos");
@@ -738,15 +730,6 @@ fn run_upgrade_all() -> anyhow::Result<()> {
         return Ok(());
     }
 
-    let hook_src = match find_hook_source() {
-        Some(p) => p,
-        None    => {
-            println!("[LocalForge] ✗ pre-commit hook source not found.");
-            println!("             Re-install LocalForge to restore it.");
-            return Ok(());
-        }
-    };
-
     println!("[LocalForge] Upgrading hooks in {} repo(s)...", repos.len());
     println!();
 
@@ -754,7 +737,7 @@ fn run_upgrade_all() -> anyhow::Result<()> {
     let mut skipped  = 0;
 
     for repo in &repos {
-        let path     = std::path::Path::new(repo);
+        let path      = std::path::Path::new(repo);
         let git_hooks = path.join(".git/hooks");
 
         if !git_hooks.exists() {
@@ -764,7 +747,7 @@ fn run_upgrade_all() -> anyhow::Result<()> {
         }
 
         let hook_dest = git_hooks.join("pre-commit");
-        match std::fs::copy(&hook_src, &hook_dest) {
+        match std::fs::write(&hook_dest, EMBEDDED_HOOK) {
             Ok(_) => {
                 #[cfg(unix)]
                 {
