@@ -31,6 +31,10 @@ tests/benchmark_v2.py
 hooks/pre-commit
 README.md
 
+# Cargo manifests — version strings score as suspicious
+Cargo.toml
+Cargo.lock
+
 # Generated output files
 localforge-install-org.sh
 localforge-report.json

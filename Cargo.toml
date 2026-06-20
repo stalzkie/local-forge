@@ -1,8 +1,8 @@
 [package]
 name        = "localforge"
-version     = "2.1.1"
+version     = "2.1.2"
 edition     = "2021"
-description = "LocalForge v2.1.1 — MCP-compliant security gateway for Apple Silicon"
+description = "LocalForge v2.1.2 — MCP-compliant security gateway for Apple Silicon"
 
 [[bin]]
 name = "localforge"

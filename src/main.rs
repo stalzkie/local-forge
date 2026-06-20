@@ -16,7 +16,7 @@ const EMBEDDED_INFER:    &str = include_str!("../coreml/infer.py");
 const EMBEDDED_ADVISORY: &str = include_str!("../coreml/advisory.py");
 
 #[derive(Parser)]
-#[command(name = "localforge", version = "2.1.1", about = "LocalForge Security Shield")]
+#[command(name = "localforge", version = "2.1.2", about = "LocalForge Security Shield")]
 struct Cli {
     /// Read a staged diff from stdin; exits 1 if blocked, 0 if clean
     #[arg(long)]
