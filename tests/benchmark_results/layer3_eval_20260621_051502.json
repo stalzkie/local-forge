@@ -1,0 +1,3174 @@
+{
+  "meta": {
+    "timestamp": "2026-06-21T05:15:02.324113+00:00",
+    "corpus_size": 145,
+    "model_dir": "/Users/stal/.localforge/qwen2.5-coder-7b-4bit",
+    "runtime_s": 1198.67,
+    "quick_mode": false
+  },
+  "overall": {
+    "tp": 54,
+    "fp": 1,
+    "fn": 36,
+    "tn": 54,
+    "precision": 0.9818,
+    "recall": 0.6,
+    "f1": 0.7448,
+    "fpr": 0.0182
+  },
+  "by_category": {
+    "clean": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 6,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0
+    },
+    "command_injection": {
+      "tp": 7,
+      "fp": 0,
+      "fn": 3,
+      "tn": 5,
+      "precision": 1.0,
+      "recall": 0.7,
+      "f1": 0.8235,
+      "fpr": 0.0
+    },
+    "dead_code": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 6,
+      "tn": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0
+    },
+    "edge_removal": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 4,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0
+    },
+    "hardcoded_secret": {
+      "tp": 8,
+      "fp": 0,
+      "fn": 0,
+      "tn": 4,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0
+    },
+    "insecure_tls": {
+      "tp": 5,
+      "fp": 0,
+      "fn": 3,
+      "tn": 4,
+      "precision": 1.0,
+      "recall": 0.625,
+      "f1": 0.7692,
+      "fpr": 0.0
+    },
+    "large_diff": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0
+    },
+    "logic_bug": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 7,
+      "tn": 4,
+      "precision": 1.0,
+      "recall": 0.125,
+      "f1": 0.2222,
+      "fpr": 0.0
+    },
+    "mixed": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0
+    },
+    "multi_file": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0
+    },
+    "obfuscated": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0
+    },
+    "path_traversal": {
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "tn": 3,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0
+    },
+    "race_condition": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 5,
+      "tn": 3,
+      "precision": 1.0,
+      "recall": 0.1667,
+      "f1": 0.2857,
+      "fpr": 0.0
+    },
+    "refactor": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0
+    },
+    "sql_injection": {
+      "tp": 10,
+      "fp": 1,
+      "fn": 0,
+      "tn": 4,
+      "precision": 0.9091,
+      "recall": 1.0,
+      "f1": 0.9524,
+      "fpr": 0.2
+    },
+    "unhandled_exception": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 6,
+      "tn": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0
+    },
+    "unsafe_deserialization": {
+      "tp": 5,
+      "fp": 0,
+      "fn": 1,
+      "tn": 3,
+      "precision": 1.0,
+      "recall": 0.8333,
+      "f1": 0.9091,
+      "fpr": 0.0
+    },
+    "xss": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 5,
+      "tn": 4,
+      "precision": 1.0,
+      "recall": 0.375,
+      "f1": 0.5455,
+      "fpr": 0.0
+    }
+  },
+  "by_language": {
+    "go": {
+      "tp": 7,
+      "fp": 0,
+      "fn": 6,
+      "tn": 12,
+      "precision": 1.0,
+      "recall": 0.5385,
+      "f1": 0.7,
+      "fpr": 0.0
+    },
+    "java": {
+      "tp": 5,
+      "fp": 0,
+      "fn": 6,
+      "tn": 6,
+      "precision": 1.0,
+      "recall": 0.4545,
+      "f1": 0.625,
+      "fpr": 0.0
+    },
+    "javascript": {
+      "tp": 7,
+      "fp": 0,
+      "fn": 5,
+      "tn": 3,
+      "precision": 1.0,
+      "recall": 0.5833,
+      "f1": 0.7368,
+      "fpr": 0.0
+    },
+    "php": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0
+    },
+    "python": {
+      "tp": 24,
+      "fp": 0,
+      "fn": 11,
+      "tn": 19,
+      "precision": 1.0,
+      "recall": 0.6857,
+      "f1": 0.8136,
+      "fpr": 0.0
+    },
+    "ruby": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 1,
+      "tn": 1,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6667,
+      "fpr": 0.0
+    },
+    "rust": {
+      "tp": 3,
+      "fp": 1,
+      "fn": 3,
+      "tn": 4,
+      "precision": 0.75,
+      "recall": 0.5,
+      "f1": 0.6,
+      "fpr": 0.2
+    },
+    "swift": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0
+    },
+    "typescript": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 4,
+      "tn": 8,
+      "precision": 1.0,
+      "recall": 0.4286,
+      "f1": 0.6,
+      "fpr": 0.0
+    }
+  },
+  "results": [
+    {
+      "id": "sql_01",
+      "language": "python",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 11.98,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "SQL injection vulnerability due to string concatenation in SQL query.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "+query = \"SELECT * FROM users WHERE name = '\" + username + \"'\"",
+            "explanation": "The SQL query is constructed by concatenating the username directly into the query string, which can lead to SQL injection if the username contains malicious SQL code.",
+            "remediation": "Use parameterized queries to prevent SQL injection. Example: query = \"SELECT * FROM users WHERE name = ?\"; conn.execute(query, (username,)).fetchone()"
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045515Z_81bdeeb0c1.txt"
+      }
+    },
+    {
+      "id": "sql_02",
+      "language": "python",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.53,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "SQL injection vulnerability in the SQL query.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "+    sql = f\"SELECT * FROM reports WHERE id={report_id} AND owner={user_id}\"",
+            "explanation": "The SQL query is constructed using string formatting, which can lead to SQL injection if `report_id` or `user_id` are not properly sanitized.",
+            "remediation": "Use parameterized queries to prevent SQL injection. Example: `sql = \"SELECT * FROM reports WHERE id=? AND owner=?\"; db.execute(sql, (report_id, user_id)).fetchall()`"
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045528Z_3fa72396e7.txt"
+      }
+    },
+    {
+      "id": "sql_03",
+      "language": "javascript",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 10.81,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "SQL injection vulnerability in product search query.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "+  const rows = await db.query(\"SELECT * FROM products WHERE name LIKE '%\" + term + \"%'\");",
+            "explanation": "The query string is constructed using string concatenation, which can lead to SQL injection if `term` is user-controlled.",
+            "remediation": "Use parameterized queries to prevent SQL injection."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045538Z_efe265dfb2.txt"
+      }
+    },
+    {
+      "id": "sql_04",
+      "language": "java",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 11.15,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "SQL injection vulnerability in the query string.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "+ResultSet rs = stmt.executeQuery(\"SELECT * FROM users WHERE email = '\" + email + \"'\");",
+            "explanation": "The query string is constructed using string concatenation, which can lead to SQL injection if the `email` parameter is not properly sanitized.",
+            "remediation": "Use a PreparedStatement to safely parameterize the query."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045550Z_f4da3e6cf2.txt"
+      }
+    },
+    {
+      "id": "sql_05",
+      "language": "go",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 11.87,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "SQL injection vulnerability in the query string.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "+row := db.QueryRow(\"SELECT * FROM orders WHERE id = \" + orderID)",
+            "explanation": "The query string is constructed by concatenating the orderID variable directly into the SQL query, which can lead to SQL injection if orderID is not properly sanitized.",
+            "remediation": "Use parameterized queries to prevent SQL injection. Example: row := db.QueryRow(\"SELECT * FROM orders WHERE id = $1\", orderID)"
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045601Z_2cb3eff2c9.txt"
+      }
+    },
+    {
+      "id": "sql_06",
+      "language": "php",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 10.76,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "SQL injection vulnerability due to direct use of user input in SQL query.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "+$query = \"SELECT * FROM products WHERE category = '\" . $_GET['cat'] . \"'\"",
+            "explanation": "The SQL query directly includes user input from $_GET['cat'] without proper sanitization, allowing SQL injection attacks.",
+            "remediation": "Use prepared statements with parameterized queries to prevent SQL injection."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045612Z_e05ba2ebb9.txt"
+      }
+    },
+    {
+      "id": "sql_07",
+      "language": "python",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 10.54,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces SQL injection vulnerabilities by directly inserting user-provided values into the SQL query.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "+where += f\" AND user_id = '{user_filter}'\"",
+            "explanation": "Directly inserting user-provided values into the SQL query can lead to SQL injection attacks.",
+            "remediation": "Use parameterized queries to safely include user-provided values in SQL queries."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045623Z_499d129972.txt"
+      }
+    },
+    {
+      "id": "sql_08",
+      "language": "typescript",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 10.41,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "SQL injection vulnerability due to string interpolation in SQL query.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "+    const sql = `SELECT * FROM invoices WHERE customer_id = '${customerId}' ORDER BY created_at DESC`;",
+            "explanation": "The SQL query uses string interpolation, which can be exploited if `customerId` is user-controlled.",
+            "remediation": "Use parameterized queries to prevent SQL injection."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045633Z_35cc7d6900.txt"
+      }
+    },
+    {
+      "id": "sql_09",
+      "language": "rust",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 11.54,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a SQL injection vulnerability by using string interpolation in a SQL query.",
+        "findings": [
+          {
+            "category": "bug_risk",
+            "type": "clippy_E0425",
+            "line_hint": "src/db/queries.rs:1",
+            "explanation": "cannot find type `PgPool` in this scope",
+            "remediation": "error[E0425]: cannot find type `PgPool` in this scope",
+            "source": "static"
+          },
+          {
+            "category": "bug_risk",
+            "type": "clippy_E0425",
+            "line_hint": "src/db/queries.rs:3",
+            "explanation": "cannot find type `Session` in this scope",
+            "remediation": "error[E0425]: cannot find type `Session` in this scope",
+            "source": "static"
+          },
+          {
+            "category": "bug_risk",
+            "type": "clippy_E0433",
+            "line_hint": "src/db/queries.rs:3",
+            "explanation": "cannot find module or crate `sqlx` in this scope",
+            "remediation": "error[E0433]: cannot find module or crate `sqlx` in this scope",
+            "source": "static"
+          },
+          {
+            "category": "bug_risk",
+            "type": "clippy_E0433",
+            "line_hint": "src/db/queries.rs:1",
+            "explanation": "cannot find module or crate `sqlx` in this scope",
+            "remediation": "error[E0433]: cannot find module or crate `sqlx` in this scope",
+            "source": "static"
+          },
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "+    let query = format!(\"SELECT * FROM sessions WHERE token = '{}'\", token);",
+            "explanation": "String interpolation in SQL queries can lead to SQL injection if the input is not properly sanitized.",
+            "remediation": "Use parameterized queries to prevent SQL injection."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045645Z_cb4a372a3a.txt"
+      }
+    },
+    {
+      "id": "sql_10",
+      "language": "python",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 11.95,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "SQL injection vulnerability due to raw SQL query with user input.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "+raw = f\"SELECT * FROM {table} WHERE {column} = '{value}'\"",
+            "explanation": "The SQL query is constructed using string formatting, which can be exploited if `table`, `column`, or `value` are user-controlled inputs.",
+            "remediation": "Use parameterized queries to prevent SQL injection. Example: `db.execute(f'SELECT * FROM {table} WHERE {column} = ?', (value,)).fetchall()`"
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045657Z_9e70bf2793.txt"
+      }
+    },
+    {
+      "id": "sql_tn_01",
+      "language": "python",
+      "category": "sql_injection",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 6.7,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045703Z_469199fc7e.txt"
+      }
+    },
+    {
+      "id": "sql_tn_02",
+      "language": "typescript",
+      "category": "sql_injection",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 6.73,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045710Z_463e0b9259.txt"
+      }
+    },
+    {
+      "id": "sql_tn_03",
+      "language": "go",
+      "category": "sql_injection",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 6.89,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045717Z_6be137d83d.txt"
+      }
+    },
+    {
+      "id": "sql_tn_04",
+      "language": "java",
+      "category": "sql_injection",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 6.64,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security issues found in the diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045724Z_e24518e1cb.txt"
+      }
+    },
+    {
+      "id": "sql_tn_05",
+      "language": "rust",
+      "category": "sql_injection",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 7.42,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [
+          {
+            "category": "bug_risk",
+            "type": "clippy_E0433",
+            "line_hint": "src/db/orders.rs:2",
+            "explanation": "cannot find module or crate `sqlx` in this scope",
+            "remediation": "error[E0433]: cannot find module or crate `sqlx` in this scope",
+            "source": "static"
+          },
+          {
+            "category": "bug_risk",
+            "type": "clippy_E0425",
+            "line_hint": "src/db/orders.rs:1",
+            "explanation": "cannot find type `PgPool` in this scope",
+            "remediation": "error[E0425]: cannot find type `PgPool` in this scope",
+            "source": "static"
+          },
+          {
+            "category": "bug_risk",
+            "type": "clippy_E0433",
+            "line_hint": "src/db/orders.rs:1",
+            "explanation": "cannot find module or crate `sqlx` in this scope",
+            "remediation": "error[E0433]: cannot find module or crate `sqlx` in this scope",
+            "source": "static"
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045731Z_e08c393f96.txt"
+      }
+    },
+    {
+      "id": "cmd_01",
+      "language": "python",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 11.62,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces an OS command execution that could lead to command injection.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "command_injection",
+            "line_hint": "+    os.system(\"convert \" + filename + \" output.png\")",
+            "explanation": "The use of `os.system` with user-provided input (`filename`) is vulnerable to command injection. An attacker could manipulate `filename` to execute arbitrary commands on the system.",
+            "remediation": "Use `subprocess.run` with `shell=False` and `check=True` to safely execute the command with user-provided arguments."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045743Z_308e2267b9.txt"
+      }
+    },
+    {
+      "id": "cmd_02",
+      "language": "python",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 11.34,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff adds a command execution that could lead to command injection.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "command_injection",
+            "line_hint": "+subprocess.run(f\"python3 reports/{report_name}.py > {output_dir}/out.txt\", shell=True)",
+            "explanation": "The use of `shell=True` with user-provided input (`report_name` and `output_dir`) can lead to command injection.",
+            "remediation": "Avoid using `shell=True` and instead use `subprocess.run` with a list of arguments."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045754Z_f17a795542.txt"
+      }
+    },
+    {
+      "id": "cmd_03",
+      "language": "javascript",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 11.31,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff adds a command execution using `execSync`, which can lead to command injection if `branch` is not properly sanitized.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "command_injection",
+            "line_hint": "+  execSync(`git checkout ${branch} && npm run build`);",
+            "explanation": "The use of `execSync` with user-provided input (`branch`) can lead to command injection if `branch` contains malicious code.",
+            "remediation": "Use a whitelist of allowed branches or sanitize the input using a library like `validator.js`."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045805Z_d355fe5184.txt"
+      }
+    },
+    {
+      "id": "cmd_04",
+      "language": "go",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 12.1,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "The diff adds a command execution that could lead to command injection if `jobName` is not properly sanitized.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045817Z_12ef3116ed.txt"
+      }
+    },
+    {
+      "id": "cmd_05",
+      "language": "python",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.17,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a command injection vulnerability by executing a shell command with user input without proper sanitization.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "command_injection",
+            "line_hint": "+    cmd = f\"psql -c 'COPY {table_name} TO STDOUT CSV' > /tmp/export.csv\"",
+            "explanation": "The command string is constructed using user input (`table_name`) and executed with `subprocess.call(cmd, shell=True)`. This can lead to command injection if `table_name` contains malicious input.",
+            "remediation": "Use parameterized queries or escape user input properly before constructing the command string."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045830Z_e74fa492fd.txt"
+      }
+    },
+    {
+      "id": "cmd_06",
+      "language": "ruby",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045830Z_5112d31f18.txt"
+      }
+    },
+    {
+      "id": "cmd_07",
+      "language": "java",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 11.31,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff adds a command execution that could lead to command injection if `scriptName` is not properly sanitized.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "command_injection",
+            "line_hint": "+        Runtime.getRuntime().exec(\"bash -c ./scripts/\" + scriptName + \".sh\");",
+            "explanation": "The command execution is vulnerable to command injection if `scriptName` contains malicious input.",
+            "remediation": "Use `ProcessBuilder` with `command` method to avoid shell injection."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045841Z_6166e80b84.txt"
+      }
+    },
+    {
+      "id": "cmd_08",
+      "language": "typescript",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 11.33,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff adds a command execution that could lead to command injection.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "command_injection",
+            "line_hint": "+  execSync(\"gzip -f \" + path);",
+            "explanation": "The use of `execSync` with user-provided input (`path`) can lead to command injection if `path` contains malicious content.",
+            "remediation": "Use `execSync` with sanitized input or consider using a safer method to handle file compression."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045852Z_51439bdb01.txt"
+      }
+    },
+    {
+      "id": "cmd_09",
+      "language": "python",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.5,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a command injection vulnerability through the use of `subprocess.check_output` with user-supplied input.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "command_injection",
+            "line_hint": "+result = subprocess.check_output(\"ping -c 1 \" + host, shell=True)",
+            "explanation": "The use of `shell=True` with user-supplied input (`host`) allows for command injection, which can lead to arbitrary command execution on the system.",
+            "remediation": "Use `subprocess.run` with `shell=False` and pass the command and arguments separately to avoid shell injection."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045905Z_37f0c7eef5.txt"
+      }
+    },
+    {
+      "id": "cmd_10",
+      "language": "go",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 7.22,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in the diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045912Z_a2868c4ee7.txt"
+      }
+    },
+    {
+      "id": "cmd_tn_01",
+      "language": "python",
+      "category": "command_injection",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 7.12,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045919Z_a997117f8a.txt"
+      }
+    },
+    {
+      "id": "cmd_tn_02",
+      "language": "go",
+      "category": "command_injection",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 7.15,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045926Z_9fe0ba8e2b.txt"
+      }
+    },
+    {
+      "id": "cmd_tn_03",
+      "language": "javascript",
+      "category": "command_injection",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 7.11,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in the diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045933Z_5c013ec058.txt"
+      }
+    },
+    {
+      "id": "cmd_tn_04",
+      "language": "python",
+      "category": "command_injection",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 7.32,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045941Z_b91dcde295.txt"
+      }
+    },
+    {
+      "id": "cmd_tn_05",
+      "language": "ruby",
+      "category": "command_injection",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 7.18,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T045948Z_a2b6c2865f.txt"
+      }
+    },
+    {
+      "id": "xss_01",
+      "language": "javascript",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.06,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a potential XSS vulnerability by using `dangerouslySetInnerHTML` with user-provided `text`.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "xss_injection",
+            "line_hint": "+  return <div dangerouslySetInnerHTML={{ __html: text }} />;",
+            "explanation": "Using `dangerouslySetInnerHTML` with unescaped user input can lead to Cross-Site Scripting (XSS) attacks.",
+            "remediation": "Escape the `text` before using it in `dangerouslySetInnerHTML`."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050000Z_670eafe4e2.txt"
+      }
+    },
+    {
+      "id": "xss_02",
+      "language": "javascript",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 7.38,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050007Z_710f697227.txt"
+      }
+    },
+    {
+      "id": "xss_03",
+      "language": "python",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 7.33,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050015Z_5145ecf2ec.txt"
+      }
+    },
+    {
+      "id": "xss_04",
+      "language": "php",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 13.6,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces an XSS vulnerability by echoing user input without proper sanitization.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "xss_injection",
+            "line_hint": "+echo \"<p>Welcome, \" . $_GET['name'] . \"!</p>\";",
+            "explanation": "The code directly outputs user input from the $_GET['name'] parameter without any sanitization, which can lead to Cross-Site Scripting (XSS) attacks.",
+            "remediation": "Sanitize the input using htmlspecialchars() before echoing it. Example: echo \"<p>Welcome, \" . htmlspecialchars($_GET['name'], ENT_QUOTES, 'UTF-8') . \"!</p>\";"
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050028Z_de5bc8c0f9.txt"
+      }
+    },
+    {
+      "id": "xss_05",
+      "language": "typescript",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 6.98,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050035Z_c36aeb6e28.txt"
+      }
+    },
+    {
+      "id": "xss_06",
+      "language": "javascript",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 13.27,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff adds a potential XSS vulnerability by directly inserting user input into the DOM without proper sanitization.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "xss_injection",
+            "line_hint": "+  logDiv.innerHTML = logs.map(l => `<span>${l.message}</span>`).join('');",
+            "explanation": "The code directly inserts user-provided log messages into the DOM using innerHTML, which can lead to Cross-Site Scripting (XSS) attacks if the log messages contain malicious scripts.",
+            "remediation": "Use a library like DOMPurify to sanitize the log messages before inserting them into the DOM."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050048Z_3f1586a886.txt"
+      }
+    },
+    {
+      "id": "xss_07",
+      "language": "python",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 14.9,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"high\",\n  \"summary\": \"The diff introduces an XSS vulnerability by directly concatenating user input into an HTML template without proper sanitization.\",\n  \"findings\": [\n    {\n      \"ca",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050103Z_5160f1342a.txt"
+      }
+    },
+    {
+      "id": "xss_08",
+      "language": "java",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 0.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050103Z_be2289fc75.txt"
+      }
+    },
+    {
+      "id": "xss_tn_01",
+      "language": "typescript",
+      "category": "xss",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050103Z_ebfbf4f552.txt"
+      }
+    },
+    {
+      "id": "xss_tn_02",
+      "language": "python",
+      "category": "xss",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050104Z_ba8ab07d77.txt"
+      }
+    },
+    {
+      "id": "xss_tn_03",
+      "language": "javascript",
+      "category": "xss",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050104Z_a809d39b2b.txt"
+      }
+    },
+    {
+      "id": "xss_tn_04",
+      "language": "java",
+      "category": "xss",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050104Z_184d8f939d.txt"
+      }
+    },
+    {
+      "id": "secret_01",
+      "language": "python",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff adds a hardcoded database password in the settings file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+    \"password\": \"Wj7#mK2$pL9qR\",",
+            "explanation": "Hardcoding secrets in the codebase can lead to security vulnerabilities, as the secret can be exposed in version control history or logs.",
+            "remediation": "Remove the hardcoded password and use environment variables or a secure secrets management system."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050116Z_49e1e2b061.txt"
+      }
+    },
+    {
+      "id": "secret_02",
+      "language": "javascript",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.49,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a hardcoded Stripe secret key, which is a security risk.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+const STRIPE_SECRET = \"sk_live_REDACTED_TEST_FIXTURE\";",
+            "explanation": "Hardcoding secrets in the source code can lead to security vulnerabilities, as the secret can be exposed and misused.",
+            "remediation": "Remove the hardcoded secret and use environment variables or a secure vault to store sensitive information."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050128Z_ed67fe9863.txt"
+      }
+    },
+    {
+      "id": "secret_03",
+      "language": "go",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 11.67,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a hardcoded JWT secret, which is a security risk.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+const jwtSecret = \"my-super-secret-signing-key-dont-share\"",
+            "explanation": "Hardcoding secrets in the source code can lead to security vulnerabilities, as the secret can be exposed and used maliciously.",
+            "remediation": "Use environment variables or secure vaults to store sensitive information like JWT secrets."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050140Z_cc41418c9d.txt"
+      }
+    },
+    {
+      "id": "secret_04",
+      "language": "java",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 16.6,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces hardcoded secrets in the configuration file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+    public static final String ENCRYPTION_KEY = \"AES256Key-32Characters1234567890\";",
+            "explanation": "Hardcoding secrets in the source code can lead to security vulnerabilities and exposure of sensitive information.",
+            "remediation": "Remove the hardcoded secret and use environment variables or secure vaults to store sensitive information."
+          },
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+    public static final String DB_PASSWORD = \"Prod@2024#Secure!\";",
+            "explanation": "Hardcoding database passwords in the source code can lead to unauthorized access to the database.",
+            "remediation": "Remove the hardcoded database password and use environment variables or secure vaults to store sensitive information."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050156Z_0825f10aba.txt"
+      }
+    },
+    {
+      "id": "secret_05",
+      "language": "typescript",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 16.26,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces hardcoded secrets in the AUTH_CONFIG object.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+  jwtSecret: \"f3cfe9ed8fae309f02079dbf\",",
+            "explanation": "Hardcoding secrets in the codebase can lead to security vulnerabilities as these secrets can be exposed and misused.",
+            "remediation": "Use environment variables to store sensitive information."
+          },
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+  refreshSecret: \"a7b3c2d1e0f9g8h7\",",
+            "explanation": "Hardcoding secrets in the codebase can lead to security vulnerabilities as these secrets can be exposed and misused.",
+            "remediation": "Use environment variables to store sensitive information."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050213Z_72a0c007d0.txt"
+      }
+    },
+    {
+      "id": "secret_06",
+      "language": "python",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 11.22,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a hardcoded secret in the SMTP configuration.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+    PASSWORD = \"CompanyEmail2024!\"",
+            "explanation": "Hardcoding secrets in the codebase can lead to security vulnerabilities and exposure of sensitive information.",
+            "remediation": "+    PASSWORD = os.getenv('SMTP_PASSWORD')"
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050224Z_8e9ae3dcc4.txt"
+      }
+    },
+    {
+      "id": "secret_07",
+      "language": "rust",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 18.64,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces hardcoded secrets in the configuration file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+pub const WEBHOOK_SECRET: &str = \"whsec_live_oiJKHjk23nMzPqr8\";",
+            "explanation": "Hardcoding secrets in the source code can lead to security vulnerabilities, as they are exposed to anyone with access to the codebase.",
+            "remediation": "Remove the hardcoded secret and use environment variables or secure vaults to store sensitive information."
+          },
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+pub const INTERNAL_API_KEY: &str = \"int_prod_9fH2kL7mN3pQ\";",
+            "explanation": "Hardcoding secrets in the source code can lead to security vulnerabilities, as they are exposed to anyone with access to the codebase.",
+            "remediation": "Remove the hardcoded secret and use environment variables or secure vaults to store sensitive information."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050242Z_fb6a81c815.txt"
+      }
+    },
+    {
+      "id": "secret_08",
+      "language": "swift",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 17.55,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces hardcoded API and secret keys which are security risks.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+    static let apiKey    = \"prod_live_xK9mN2pQ7rS4tU1v\"",
+            "explanation": "Hardcoding API keys and secret keys in the source code exposes sensitive information and can lead to security breaches.",
+            "remediation": "Remove the hardcoded API and secret keys and use environment variables or secure vaults to store them."
+          },
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+    static let secretKey = \"sk_prod_ABCDEFGhijklmnop\"",
+            "explanation": "Hardcoding API keys and secret keys in the source code exposes sensitive information and can lead to security breaches.",
+            "remediation": "Remove the hardcoded API and secret keys and use environment variables or secure vaults to store them."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050300Z_459e605c45.txt"
+      }
+    },
+    {
+      "id": "secret_tn_01",
+      "language": "python",
+      "category": "hardcoded_secret",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 12.23,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "The diff introduces a hardcoded secret in the database configuration.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050312Z_a0d4777bd7.txt"
+      }
+    },
+    {
+      "id": "secret_tn_02",
+      "language": "go",
+      "category": "hardcoded_secret",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 12.9,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "The JWT secret is hardcoded and retrieved from an environment variable, which is a security risk.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050325Z_475f59907c.txt"
+      }
+    },
+    {
+      "id": "secret_tn_03",
+      "language": "typescript",
+      "category": "hardcoded_secret",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 18.16,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "The diff introduces hardcoded secrets in the AUTH_CONFIG object.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050343Z_e85e2cdb90.txt"
+      }
+    },
+    {
+      "id": "secret_tn_04",
+      "language": "rust",
+      "category": "hardcoded_secret",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 12.97,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"high\",\n  \"summary\": \"The diff introduces a function to retrieve a webhook secret from the environment, which could lead to security issues if not handled properly.\",\n  \"findings\": [\n ",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050356Z_82bf93e92d.txt"
+      }
+    },
+    {
+      "id": "tls_01",
+      "language": "python",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 11.6,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "Disables TLS verification in API client, exposing to man-in-the-middle attacks.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050408Z_512b743b42.txt"
+      }
+    },
+    {
+      "id": "tls_02",
+      "language": "python",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.0,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a hardcoded MD5 hash function, which is insecure and should be avoided.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "insecure_crypto",
+            "line_hint": "+    return hashlib.md5(password.encode()).hexdigest()",
+            "explanation": "MD5 is a weak hashing algorithm that is no longer considered secure for cryptographic purposes. It can be easily broken by modern computing power.",
+            "remediation": "Replace MD5 with a stronger hashing algorithm like SHA-256."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050420Z_30c6159307.txt"
+      }
+    },
+    {
+      "id": "tls_03",
+      "language": "java",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 0.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050420Z_434924d0b2.txt"
+      }
+    },
+    {
+      "id": "tls_04",
+      "language": "go",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.63,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces an insecure HTTP client that skips TLS verification, which can lead to man-in-the-middle attacks.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "disabled_tls_verification",
+            "line_hint": "+    TLSClientConfig: &tls.Config{InsecureSkipVerify: true},",
+            "explanation": "InsecureSkipVerify set to true disables TLS verification, allowing potential man-in-the-middle attacks.",
+            "remediation": "+    TLSClientConfig: &tls.Config{InsecureSkipVerify: false},"
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050433Z_f783a012c9.txt"
+      }
+    },
+    {
+      "id": "tls_05",
+      "language": "javascript",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 12.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "Disables TLS verification, which can lead to man-in-the-middle attacks.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050444Z_72f53ae3aa.txt"
+      }
+    },
+    {
+      "id": "tls_06",
+      "language": "python",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 11.94,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a hardcoded secret in the hashing function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+    raw = str(user_id) + \"salt\"",
+            "explanation": "The string 'salt' is hardcoded and used in a hashing function, which can be exploited to predict hashes for other user IDs.",
+            "remediation": "+    raw = str(user_id) + os.urandom(16).hex()"
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050456Z_aad586fb19.txt"
+      }
+    },
+    {
+      "id": "tls_07",
+      "language": "rust",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff enables insecure TLS verification by setting `danger_accept_invalid_certs(true)`.",
+        "findings": [
+          {
+            "category": "bug_risk",
+            "type": "clippy_E0433",
+            "line_hint": "src/http/client.rs:2",
+            "explanation": "cannot find module or crate `reqwest` in this scope",
+            "remediation": "error[E0433]: cannot find module or crate `reqwest` in this scope",
+            "source": "static"
+          },
+          {
+            "category": "bug_risk",
+            "type": "clippy_E0433",
+            "line_hint": "src/http/client.rs:1",
+            "explanation": "cannot find module or crate `reqwest` in this scope",
+            "remediation": "error[E0433]: cannot find module or crate `reqwest` in this scope",
+            "source": "static"
+          },
+          {
+            "category": "security",
+            "type": "disabled_tls_verification",
+            "line_hint": "+.danger_accept_invalid_certs(true)",
+            "explanation": "This allows the client to accept invalid SSL/TLS certificates, making it vulnerable to man-in-the-middle attacks.",
+            "remediation": "Disable TLS verification only in development and remove this line in production."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050508Z_ea44d427cd.txt"
+      }
+    },
+    {
+      "id": "tls_08",
+      "language": "python",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 17.43,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a hardcoded secret in the encryption key and uses ECB mode, which is insecure.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+    cipher = DES.new(key[:8], DES.MODE_ECB)",
+            "explanation": "The encryption key is hardcoded and the use of ECB mode is insecure as it does not provide adequate confidentiality.",
+            "remediation": "Remove the hardcoded key and use a secure method to generate a key, such as generating a random key using a secure random number generator."
+          },
+          {
+            "category": "security",
+            "type": "insecure_crypto",
+            "line_hint": "+    cipher = DES.new(key[:8], DES.MODE_ECB)",
+            "explanation": "DES is considered insecure and should not be used for new applications. ECB mode does not provide adequate confidentiality.",
+            "remediation": "Replace DES with a more secure algorithm like AES and use a secure mode like CBC."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050526Z_0b7e2af21f.txt"
+      }
+    },
+    {
+      "id": "tls_tn_01",
+      "language": "python",
+      "category": "insecure_tls",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050526Z_6ce3589563.txt"
+      }
+    },
+    {
+      "id": "tls_tn_02",
+      "language": "go",
+      "category": "insecure_tls",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050526Z_00e4ad35db.txt"
+      }
+    },
+    {
+      "id": "tls_tn_03",
+      "language": "python",
+      "category": "insecure_tls",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 7.5,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050533Z_028cc157d5.txt"
+      }
+    },
+    {
+      "id": "tls_tn_04",
+      "language": "rust",
+      "category": "insecure_tls",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050534Z_2fb4994e16.txt"
+      }
+    },
+    {
+      "id": "path_01",
+      "language": "python",
+      "category": "path_traversal",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.79,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a path traversal vulnerability by concatenating user input (`filename`) directly into a file path.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "path_traversal",
+            "line_hint": "+    path = \"/var/uploads/\" + filename",
+            "explanation": "Concatenating user input (`filename`) directly into a file path can lead to path traversal vulnerabilities, allowing attackers to access or modify files outside the intended directory.",
+            "remediation": "Use a whitelist of allowed filenames or sanitize the input to prevent directory traversal."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050546Z_ff7435407d.txt"
+      }
+    },
+    {
+      "id": "path_02",
+      "language": "go",
+      "category": "path_traversal",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 13.34,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a path traversal vulnerability by directly using user input to construct file paths.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "path_traversal",
+            "line_hint": "+    data, _ := os.ReadFile(\"/srv/files/\" + name)",
+            "explanation": "The code constructs a file path using user input (`name`) without proper validation, allowing attackers to traverse the filesystem and potentially read sensitive files.",
+            "remediation": "Validate and sanitize the `name` input to ensure it does not contain any path traversal characters (e.g., `/`, `..`)."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050600Z_4257a037f9.txt"
+      }
+    },
+    {
+      "id": "path_03",
+      "language": "java",
+      "category": "path_traversal",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.6,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a potential path traversal vulnerability.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "path_traversal",
+            "line_hint": "+        File f = new File(\"/var/app/uploads/\" + filename);",
+            "explanation": "The code constructs a file path using user-supplied input (`filename`). This can lead to path traversal vulnerabilities if an attacker can control the value of `filename`.",
+            "remediation": "Use a whitelist of allowed filenames or sanitize the input to prevent directory traversal."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050612Z_ce60720f45.txt"
+      }
+    },
+    {
+      "id": "path_04",
+      "language": "javascript",
+      "category": "path_traversal",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 14.13,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a potential path traversal vulnerability by using `req.query.file` directly in the file path.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "path_traversal",
+            "line_hint": "+  const filePath = path.join(__dirname, 'uploads', req.query.file);",
+            "explanation": "The use of `req.query.file` directly in the file path can lead to path traversal attacks if an attacker can control the value of `req.query.file`.",
+            "remediation": "Validate and sanitize `req.query.file` to ensure it does not contain any malicious path traversal characters."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050626Z_de0bab81cb.txt"
+      }
+    },
+    {
+      "id": "path_05",
+      "language": "php",
+      "category": "path_traversal",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 13.88,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a path traversal vulnerability by directly using user input to construct a file path.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "path_traversal",
+            "line_hint": "+$file = \"/var/www/uploads/\" . $_GET['file'];",
+            "explanation": "The code constructs a file path using user input from $_GET['file'], which can lead to path traversal attacks where an attacker can access or modify files outside the intended directory.",
+            "remediation": "Use a whitelist of allowed filenames or sanitize the input to prevent directory traversal."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050640Z_ee36d7904e.txt"
+      }
+    },
+    {
+      "id": "path_06",
+      "language": "python",
+      "category": "path_traversal",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.94,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded path in the file storage logic, which could lead to path traversal vulnerabilities.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "path_traversal",
+            "line_hint": "+    base = \"/app/templates/\"",
+            "explanation": "The hardcoded path \"/app/templates/\" could be exploited to access files outside the intended directory if an attacker can control the `template_name` parameter.",
+            "remediation": "Use a whitelist of allowed template names or sanitize the input to prevent path traversal."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050653Z_58b2bed17c.txt"
+      }
+    },
+    {
+      "id": "path_tn_01",
+      "language": "python",
+      "category": "path_traversal",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 8.0,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050701Z_4a06981223.txt"
+      }
+    },
+    {
+      "id": "path_tn_02",
+      "language": "go",
+      "category": "path_traversal",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050701Z_b566e05553.txt"
+      }
+    },
+    {
+      "id": "path_tn_03",
+      "language": "java",
+      "category": "path_traversal",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 7.64,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security issues found in the diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050709Z_643cfbca6d.txt"
+      }
+    },
+    {
+      "id": "deser_01",
+      "language": "python",
+      "category": "unsafe_deserialization",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 11.66,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Deserializing data with pickle can lead to arbitrary code execution.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "unsafe_deserialization",
+            "line_hint": "+    return pickle.loads(data)",
+            "explanation": "Using pickle.loads to deserialize untrusted data can execute arbitrary code, leading to potential security vulnerabilities.",
+            "remediation": "Use a safer serialization format like JSON or consider using a safer deserialization library."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050721Z_563bf90b7c.txt"
+      }
+    },
+    {
+      "id": "deser_02",
+      "language": "python",
+      "category": "unsafe_deserialization",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 11.91,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff loads a YAML payload without validating it, which could lead to arbitrary code execution.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "unsafe_deserialization",
+            "line_hint": "+payload = yaml.load(raw_body)",
+            "explanation": "Using `yaml.load` without validation can execute arbitrary code if the input is malicious.",
+            "remediation": "Use `yaml.safe_load` instead of `yaml.load`."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050732Z_076deb338e.txt"
+      }
+    },
+    {
+      "id": "deser_03",
+      "language": "java",
+      "category": "unsafe_deserialization",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.58,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Deserializing untrusted data using ObjectInputStream can lead to remote code execution.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "unsafe_deserialization",
+            "line_hint": "+ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));",
+            "explanation": "Deserializing untrusted data using ObjectInputStream can lead to remote code execution.",
+            "remediation": "Use a safe deserialization library or validate the data before deserializing."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050745Z_049268d301.txt"
+      }
+    },
+    {
+      "id": "deser_04",
+      "language": "ruby",
+      "category": "unsafe_deserialization",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.41,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Deserializing data from a cookie without proper validation can lead to arbitrary code execution.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "unsafe_deserialization",
+            "line_hint": "+    Marshal.load(Base64.decode64(cookie))",
+            "explanation": "Deserializing data from an untrusted source (cookie) can lead to arbitrary code execution.",
+            "remediation": "Use a safe deserialization method or validate the data before deserializing."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050757Z_de10c87ebc.txt"
+      }
+    },
+    {
+      "id": "deser_05",
+      "language": "python",
+      "category": "unsafe_deserialization",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 14.07,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a potential security risk due to the use of `eval()` to execute code from an untrusted source.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "unsafe_deserialization",
+            "line_hint": "+    task = eval(message[\"code\"])",
+            "explanation": "Using `eval()` to execute code from an untrusted source can lead to arbitrary code execution and potential security vulnerabilities.",
+            "remediation": "Avoid using `eval()`. Consider using a safer alternative like `ast.literal_eval()` if the code is expected to be a literal expression."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050812Z_aaa8210705.txt"
+      }
+    },
+    {
+      "id": "deser_06",
+      "language": "javascript",
+      "category": "unsafe_deserialization",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 12.99,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"high\",\n  \"summary\": \"The diff introduces a potential security risk due to the use of `eval` to parse JSON data.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"un",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050825Z_ee207559e6.txt"
+      }
+    },
+    {
+      "id": "deser_tn_01",
+      "language": "python",
+      "category": "unsafe_deserialization",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050825Z_8495b1fe03.txt"
+      }
+    },
+    {
+      "id": "deser_tn_02",
+      "language": "python",
+      "category": "unsafe_deserialization",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050825Z_d141c85179.txt"
+      }
+    },
+    {
+      "id": "deser_tn_03",
+      "language": "java",
+      "category": "unsafe_deserialization",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050825Z_9992a06543.txt"
+      }
+    },
+    {
+      "id": "race_01",
+      "language": "python",
+      "category": "race_condition",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 7.8,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in the diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050832Z_9278ef8c14.txt"
+      }
+    },
+    {
+      "id": "race_02",
+      "language": "go",
+      "category": "race_condition",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 24.56,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a global cache variable and a function that modifies and returns it, which could lead to data leakage or race conditions.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "path_traversal",
+            "line_hint": "+var cache = map[string]string{}",
+            "explanation": "The use of a global cache variable can lead to path traversal vulnerabilities if the keys are not properly sanitized.",
+            "remediation": "Use a thread-safe cache implementation or sanitize the keys before storing them in the cache."
+          },
+          {
+            "category": "bug_risk",
+            "type": "race_condition",
+            "line_hint": "+cache[key] = value",
+            "explanation": "Modifying a global cache variable without proper synchronization can lead to race conditions.",
+            "remediation": "Use a mutex or other synchronization mechanism to protect access to the cache."
+          },
+          {
+            "category": "bug_risk",
+            "type": "unhandled_error",
+            "line_hint": "+return cache[key]",
+            "explanation": "Returning a value from the cache without checking if the key exists can lead to a panic if the key is not found.",
+            "remediation": "Check if the key exists in the cache before returning its value."
+          },
+          {
+            "category": "quality",
+            "type": "unused_variable",
+            "line_hint": "+var cache = map[string]string{}",
+            "explanation": "The variable 'cache' is declared but never used in the function.",
+            "remediation": "Remove the unused variable or use it appropriately in the function."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050857Z_94c12f13ce.txt"
+      }
+    },
+    {
+      "id": "race_03",
+      "language": "java",
+      "category": "race_condition",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 10.13,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in the diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050907Z_7a2460937c.txt"
+      }
+    },
+    {
+      "id": "race_04",
+      "language": "rust",
+      "category": "race_condition",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 0.07,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050907Z_1c4d4c88bf.txt"
+      }
+    },
+    {
+      "id": "race_05",
+      "language": "python",
+      "category": "race_condition",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 0.05,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050907Z_9ac47c27c2.txt"
+      }
+    },
+    {
+      "id": "race_06",
+      "language": "go",
+      "category": "race_condition",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 10.43,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in the diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050918Z_5ffe18d30d.txt"
+      }
+    },
+    {
+      "id": "race_tn_01",
+      "language": "go",
+      "category": "race_condition",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 12.05,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050930Z_385f5f1529.txt"
+      }
+    },
+    {
+      "id": "race_tn_02",
+      "language": "java",
+      "category": "race_condition",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 11.72,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050941Z_c82b038b46.txt"
+      }
+    },
+    {
+      "id": "race_tn_03",
+      "language": "rust",
+      "category": "race_condition",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.05,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050942Z_e7d22d765e.txt"
+      }
+    },
+    {
+      "id": "logic_01",
+      "language": "python",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 15.56,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces an off-by-one error in the pagination logic.",
+        "findings": [
+          {
+            "category": "bug_risk",
+            "type": "off_by_one_error",
+            "line_hint": "+end   = start + page_size + 1",
+            "explanation": "The end index is one more than necessary, potentially including an extra item.",
+            "remediation": "-end   = start + page_size + 1\n+end   = start + page_size"
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T050957Z_fc78c5ff8c.txt"
+      }
+    },
+    {
+      "id": "logic_02",
+      "language": "javascript",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 10.97,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051008Z_0e32f37207.txt"
+      }
+    },
+    {
+      "id": "logic_03",
+      "language": "go",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 10.28,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051018Z_ee136a5f51.txt"
+      }
+    },
+    {
+      "id": "logic_04",
+      "language": "python",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 0.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051018Z_c479386ea5.txt"
+      }
+    },
+    {
+      "id": "logic_05",
+      "language": "rust",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 9.6,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in the diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051028Z_eec1afd6f5.txt"
+      }
+    },
+    {
+      "id": "logic_06",
+      "language": "java",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 0.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051028Z_767780bc81.txt"
+      }
+    },
+    {
+      "id": "logic_07",
+      "language": "typescript",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051028Z_f5ab6a6cc8.txt"
+      }
+    },
+    {
+      "id": "logic_08",
+      "language": "python",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051028Z_3e4a325729.txt"
+      }
+    },
+    {
+      "id": "logic_tn_01",
+      "language": "python",
+      "category": "logic_bug",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051028Z_b71e179b26.txt"
+      }
+    },
+    {
+      "id": "logic_tn_02",
+      "language": "go",
+      "category": "logic_bug",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051028Z_80e054b373.txt"
+      }
+    },
+    {
+      "id": "logic_tn_03",
+      "language": "python",
+      "category": "logic_bug",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051028Z_2ac70c20ec.txt"
+      }
+    },
+    {
+      "id": "logic_tn_04",
+      "language": "typescript",
+      "category": "logic_bug",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051028Z_53433c683a.txt"
+      }
+    },
+    {
+      "id": "exc_01",
+      "language": "python",
+      "category": "unhandled_exception",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 8.76,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051037Z_04fd532a6e.txt"
+      }
+    },
+    {
+      "id": "exc_02",
+      "language": "javascript",
+      "category": "unhandled_exception",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 0.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051037Z_855cdb5450.txt"
+      }
+    },
+    {
+      "id": "exc_03",
+      "language": "go",
+      "category": "unhandled_exception",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 10.08,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051047Z_d91bbce550.txt"
+      }
+    },
+    {
+      "id": "exc_04",
+      "language": "java",
+      "category": "unhandled_exception",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 10.47,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051057Z_1e58c92189.txt"
+      }
+    },
+    {
+      "id": "exc_05",
+      "language": "typescript",
+      "category": "unhandled_exception",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 13.71,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "The diff adds a potential security risk by parsing raw JSON data without validation, which could lead to arbitrary code execution.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051111Z_280d79eecf.txt"
+      }
+    },
+    {
+      "id": "exc_06",
+      "language": "python",
+      "category": "unhandled_exception",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 8.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051119Z_8311a4ef08.txt"
+      }
+    },
+    {
+      "id": "exc_tn_01",
+      "language": "python",
+      "category": "unhandled_exception",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 8.23,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051127Z_c7119fa094.txt"
+      }
+    },
+    {
+      "id": "exc_tn_02",
+      "language": "go",
+      "category": "unhandled_exception",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 8.18,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051136Z_87a22750a9.txt"
+      }
+    },
+    {
+      "id": "exc_tn_03",
+      "language": "typescript",
+      "category": "unhandled_exception",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 8.07,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051144Z_b59d916fc4.txt"
+      }
+    },
+    {
+      "id": "dead_01",
+      "language": "python",
+      "category": "dead_code",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 8.12,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in the diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051152Z_753113f6f7.txt"
+      }
+    },
+    {
+      "id": "dead_02",
+      "language": "go",
+      "category": "dead_code",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 8.17,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in the diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051200Z_46d836f152.txt"
+      }
+    },
+    {
+      "id": "dead_03",
+      "language": "typescript",
+      "category": "dead_code",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 0.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051200Z_9453884c36.txt"
+      }
+    },
+    {
+      "id": "dead_04",
+      "language": "java",
+      "category": "dead_code",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051200Z_a0583869ac.txt"
+      }
+    },
+    {
+      "id": "dead_05",
+      "language": "python",
+      "category": "dead_code",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051200Z_4bbd004ba2.txt"
+      }
+    },
+    {
+      "id": "dead_06",
+      "language": "rust",
+      "category": "dead_code",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051200Z_5de09bbb04.txt"
+      }
+    },
+    {
+      "id": "dead_tn_01",
+      "language": "python",
+      "category": "dead_code",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 7.98,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051208Z_2f24bd719d.txt"
+      }
+    },
+    {
+      "id": "dead_tn_02",
+      "language": "go",
+      "category": "dead_code",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 7.82,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in the diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051216Z_008d97cbb7.txt"
+      }
+    },
+    {
+      "id": "dead_tn_03",
+      "language": "typescript",
+      "category": "dead_code",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051216Z_4b8b282e68.txt"
+      }
+    },
+    {
+      "id": "edge_removal_01",
+      "language": "python",
+      "category": "edge_removal",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051216Z_efdd8fc72b.txt"
+      }
+    },
+    {
+      "id": "edge_removal_02",
+      "language": "javascript",
+      "category": "edge_removal",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051216Z_1dffed3e8f.txt"
+      }
+    },
+    {
+      "id": "edge_removal_03",
+      "language": "go",
+      "category": "edge_removal",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 7.73,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in this diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051224Z_74cc5c6a2e.txt"
+      }
+    },
+    {
+      "id": "edge_removal_04",
+      "language": "python",
+      "category": "edge_removal",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051224Z_07afb24bdb.txt"
+      }
+    },
+    {
+      "id": "edge_multifile_01",
+      "language": "python",
+      "category": "multi_file",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 19.64,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "SQL injection vulnerability in user query and XSS in profile view.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "+return db.execute(\"SELECT * FROM users WHERE name = '\" + name + \"'\").fetchone()",
+            "explanation": "The SQL query is vulnerable to SQL injection because it directly concatenates user input into the query string.",
+            "remediation": "Use parameterized queries: `return db.execute(\"SELECT * FROM users WHERE name = ?\", (name,)).fetchone()`"
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051243Z_aaa0b5d1e9.txt"
+      }
+    },
+    {
+      "id": "edge_multifile_02",
+      "language": "go",
+      "category": "multi_file",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.19,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a hardcoded database password which is a security risk.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+const dbPassword = \"prod_password_2024\"",
+            "explanation": "Hardcoding secrets in the source code exposes them to potential attackers.",
+            "remediation": "Use environment variables or a secure secrets management system to store sensitive information."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051256Z_e26f3da515.txt"
+      }
+    },
+    {
+      "id": "edge_multifile_03",
+      "language": "python",
+      "category": "multi_file",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051256Z_8b9566dc2f.txt"
+      }
+    },
+    {
+      "id": "edge_obfuscated_01",
+      "language": "python",
+      "category": "obfuscated",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 14.57,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a hardcoded secret in the code.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+_k = base64.b64decode(\"c2tfc2VjcmV0X2xpdmVfQUJDREVGR0hJSktM\").decode()",
+            "explanation": "The code contains a hardcoded secret in the form of a base64-encoded string. This can be easily extracted and used by attackers.",
+            "remediation": "Remove the hardcoded secret and use environment variables or secure vaults to store sensitive information."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051310Z_cac9f3754d.txt"
+      }
+    },
+    {
+      "id": "edge_obfuscated_02",
+      "language": "javascript",
+      "category": "obfuscated",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 15.24,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Base64-encoded hardcoded secret in configuration file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+const _cfg = atob(\"QUtJQUlPU0ZPRE5ON0VYQU1QTEU=\");",
+            "explanation": "The Base64-encoded string 'QUtJQUlPU0ZPRE5ON0VYQU1QTEU=' decodes to 'AKIAIOSFODNN7EXAMPLE', which appears to be an AWS access key ID. Hardcoding secrets in source code is a significant security risk.",
+            "remediation": "Remove the hardcoded secret and use environment variables or secure vaults to store sensitive information."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051325Z_7b4f544ded.txt"
+      }
+    },
+    {
+      "id": "edge_obfuscated_03",
+      "language": "python",
+      "category": "obfuscated",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 12.06,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a hardcoded JWT secret in the code.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "+JWT_SECRET = \"\".join(parts)",
+            "explanation": "Hardcoding secrets in the source code can lead to security vulnerabilities, as the secret can be exposed and used maliciously.",
+            "remediation": "Use environment variables or secure vaults to store sensitive information."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051338Z_a2ef60243f.txt"
+      }
+    },
+    {
+      "id": "edge_large_01",
+      "language": "python",
+      "category": "large_diff",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 18.61,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff adds a SQL query with string concatenation, which is vulnerable to SQL injection.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "+return db.execute(\"SELECT * FROM users WHERE name = '\" + name + \"'\").fetchone()",
+            "explanation": "The SQL query concatenates user input directly into the query string, allowing attackers to manipulate the SQL query.",
+            "remediation": "Use parameterized queries to prevent SQL injection. Example: `return db.execute(\"SELECT * FROM users WHERE name = ?\", (name,)).fetchone()`"
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051356Z_97f79d3440.txt"
+      }
+    },
+    {
+      "id": "edge_large_02",
+      "language": "go",
+      "category": "large_diff",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 12.95,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in the diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051409Z_f6b5ecbe5a.txt"
+      }
+    },
+    {
+      "id": "edge_clean_py",
+      "language": "python",
+      "category": "clean",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051409Z_699ada8a09.txt"
+      }
+    },
+    {
+      "id": "edge_clean_ts",
+      "language": "typescript",
+      "category": "clean",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051409Z_78b6eb4ea0.txt"
+      }
+    },
+    {
+      "id": "edge_clean_go",
+      "language": "go",
+      "category": "clean",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051409Z_ea85a9439b.txt"
+      }
+    },
+    {
+      "id": "edge_clean_rust",
+      "language": "rust",
+      "category": "clean",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051409Z_6f19ac1b20.txt"
+      }
+    },
+    {
+      "id": "edge_clean_java",
+      "language": "java",
+      "category": "clean",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051409Z_74b55d9890.txt"
+      }
+    },
+    {
+      "id": "edge_clean_swift",
+      "language": "swift",
+      "category": "clean",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 0.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No risky patterns detected in added lines.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051409Z_67439687bd.txt"
+      }
+    },
+    {
+      "id": "edge_refactor_01",
+      "language": "python",
+      "category": "refactor",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 8.09,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "No security, quality, or bug risk issues found in the diff.",
+        "findings": [],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051417Z_01a3a66d07.txt"
+      }
+    },
+    {
+      "id": "edge_refactor_02",
+      "language": "typescript",
+      "category": "refactor",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 13.15,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"high\",\n  \"summary\": \"The diff introduces a hardcoded JWT secret in the `validateToken` function.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"hardcoded_secret\"",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051430Z_3eb45c06d7.txt"
+      }
+    },
+    {
+      "id": "edge_mixed_01",
+      "language": "python",
+      "category": "mixed",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 14.25,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces an SQL injection vulnerability in the `search.py` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "+    sql = \"SELECT * FROM items WHERE name LIKE '%\" + query + \"%'\"",
+            "explanation": "The SQL query is constructed using string concatenation, which can be exploited to inject malicious SQL code.",
+            "remediation": "Use parameterized queries to prevent SQL injection. Example: `sql = \"SELECT * FROM items WHERE name LIKE %s\"; db.execute(sql, (query,))`"
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051445Z_84890d3f40.txt"
+      }
+    },
+    {
+      "id": "edge_mixed_02",
+      "language": "go",
+      "category": "mixed",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 16.99,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces SQL injection and insecure data handling.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "+query := \"INSERT INTO users VALUES ('\" + string(data) + \"')\"",
+            "explanation": "The query string is constructed using string concatenation, which can lead to SQL injection if `data` contains malicious SQL code.",
+            "remediation": "Use parameterized queries to prevent SQL injection."
+          },
+          {
+            "category": "security",
+            "type": "insecure_data_handling",
+            "line_hint": "+db.Exec(query)",
+            "explanation": "The database execution is done without proper error handling, which can lead to information leakage or other security issues.",
+            "remediation": "Add error handling around `db.Exec(query)` to ensure proper error management."
+          }
+        ],
+        "model": "qwen2.5-coder-7b-4bit",
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T051502Z_3d57e5441b.txt"
+      }
+    }
+  ]
+}

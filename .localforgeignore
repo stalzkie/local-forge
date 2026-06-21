@@ -39,3 +39,11 @@ Cargo.lock
 localforge-install-org.sh
 localforge-report.json
 localforge-report.csv
+
+# Layer 3 eval — contains intentionally vulnerable diffs and fake secrets
+tests/layer3_eval_corpus.py
+tests/layer3_eval.py
+tests/benchmark_results/
+
+# Static analysis shim — contains tool invocation patterns
+coreml/static_analysis.py

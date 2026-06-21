@@ -133,10 +133,10 @@ Training prints live progress to your terminal: per-fold F1 bars, a classificati
 
 ```bash
 pip3 install mlx-lm
-python3 -c "from mlx_lm import load; load('Qwen/Qwen2.5-Coder-1.5B-Instruct-4bit')"
+python3 -c "from mlx_lm import load; load('Qwen/Qwen2.5-Coder-7B-Instruct-4bit')"
 ```
 
-The installer auto-detects the downloaded model from your HuggingFace cache — no manual `mv` needed.
+The installer auto-detects the downloaded model from your HuggingFace cache — no manual `mv` needed. If the 7B model is not present, it falls back to the 1.5B variant automatically.
 
 ### 4. Install into your project
 
@@ -267,9 +267,11 @@ python3 coreml/build_model.py
 localforge --install   # redeploys updated model to ~/.localforge/
 ```
 
-### Layer 3 — Qwen2.5-Coder via MLX (`~5-8s`)
+### Layer 3 — Qwen2.5-Coder-7B via MLX (`~8-20s`)
 
-A 1.5B parameter code model running locally via Apple's MLX framework. Detects language from diff file extensions and reviews only **added lines** — not deletions. All findings from a single `git commit` are written to **one consolidated report file** at `~/.localforge/reports/commit_<timestamp>.txt`.
+A **7B parameter** code model running locally via Apple's MLX framework. Detects language from diff file extensions and reviews only **added lines** — not deletions. All findings from a single `git commit` are written to **one consolidated report file** at `~/.localforge/reports/commit_<timestamp>.txt`.
+
+A **clean-diff fast path** (`_is_clean_diff`) skips the model entirely when no added lines match any risky keyword, keeping advisory latency near zero on refactor/cleanup commits. A **post-inference false positive filter** (`filter_false_positives`) suppresses known-safe patterns (parameterized queries, list-form subprocess calls, etc.) and cross-category misclassifications before findings are written to the report.
 
 Review categories:
 - **Security** — injection, insecure crypto, path traversal, unsafe deserialization, disabled TLS
@@ -277,6 +279,19 @@ Review categories:
 - **Code Quality** — dead/orphan functions, unused variables, overly complex logic
 
 Large diffs are chunked at file boundaries and findings are merged and deduplicated. **Layer 3 never blocks a commit** — it advises.
+
+### Layer 3.5 — Static Analysis (`parallel with Layer 3`)
+
+Deterministic tools that run alongside the LLM for categories where semantic reasoning outperforms pattern matching. Findings use the same JSON schema and merge into the same report.
+
+| Language | Tools |
+|---|---|
+| Python | bandit (security), pylint (dead code, unused imports) |
+| JavaScript / TypeScript | eslint (no-unused-vars, no-eval) |
+| Go | go vet, staticcheck |
+| Rust | cargo clippy (suspicious, correctness, perf, dead_code) |
+
+`localforge --install` auto-installs all available tools (pip3, npm, go install, rustup).
 
 ---
 
@@ -417,7 +432,7 @@ Every commit with Layer 3 enabled writes a single `.txt` report to `~/.localforg
   LocalForge Security & Code Assessment
   2026-06-19 14:31:02 UTC
   Diff hash : 4d06522c65
-  Model     : Qwen2.5-Coder-1.5B (Layer 3 advisory)
+  Model     : Qwen2.5-Coder-7B (Layer 3 advisory)
 ======================================================================
 
   Severity : MEDIUM
@@ -439,7 +454,24 @@ Toggle Layer 3 on/off using the **Code Review** switch in the app. When off, Qwe
 
 ## Benchmark Results
 
-### v2.1 Model (current)
+### Layer 3 Eval — 7B Model (current)
+
+Run with `python3 tests/layer3_eval.py` — evaluates all 145 labeled diffs, writes JSON artifact + 4 charts.
+
+| Metric | 1.5B Baseline | 7B (current) |
+|---|---|---|
+| Precision | 0.649 | **0.982** |
+| Recall | 0.822 | 0.600 |
+| F1 | 0.726 | **0.745** |
+| FPR (false positive rate) | 0.727 | **0.018** |
+| False positives | 40 | **1** |
+
+The 7B upgrade collapsed FPR from **0.727 → 0.018** — 39 of 40 false positives eliminated. Precision is production-grade. The recall gap on semantic categories (dead code, race conditions, logic bugs) is covered by the static analysis layer.
+
+**Strongest categories (F1 = 1.000):** hardcoded_secret, path_traversal, obfuscated, multi_file, mixed, large_diff  
+**Corpus:** 145 labeled diffs · 90 TP · 55 TN · 18 categories · 9 languages
+
+### v2.1 Layer 2 Model
 
 Run with `python3 tests/benchmark_v2.py` — reads from `coreml/model_metadata.json`, no re-inference required.
 
@@ -452,27 +484,20 @@ Run with `python3 tests/benchmark_v2.py` — reads from `coreml/model_metadata.j
 | Layer 1 patterns | 7 | **26** |
 | Layer 1 providers | 5 | **13** |
 
-### v2.1 Benchmark Graphs
+### Benchmark Graphs
 
 | Graph | What It Shows |
 |---|---|
+| `layer3_eval_*_cat_prf.png` | Per-category precision / recall / F1 bars |
+| `layer3_eval_*_fpr_lang.png` | FPR by language |
+| `layer3_eval_*_heatmap.png` | Precision × recall heatmap across all categories |
+| `layer3_eval_*_cat_counts.png` | TP / FP / FN / TN counts per category |
 | `07_v21_before_after.png` | Side-by-side: training samples, CV F1 with error bars, verification accuracy |
 | `08_v21_score_distribution.png` | Risk score histogram split by ground truth — clean vs risky separation |
 | `09_v21_language_heatmap.png` | Per-language precision / recall / F1 heatmap (Python, JS, Java, Go, PHP) |
 | `10_v21_cv_stability.png` | Fold-by-fold F1 bars — v2.0 wild variance vs v2.1 tight consistency |
 | `11_v21_l1_coverage.png` | Pie charts: Layer 1 pattern coverage (7 → 26 across 13 providers) |
 | `12_v21_confidence_margin.png` | Per-sample distance from 0.5 threshold — confidence of each prediction |
-
-### v2.0 Baseline Graphs (historical)
-
-| Graph | What It Shows |
-|---|---|
-| `01_layer1_latency.png` | Histogram + box plot of L1 latency per category (µs) |
-| `02_layer2_accuracy.png` | Confusion matrix + risk score distribution |
-| `03_layer3_quality.png` | Severity pie + detection rate + inference time |
-| `04_pipeline_timing.png` | Per-sample L2 bars + avg per layer (log scale) |
-| `05_security_coverage.png` | Pattern × obfuscation variant heatmap |
-| `06_false_positive_rate.png` | FP rate per layer + per language |
 
 All graphs are saved to `tests/benchmark_results/`.
 
@@ -486,6 +511,9 @@ cargo test
 
 # End-to-end validation suite
 python3 tests/verify.py
+
+# Layer 3 full eval — 145 diffs, precision/recall/F1/FPR, charts, JSON artifact
+python3 tests/layer3_eval.py
 
 # 80-sample v2.0 benchmark (all 3 layers)
 python3 tests/benchmark.py --skip-qwen
@@ -524,9 +552,10 @@ local-forge/
 ├── coreml/
 │   ├── build_model.py        # Train TF-IDF + logistic regression → CoreML (live progress)
 │   ├── infer.py              # Layer 2 inference shim
-│   ├── advisory.py           # Layer 3 Qwen inference + single-file report writer
+│   ├── advisory.py           # Layer 3 Qwen inference, FP filter, clean-diff fast path
+│   ├── static_analysis.py    # Layer 3.5 — bandit, pylint, eslint, go vet, staticcheck, clippy
 │   ├── LocalForgeModel.mlpackage/
-│   └── qwen2.5-coder-1.5b-4bit/  (gitignored — downloaded separately)
+│   └── qwen2.5-coder-7b-4bit/  (gitignored — downloaded via --install)
 ├── ui/
 │   ├── LocalForge.xcodeproj/
 │   └── LocalForgeApp/
@@ -545,11 +574,15 @@ local-forge/
 │   └── package_homebrew.sh   # Generate Homebrew tarball + SHA256
 ├── Formula/
 │   └── localforge.rb         # Homebrew formula (brew tap stalzkie/local-forge)
+├── docs/
+│   └── layer3_optimization.md  # Layer 3 optimization changelog and measured results
 ├── tests/
 │   ├── verify.py             # End-to-end validation suite
 │   ├── benchmark.py          # 80-sample v2.0 benchmark
 │   ├── benchmark_v2.py       # v2.1 accuracy benchmark charts
-│   └── benchmark_results/    # PNGs: 01-06 (v2.0 baseline), 07-12 (v2.1)
+│   ├── layer3_eval_corpus.py # 145 labeled diffs — 90 TP, 55 TN, 18 categories, 9 languages
+│   ├── layer3_eval.py        # Eval runner — precision/recall/F1/FPR + charts + JSON artifact
+│   └── benchmark_results/    # PNGs and eval reports
 └── .localforgeignore         # Paths excluded from scanning
 ```
 
@@ -562,8 +595,9 @@ local-forge/
 | Core binary | Rust 1.78, tokio, clap, regex, once_cell, dirs, serde_json, ratatui, crossterm, anyhow |
 | Layer 2 training | Python, scikit-learn, coremltools, numpy |
 | Layer 2 runtime | Apple CoreML `CPU_AND_NE` (Apple Neural Engine) |
-| Layer 3 model | Qwen2.5-Coder-1.5B-Instruct-4bit |
+| Layer 3 model | Qwen2.5-Coder-7B-Instruct-4bit (falls back to 1.5B if absent) |
 | Layer 3 runtime | Apple MLX, mlx-lm |
+| Layer 3.5 tools | bandit, pylint, eslint, go vet, staticcheck, cargo clippy |
 | macOS app | Swift 6, SwiftUI, Combine, AppKit, macOS 14+ |
 | Packaging | xcodebuild, create-dmg, xcrun notarytool |
 | Distribution | GitHub Releases, Homebrew tap |
@@ -588,6 +622,12 @@ local-forge/
 - [x] `localforge --install-org` team install script generator
 - [x] `localforge --export-report` compliance export (JSON / CSV)
 - [x] Repo discovery UI — Scan Folder in the app finds all git repos and installs with one click
+- [x] Layer 3 upgraded to Qwen2.5-Coder-7B (FPR: 0.727 → 0.018)
+- [x] Clean-diff fast path — skips model on refactor/deletion-only commits
+- [x] Post-inference false positive filter — suppresses known-safe patterns
+- [x] Layer 3.5 static analysis — bandit, pylint, eslint, go vet, staticcheck, clippy
+- [x] `localforge --install` auto-installs static analysis tools and downloads 7B model
+- [x] Layer 3 eval suite — 145 labeled diffs, precision/recall/F1/FPR, per-category/language charts
 - [ ] Configurable block thresholds per-project
 - [ ] VS Code extension
 - [ ] CI/CD mode (exit codes for GitHub Actions)

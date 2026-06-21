@@ -284,30 +284,36 @@ fn run_install(repo_path: &str) -> anyhow::Result<()> {
         println!("[LocalForge] ✓ {shim:<14} → {}", dest.display());
     }
 
-    // ── 5. Qwen model — auto-detect from repo or HuggingFace cache ───────────
-    let qwen_dir  = lf_dir.join("qwen2.5-coder-1.5b-4bit");
-    let qwen_name = "qwen2.5-coder-1.5b-4bit";
-    if qwen_dir.exists() {
-        println!("[LocalForge] ✓ Qwen model found  → {}", qwen_dir.display());
+    // ── 5. Qwen 7B model — prefer 7B, fall back to 1.5B ─────────────────────
+    let qwen_7b_dir  = lf_dir.join("qwen2.5-coder-7b-4bit");
+    let qwen_15b_dir = lf_dir.join("qwen2.5-coder-1.5b-4bit");
+
+    if qwen_7b_dir.exists() {
+        println!("[LocalForge] ✓ Qwen 7B model     → {}", qwen_7b_dir.display());
+    } else if qwen_15b_dir.exists() {
+        // Upgrade path: 1.5B present, download 7B
+        println!("[LocalForge] ℹ Qwen 1.5B found. Downloading 7B for better accuracy...");
+        install_qwen_model(&lf_dir, "mlx-community/Qwen2.5-Coder-7B-Instruct-4bit", "qwen2.5-coder-7b-4bit");
     } else {
-        // Check repo coreml/ first
-        let repo_qwen = find_repo_resource(qwen_name);
-        // Then HuggingFace cache
+        // Fresh install: try to find in repo/HF cache first, then download
+        let repo_qwen = find_repo_resource("qwen2.5-coder-7b-4bit")
+            .or_else(|| find_repo_resource("qwen2.5-coder-1.5b-4bit"));
         let hf_cache  = find_qwen_in_hf_cache();
         if let Some(src) = repo_qwen.or(hf_cache) {
-            // Use rename (same volume usually), fall back to copy
-            if fs::rename(&src, &qwen_dir).is_err() {
-                copy_dir_all(&src, &qwen_dir)?;
+            if fs::rename(&src, &qwen_7b_dir).is_err() {
+                copy_dir_all(&src, &qwen_7b_dir)?;
             }
-            println!("[LocalForge] ✓ Qwen model moved  → {}", qwen_dir.display());
+            println!("[LocalForge] ✓ Qwen model moved  → {}", qwen_7b_dir.display());
         } else {
-            println!("[LocalForge] ⚠ Qwen model not found (Layer 3 advisory will be skipped).");
-            println!("             To enable it:");
-            println!("               pip3 install mlx-lm");
-            println!("               python3 -c \"from mlx_lm import load; load('Qwen/Qwen2.5-Coder-1.5B-Instruct-4bit')\"");
-            println!("             Then re-run: localforge --install");
+            println!("[LocalForge] ℹ Downloading Qwen2.5-Coder-7B (4-bit, ~4GB) for Layer 3 advisory...");
+            install_qwen_model(&lf_dir, "mlx-community/Qwen2.5-Coder-7B-Instruct-4bit", "qwen2.5-coder-7b-4bit");
         }
     }
+
+    // ── 5b. Static analysis tools — auto-install if missing ──────────────────
+    println!();
+    println!("[LocalForge] Checking static analysis tools (Layer 3.5)...");
+    install_static_tools();
 
     // ── 6. Install git hook ───────────────────────────────────────────────────
     let repo = std::path::Path::new(repo_path);
@@ -899,6 +905,188 @@ fn copy_dir_all(src: &std::path::Path, dst: &std::path::Path) -> anyhow::Result<
         }
     }
     Ok(())
+}
+
+fn install_qwen_model(lf_dir: &std::path::Path, hf_repo: &str, model_name: &str) {
+    // Ensure mlx-lm is available
+    let pip_ok = std::process::Command::new("pip3")
+        .args(["install", "-q", "mlx-lm"])
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false);
+
+    if !pip_ok {
+        println!("[LocalForge] ⚠ pip3 not found — cannot auto-download Qwen model.");
+        println!("             Install Python 3 and run: pip3 install mlx-lm");
+        println!("             Then: python3 -m mlx_lm.convert --hf-path {hf_repo} --mlx-path ~/.localforge/{model_name}");
+        return;
+    }
+
+    let dest = lf_dir.join(model_name);
+    println!("[LocalForge]   Destination: {}", dest.display());
+    println!("[LocalForge]   This may take a few minutes depending on your connection...");
+
+    let status = std::process::Command::new("python3")
+        .args([
+            "-c",
+            &format!(
+                "from mlx_lm import load; import os; \
+                 m,t=load('{hf_repo}'); \
+                 print('[LocalForge] ✓ Qwen model downloaded')"
+            ),
+        ])
+        .status();
+
+    match status {
+        Ok(s) if s.success() => {
+            // mlx_lm.load caches to ~/.cache/huggingface — move to .localforge
+            let hf_cache = std::path::PathBuf::from(std::env::var("HOME").unwrap_or_default())
+                .join(".cache/huggingface/hub");
+            if let Ok(entries) = std::fs::read_dir(&hf_cache) {
+                for entry in entries.flatten() {
+                    let name = entry.file_name().to_string_lossy().to_lowercase();
+                    if name.contains("qwen2.5-coder") && name.contains(&model_name[..6]) {
+                        let _ = std::fs::rename(entry.path(), &dest)
+                            .or_else(|_| copy_dir_all(&entry.path(), &dest));
+                        break;
+                    }
+                }
+            }
+            if dest.exists() {
+                println!("[LocalForge] ✓ Qwen model ready  → {}", dest.display());
+            } else {
+                println!("[LocalForge] ✓ Qwen model cached in HuggingFace cache.");
+                println!("             advisory.py will find it automatically.");
+            }
+        }
+        _ => {
+            println!("[LocalForge] ⚠ Model download failed. To install manually:");
+            println!("               pip3 install mlx-lm");
+            println!("               python3 -m mlx_lm.convert --hf-path {hf_repo} \\");
+            println!("                 --mlx-path ~/.localforge/{model_name}");
+        }
+    }
+}
+
+fn install_static_tools() {
+    // ── bandit (Python security) ──────────────────────────────────────────────
+    let bandit_ok = which_tool("bandit");
+    if bandit_ok {
+        println!("[LocalForge] ✓ bandit            → installed");
+    } else {
+        print!("[LocalForge]   Installing bandit (Python security)... ");
+        let ok = std::process::Command::new("pip3")
+            .args(["install", "-q", "bandit"])
+            .status()
+            .map(|s| s.success())
+            .unwrap_or(false);
+        println!("{}", if ok { "✓" } else { "⚠ failed (pip3 install bandit)" });
+    }
+
+    // ── pylint (Python quality) ───────────────────────────────────────────────
+    let pylint_ok = which_tool("pylint");
+    if pylint_ok {
+        println!("[LocalForge] ✓ pylint            → installed");
+    } else {
+        print!("[LocalForge]   Installing pylint (Python quality)... ");
+        let ok = std::process::Command::new("pip3")
+            .args(["install", "-q", "pylint"])
+            .status()
+            .map(|s| s.success())
+            .unwrap_or(false);
+        println!("{}", if ok { "✓" } else { "⚠ failed (pip3 install pylint)" });
+    }
+
+    // ── eslint (JS/TS) ────────────────────────────────────────────────────────
+    let eslint_ok = which_tool("eslint");
+    if eslint_ok {
+        println!("[LocalForge] ✓ eslint            → installed");
+    } else {
+        print!("[LocalForge]   Installing eslint (JS/TS quality)... ");
+        let ok = std::process::Command::new("npm")
+            .args(["install", "-g", "--silent", "eslint"])
+            .status()
+            .map(|s| s.success())
+            .unwrap_or(false);
+        if !ok {
+            println!("⚠ failed");
+            println!("             npm not found or permission error.");
+            println!("             To install manually: npm install -g eslint");
+        } else {
+            println!("✓");
+        }
+    }
+
+    // ── staticcheck (Go) ─────────────────────────────────────────────────────
+    let sc_ok = which_tool("staticcheck");
+    if sc_ok {
+        println!("[LocalForge] ✓ staticcheck       → installed");
+    } else {
+        // Try go install first, then brew
+        let go_ok = which_tool("go");
+        if go_ok {
+            print!("[LocalForge]   Installing staticcheck (Go quality)... ");
+            let ok = std::process::Command::new("go")
+                .args(["install", "honnef.co/go/tools/cmd/staticcheck@latest"])
+                .status()
+                .map(|s| s.success())
+                .unwrap_or(false);
+            println!("{}", if ok { "✓" } else { "⚠ failed (go install staticcheck)" });
+        } else {
+            // Try brew
+            let brew_ok = which_tool("brew");
+            if brew_ok {
+                print!("[LocalForge]   Installing staticcheck via brew... ");
+                let ok = std::process::Command::new("brew")
+                    .args(["install", "-q", "staticcheck"])
+                    .status()
+                    .map(|s| s.success())
+                    .unwrap_or(false);
+                println!("{}", if ok { "✓" } else { "⚠ failed" });
+            } else {
+                println!("[LocalForge] ⚠ staticcheck not found.");
+                println!("             Install with: brew install staticcheck");
+            }
+        }
+    }
+
+    // ── go vet (built into go toolchain) ─────────────────────────────────────
+    if which_tool("go") {
+        println!("[LocalForge] ✓ go vet            → available (part of Go toolchain)");
+    } else {
+        println!("[LocalForge] ℹ go not found — Go static analysis will be skipped.");
+        println!("             Install Go from https://go.dev/dl/ to enable it.");
+    }
+
+    // ── cargo clippy (built into rustup) ─────────────────────────────────────
+    if which_tool("cargo") {
+        let clippy_ok = std::process::Command::new("cargo")
+            .args(["clippy", "--version"])
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false);
+        if clippy_ok {
+            println!("[LocalForge] ✓ cargo clippy      → available");
+        } else {
+            print!("[LocalForge]   Installing clippy component... ");
+            let ok = std::process::Command::new("rustup")
+                .args(["component", "add", "clippy"])
+                .status()
+                .map(|s| s.success())
+                .unwrap_or(false);
+            println!("{}", if ok { "✓" } else { "⚠ failed (rustup component add clippy)" });
+        }
+    } else {
+        println!("[LocalForge] ℹ cargo not found — Rust static analysis will be skipped.");
+    }
+}
+
+fn which_tool(name: &str) -> bool {
+    std::process::Command::new("which")
+        .arg(name)
+        .output()
+        .map(|o| o.status.success())
+        .unwrap_or(false)
 }
 
 fn print_advisory(report: &advisory_engine::AdvisoryResult) {

@@ -1,87 +1,262 @@
 {
-  "built_at": "2026-06-18T11:43:48.059049+00:00",
-  "model_version": "2.0.0",
+  "built_at": "2026-06-19T14:23:18.071379+00:00",
+  "model_version": "2.1.0",
   "layer": 2,
-  "architecture": "TF-IDF (char_wb 3-5gram, 512 features) + Inner Product + Sigmoid (CoreML)",
+  "architecture": "TF-IDF (char_wb 3-5gram, 1024 features) + Inner Product + Sigmoid (CoreML)",
   "compute_unit": "CPU_AND_NE",
-  "n_training_samples": 81,
-  "n_risky": 50,
-  "n_clean": 31,
-  "train_accuracy": 0.9383,
-  "cv_f1_mean": 0.4963,
-  "cv_f1_std": 0.229,
+  "n_training_samples": 297,
+  "n_risky": 170,
+  "n_clean": 127,
+  "languages": [
+    "Python",
+    "JavaScript",
+    "TypeScript",
+    "Java",
+    "Go",
+    "Rust",
+    "C#",
+    "PHP",
+    "Ruby",
+    "Swift",
+    "Kotlin",
+    "SQL"
+  ],
+  "train_accuracy": 0.8956,
+  "cv_f1_mean": 0.7543,
+  "cv_f1_std": 0.021,
   "threshold": 0.5,
   "verification": {
-    "n_cases": 10,
-    "passed": 10,
-    "accuracy": 1.0,
+    "n_cases": 33,
+    "passed": 32,
+    "accuracy": 0.9697,
     "cases": [
       {
         "text": "password = 'hunter2'",
-        "score": 0.7358,
+        "score": 0.5522,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "eval(request.GET['cmd'])",
+        "score": 0.7745,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "verify=False",
+        "score": 0.7899,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "requests.get(url, verify=False)",
+        "score": 0.6308,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "jwt_secret = 'not-very-secret'",
+        "score": 0.831,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "hashlib.md5(password.encode())",
+        "score": 0.6042,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "cursor.execute('SELECT * FROM u WHERE id=' + id)",
+        "score": 0.5558,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "pickle.loads(untrusted_data)",
+        "score": 0.7922,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "eval(userInput)",
+        "score": 0.785,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "innerHTML = userComment",
+        "score": 0.6726,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "db.query('SELECT * FROM u WHERE id=' + req.params.id)",
+        "score": 0.6194,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'",
+        "score": 0.5674,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "Runtime.getRuntime().exec(userInput)",
+        "score": 0.7891,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "MessageDigest.getInstance(\"MD5\")",
+        "score": 0.4994,
+        "label": 0,
+        "expected": 1,
+        "pass": false
+      },
+      {
+        "text": "tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}",
+        "score": 0.6043,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "fmt.Sprintf(\"SELECT * FROM t WHERE name='%s'\", name)",
+        "score": 0.6174,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "system($_GET['cmd']);",
+        "score": 0.795,
+        "label": 1,
+        "expected": 1,
+        "pass": true
+      },
+      {
+        "text": "md5($password)",
+        "score": 0.6736,
         "label": 1,
         "expected": 1,
         "pass": true
       },
       {
         "text": "def add(a, b): return a + b",
-        "score": 0.1649,
+        "score": 0.4136,
         "label": 0,
         "expected": 0,
-        "pass": true
-      },
-      {
-        "text": "eval(request.GET['cmd'])",
-        "score": 0.6732,
-        "label": 1,
-        "expected": 1,
         "pass": true
       },
       {
         "text": "api_key = os.getenv('API_KEY')",
-        "score": 0.375,
+        "score": 0.2309,
         "label": 0,
         "expected": 0,
-        "pass": true
-      },
-      {
-        "text": "verify=False",
-        "score": 0.7529,
-        "label": 1,
-        "expected": 1,
         "pass": true
       },
       {
         "text": "let x: u32 = 42;",
-        "score": 0.4094,
+        "score": 0.3552,
         "label": 0,
         "expected": 0,
-        "pass": true
-      },
-      {
-        "text": "requests.get(url, verify=False)",
-        "score": 0.5671,
-        "label": 1,
-        "expected": 1,
         "pass": true
       },
       {
         "text": "ssl.create_default_context()",
-        "score": 0.3921,
+        "score": 0.3648,
         "label": 0,
         "expected": 0,
         "pass": true
       },
       {
-        "text": "jwt_secret = 'not-very-secret'",
-        "score": 0.809,
-        "label": 1,
-        "expected": 1,
+        "text": "secrets.token_hex(32)",
+        "score": 0.2351,
+        "label": 0,
+        "expected": 0,
         "pass": true
       },
       {
-        "text": "secrets.token_hex(32)",
-        "score": 0.4973,
+        "text": "cursor.execute('SELECT * FROM u WHERE id = %s', (id,))",
+        "score": 0.4336,
+        "label": 0,
+        "expected": 0,
+        "pass": true
+      },
+      {
+        "text": "const apiKey = process.env.API_KEY;",
+        "score": 0.2858,
+        "label": 0,
+        "expected": 0,
+        "pass": true
+      },
+      {
+        "text": "crypto.randomBytes(32).toString('hex')",
+        "score": 0.3002,
+        "label": 0,
+        "expected": 0,
+        "pass": true
+      },
+      {
+        "text": "const stmt = db.prepare('SELECT * FROM users WHERE id = ?');",
+        "score": 0.1528,
+        "label": 0,
+        "expected": 0,
+        "pass": true
+      },
+      {
+        "text": "password := os.Getenv(\"DB_PASSWORD\")",
+        "score": 0.1915,
+        "label": 0,
+        "expected": 0,
+        "pass": true
+      },
+      {
+        "text": "rows, err := db.Query(\"SELECT * FROM u WHERE id = $1\", id)",
+        "score": 0.3532,
+        "label": 0,
+        "expected": 0,
+        "pass": true
+      },
+      {
+        "text": "String password = System.getenv(\"DB_PASSWORD\");",
+        "score": 0.2808,
+        "label": 0,
+        "expected": 0,
+        "pass": true
+      },
+      {
+        "text": "PreparedStatement ps = conn.prepareStatement(\"SELECT * FROM u WHERE id=?\");",
+        "score": 0.2511,
+        "label": 0,
+        "expected": 0,
+        "pass": true
+      },
+      {
+        "text": "password = os.environ['PASSWORD']",
+        "score": 0.2302,
+        "label": 0,
+        "expected": 0,
+        "pass": true
+      },
+      {
+        "text": "test_password = 'test_value_for_unit_test'",
+        "score": 0.3481,
         "label": 0,
         "expected": 0,
         "pass": true

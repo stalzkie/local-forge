@@ -1,0 +1,3526 @@
+{
+  "meta": {
+    "timestamp": "2026-06-21T04:13:40.044117+00:00",
+    "corpus_size": 145,
+    "model_dir": "/Users/stal/.localforge/qwen2.5-coder-1.5b-4bit",
+    "runtime_s": 457.94,
+    "quick_mode": false
+  },
+  "overall": {
+    "tp": 74,
+    "fp": 40,
+    "fn": 16,
+    "tn": 15,
+    "precision": 0.6491,
+    "recall": 0.8222,
+    "f1": 0.7255,
+    "fpr": 0.7273
+  },
+  "by_category": {
+    "clean": {
+      "tp": 0,
+      "fp": 5,
+      "fn": 0,
+      "tn": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.8333
+    },
+    "command_injection": {
+      "tp": 7,
+      "fp": 2,
+      "fn": 3,
+      "tn": 3,
+      "precision": 0.7778,
+      "recall": 0.7,
+      "f1": 0.7368,
+      "fpr": 0.4
+    },
+    "dead_code": {
+      "tp": 4,
+      "fp": 3,
+      "fn": 2,
+      "tn": 0,
+      "precision": 0.5714,
+      "recall": 0.6667,
+      "f1": 0.6154,
+      "fpr": 1.0
+    },
+    "edge_removal": {
+      "tp": 0,
+      "fp": 3,
+      "fn": 0,
+      "tn": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.75
+    },
+    "hardcoded_secret": {
+      "tp": 8,
+      "fp": 1,
+      "fn": 0,
+      "tn": 3,
+      "precision": 0.8889,
+      "recall": 1.0,
+      "f1": 0.9412,
+      "fpr": 0.25
+    },
+    "insecure_tls": {
+      "tp": 7,
+      "fp": 3,
+      "fn": 1,
+      "tn": 1,
+      "precision": 0.7,
+      "recall": 0.875,
+      "f1": 0.7778,
+      "fpr": 0.75
+    },
+    "large_diff": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1": 0.6667,
+      "fpr": 1.0
+    },
+    "logic_bug": {
+      "tp": 7,
+      "fp": 4,
+      "fn": 1,
+      "tn": 0,
+      "precision": 0.6364,
+      "recall": 0.875,
+      "f1": 0.7368,
+      "fpr": 1.0
+    },
+    "mixed": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0
+    },
+    "multi_file": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "tn": 0,
+      "precision": 0.5,
+      "recall": 0.5,
+      "f1": 0.5,
+      "fpr": 1.0
+    },
+    "obfuscated": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0,
+      "precision": 1.0,
+      "recall": 0.6667,
+      "f1": 0.8,
+      "fpr": 0.0
+    },
+    "path_traversal": {
+      "tp": 5,
+      "fp": 3,
+      "fn": 1,
+      "tn": 0,
+      "precision": 0.625,
+      "recall": 0.8333,
+      "f1": 0.7143,
+      "fpr": 1.0
+    },
+    "race_condition": {
+      "tp": 6,
+      "fp": 3,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.6667,
+      "recall": 1.0,
+      "f1": 0.8,
+      "fpr": 1.0
+    },
+    "refactor": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0
+    },
+    "sql_injection": {
+      "tp": 10,
+      "fp": 2,
+      "fn": 0,
+      "tn": 3,
+      "precision": 0.8333,
+      "recall": 1.0,
+      "f1": 0.9091,
+      "fpr": 0.4
+    },
+    "unhandled_exception": {
+      "tp": 4,
+      "fp": 3,
+      "fn": 2,
+      "tn": 0,
+      "precision": 0.5714,
+      "recall": 0.6667,
+      "f1": 0.6154,
+      "fpr": 1.0
+    },
+    "unsafe_deserialization": {
+      "tp": 5,
+      "fp": 2,
+      "fn": 1,
+      "tn": 1,
+      "precision": 0.7143,
+      "recall": 0.8333,
+      "f1": 0.7692,
+      "fpr": 0.6667
+    },
+    "xss": {
+      "tp": 5,
+      "fp": 4,
+      "fn": 3,
+      "tn": 0,
+      "precision": 0.5556,
+      "recall": 0.625,
+      "f1": 0.5882,
+      "fpr": 1.0
+    }
+  },
+  "by_language": {
+    "go": {
+      "tp": 12,
+      "fp": 9,
+      "fn": 1,
+      "tn": 3,
+      "precision": 0.5714,
+      "recall": 0.9231,
+      "f1": 0.7059,
+      "fpr": 0.75
+    },
+    "java": {
+      "tp": 9,
+      "fp": 6,
+      "fn": 2,
+      "tn": 0,
+      "precision": 0.6,
+      "recall": 0.8182,
+      "f1": 0.6923,
+      "fpr": 1.0
+    },
+    "javascript": {
+      "tp": 8,
+      "fp": 3,
+      "fn": 4,
+      "tn": 0,
+      "precision": 0.7273,
+      "recall": 0.6667,
+      "f1": 0.6957,
+      "fpr": 1.0
+    },
+    "php": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 2,
+      "tn": 0,
+      "precision": 1.0,
+      "recall": 0.3333,
+      "f1": 0.5,
+      "fpr": 0.0
+    },
+    "python": {
+      "tp": 29,
+      "fp": 12,
+      "fn": 6,
+      "tn": 7,
+      "precision": 0.7073,
+      "recall": 0.8286,
+      "f1": 0.7632,
+      "fpr": 0.6316
+    },
+    "ruby": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0
+    },
+    "rust": {
+      "tp": 6,
+      "fp": 4,
+      "fn": 0,
+      "tn": 1,
+      "precision": 0.6,
+      "recall": 1.0,
+      "f1": 0.75,
+      "fpr": 0.8
+    },
+    "swift": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1": 0.6667,
+      "fpr": 1.0
+    },
+    "typescript": {
+      "tp": 6,
+      "fp": 5,
+      "fn": 1,
+      "tn": 3,
+      "precision": 0.5455,
+      "recall": 0.8571,
+      "f1": 0.6667,
+      "fpr": 0.625
+    }
+  },
+  "results": [
+    {
+      "id": "sql_01",
+      "language": "python",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.7,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "SQL command injection vulnerability introduced in the `query` variable.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_command_injection",
+            "line_hint": "line 12 in diff",
+            "explanation": "The SQL query is constructed directly from user input without proper sanitization.",
+            "remediation": "Use parameterized queries or ORM libraries to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040604Z_81bdeeb0c1.txt"
+      }
+    },
+    {
+      "id": "sql_02",
+      "language": "python",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.1,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "SQL command injection vulnerability introduced by the SQL query generated from the report_id and user_id.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_command_injection",
+            "line_hint": "line 34 in generator.py",
+            "explanation": "The SQL query is constructed directly from user input without proper sanitization, allowing for SQL injection attacks.",
+            "remediation": "Use parameterized queries or prepared statements to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040607Z_3fa72396e7.txt"
+      }
+    },
+    {
+      "id": "sql_03",
+      "language": "javascript",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.72,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "SQL command injection vulnerability introduced in the diff.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_command_injection",
+            "line_hint": "exact added line from diff",
+            "explanation": "The SQL query is vulnerable to SQL injection because it directly concatenates user input without proper sanitization.",
+            "remediation": "Use parameterized queries or prepared statements to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040610Z_efe265dfb2.txt"
+      }
+    },
+    {
+      "id": "sql_04",
+      "language": "java",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.76,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded password in SQL query",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 21 in UserDao.java",
+            "explanation": "The password is directly embedded in the SQL query, which is a security risk.",
+            "remediation": "Replace the hardcoded password with a secure mechanism, such as environment variables or a secure data store."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040613Z_f4da3e6cf2.txt"
+      }
+    },
+    {
+      "id": "sql_05",
+      "language": "go",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.92,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "SQL command injection vulnerability introduced in the `QueryRow` method.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_command_injection",
+            "line_hint": "line 18 in users.go",
+            "explanation": "The SQL query is directly constructed from user input (`orderID`), which can lead to SQL injection if `orderID` is not properly sanitized.",
+            "remediation": "Use parameterized queries or prepared statements to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040616Z_2cb3eff2c9.txt"
+      }
+    },
+    {
+      "id": "sql_06",
+      "language": "php",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.72,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "SQL command injection vulnerability introduced in the search query.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_command_injection",
+            "line_hint": "line 5 of diff",
+            "explanation": "The query directly concatenates user input without proper sanitization.",
+            "remediation": "Use prepared statements or parameterized queries to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040618Z_e05ba2ebb9.txt"
+      }
+    },
+    {
+      "id": "sql_07",
+      "language": "python",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.87,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "SQL command injection vulnerability introduced by the `start_date` and `end_date` parameters.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_command_injection",
+            "line_hint": "line 44",
+            "explanation": "The `start_date` and `end_date` parameters are directly concatenated into the SQL query without proper sanitization.",
+            "remediation": "Use parameterized queries or prepared statements to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040621Z_499d129972.txt"
+      }
+    },
+    {
+      "id": "sql_08",
+      "language": "typescript",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.87,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "SQL command injection vulnerability introduced by the SQL query generated from the customer_id parameter.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_command_injection",
+            "line_hint": "line 22 in invoiceRepo.ts",
+            "explanation": "The SQL query is constructed directly from user input without proper sanitization, allowing for SQL injection attacks.",
+            "remediation": "Use parameterized queries or prepared statements to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040624Z_35cc7d6900.txt"
+      }
+    },
+    {
+      "id": "sql_09",
+      "language": "rust",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.66,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "SQL command injection vulnerability introduced in the diff.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_command_injection",
+            "line_hint": "line 31 in diff",
+            "explanation": "The query is constructed directly from user input without proper sanitization.",
+            "remediation": "Use parameterized queries or prepared statements to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040627Z_cb4a372a3a.txt"
+      }
+    },
+    {
+      "id": "sql_10",
+      "language": "python",
+      "category": "sql_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.69,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "SQL command injection vulnerability introduced in the `raw` variable.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_command_injection",
+            "line_hint": "line 89 in diff",
+            "explanation": "The SQL query is constructed directly from user input without proper sanitization.",
+            "remediation": "Use parameterized queries or prepared statements to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040630Z_9e70bf2793.txt"
+      }
+    },
+    {
+      "id": "sql_tn_01",
+      "language": "python",
+      "category": "sql_injection",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 2.97,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "SQL command injection vulnerability introduced in the `get_user` function.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040633Z_469199fc7e.txt"
+      }
+    },
+    {
+      "id": "sql_tn_02",
+      "language": "typescript",
+      "category": "sql_injection",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 3.38,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "Hardcoded secret in the query parameter.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040636Z_463e0b9259.txt"
+      }
+    },
+    {
+      "id": "sql_tn_03",
+      "language": "go",
+      "category": "sql_injection",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 2.79,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "SQL command injection vulnerability introduced in the query.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040639Z_6be137d83d.txt"
+      }
+    },
+    {
+      "id": "sql_tn_04",
+      "language": "java",
+      "category": "sql_injection",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.02,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in SQL query",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 18",
+            "explanation": "The SQL query directly includes the user ID, which is hard-coded in the query string. This is a security risk as it exposes the user ID directly in the query.",
+            "remediation": "Replace the user ID with a parameterized query to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040642Z_e24518e1cb.txt"
+      }
+    },
+    {
+      "id": "sql_tn_05",
+      "language": "rust",
+      "category": "sql_injection",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 2.82,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "SQL command injection vulnerability introduced in the diff.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_command_injection",
+            "line_hint": "exact added line from diff",
+            "explanation": "The SQL query is vulnerable to SQL injection because it directly concatenates user input without proper sanitization.",
+            "remediation": "Use parameterized queries or prepared statements to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040645Z_e08c393f96.txt"
+      }
+    },
+    {
+      "id": "cmd_01",
+      "language": "python",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.47,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff adds a command to the system that runs the `convert` command with the filename as input and outputs the result as `output.png`. This command is executed without any checks or sanitization, which could lead to command injection if the filename is controlled by an attacker.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "command_injection",
+            "line_hint": "line 18 in diff",
+            "explanation": "The `convert` command is executed with the filename as input, which could be controlled by an attacker. This could lead to command injection if the filename is controlled by an attacker.",
+            "remediation": "Add input validation or sanitization to the filename before passing it to the `convert` command."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040648Z_308e2267b9.txt"
+      }
+    },
+    {
+      "id": "cmd_02",
+      "language": "python",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.08,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `runner.py` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +    subprocess.run(f\"python3 reports/{report_name}.py > {output_dir}/out.txt\", shell=True)",
+            "explanation": "The secret `report_name` is hardcoded in the command line argument, which can be easily read by anyone with access to the file.",
+            "remediation": "Change the secret to a variable or environment variable that is not hard-coded in the file."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040651Z_f17a795542.txt"
+      }
+    },
+    {
+      "id": "cmd_03",
+      "language": "javascript",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.98,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `deploy.js` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 15: `const { execSync } = require('child_process');`",
+            "explanation": "The `execSync` function is used to execute a command, which can expose the secret if the command is executed with the wrong permissions.",
+            "remediation": "Change the command to use `child_process.exec` instead, which does not expose the secret."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040654Z_d355fe5184.txt"
+      }
+    },
+    {
+      "id": "cmd_04",
+      "language": "go",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.84,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "Hardcoded secret in the command line argument.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 28: cmd := exec.Command(\"bash\", \"-c\", \"run_job.sh \" + jobName)",
+            "explanation": "The command line argument `run_job.sh` contains a hardcoded secret `jobName`.",
+            "remediation": "Replace `jobName` with a secure environment variable or parameter."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040657Z_12ef3116ed.txt"
+      }
+    },
+    {
+      "id": "cmd_05",
+      "language": "python",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.88,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "SQL command injection vulnerability introduced in the export function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_command_injection",
+            "line_hint": "line 42 in diff",
+            "explanation": "The command `psql -c 'COPY {table_name} TO STDOUT CSV' > /tmp/export.csv'` is vulnerable to SQL injection if `table_name` is user-controlled.",
+            "remediation": "Use parameterized queries or prepared statements to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040700Z_e74fa492fd.txt"
+      }
+    },
+    {
+      "id": "cmd_06",
+      "language": "ruby",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.7,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff adds a command to resize an image file using the `convert` command, which is a common tool for image manipulation. This command is vulnerable to command injection if the input is not properly sanitized.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "command_injection",
+            "line_hint": "exact added line from diff",
+            "explanation": "The command `convert #{filename} -resize #{width}x#{height} #{filename}` is vulnerable to command injection if the `filename` variable is not properly sanitized. An attacker could manipulate the `filename` variable to execute arbitrary commands.",
+            "remediation": "Use parameterized queries or prepared statements to sanitize the `filename` variable. For example, use `convert #{filename} -resize #{width}x#{height} #{filename}` instead of `convert #{filename} -resize #{width}x#{height} #{filename}`."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040704Z_5112d31f18.txt"
+      }
+    },
+    {
+      "id": "cmd_07",
+      "language": "java",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.7,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "Hardcoded password in ShellRunner.java",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 25 in ShellRunner.java",
+            "explanation": "The password is hard-coded in the exec command, which is a security risk.",
+            "remediation": "Change the password to a secure value and update the exec command accordingly."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040706Z_6166e80b84.txt"
+      }
+    },
+    {
+      "id": "cmd_08",
+      "language": "typescript",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 2.74,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"medium\",\n  \"summary\": \"The diff introduces a hardcoded secret in the `execSync` command.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"hardcoded_secret\",\n      ",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040709Z_51439bdb01.txt"
+      }
+    },
+    {
+      "id": "cmd_09",
+      "language": "python",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 3.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"medium\",\n  \"summary\": \"The diff introduces a hardcoded secret in the `host` variable, which could be used for unauthorized access.\",\n  \"findings\": [\n    {\n      \"category\": \"security\"",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040712Z_37f0c7eef5.txt"
+      }
+    },
+    {
+      "id": "cmd_10",
+      "language": "go",
+      "category": "command_injection",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 3.11,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"medium\",\n  \"summary\": \"The diff introduces a hardcoded secret in the `shell.go` file.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"hardcoded_secret\",\n      \"li",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040715Z_a2868c4ee7.txt"
+      }
+    },
+    {
+      "id": "cmd_tn_01",
+      "language": "python",
+      "category": "command_injection",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 3.39,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "The diff adds a subprocess call that runs the 'convert' command with the filename and 'output.png' as arguments. This command is executed without any input validation or sanitization, which could lead to command injection if the filename is controlled by an attacker.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040718Z_a997117f8a.txt"
+      }
+    },
+    {
+      "id": "cmd_tn_02",
+      "language": "go",
+      "category": "command_injection",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 2.75,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "Hardcoded secret in the command line argument.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 28: cmd := exec.Command(\"run_job.sh\", jobName)",
+            "explanation": "The command line argument `jobName` contains a hardcoded secret.",
+            "remediation": "Replace `jobName` with a secure environment variable or parameter."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040721Z_9fe0ba8e2b.txt"
+      }
+    },
+    {
+      "id": "cmd_tn_03",
+      "language": "javascript",
+      "category": "command_injection",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 2.69,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the build process.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "const { spawnSync } = require('child_process');",
+            "explanation": "The secret is hardcoded in the build script, which is not secure.",
+            "remediation": "Replace the secret with environment variables or a secure configuration file."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040724Z_5c013ec058.txt"
+      }
+    },
+    {
+      "id": "cmd_tn_04",
+      "language": "python",
+      "category": "command_injection",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 3.3,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "The diff adds a subprocess call to run 'gzip -f path' which is a common command for compressing files. This command is not secure as it does not verify the input file path, which could lead to directory traversal attacks.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040727Z_b91dcde295.txt"
+      }
+    },
+    {
+      "id": "cmd_tn_05",
+      "language": "ruby",
+      "category": "command_injection",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 3.38,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"medium\",\n  \"summary\": \"The diff adds a command to run RSpec with a progress format, which is a common practice for running tests. However, the command is executed directly without any",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040731Z_a2b6c2865f.txt"
+      }
+    },
+    {
+      "id": "xss_01",
+      "language": "javascript",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.95,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `Comment.jsx` component.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 14: `+  return <div dangerouslySetInnerHTML={{ __html: text }} />;`",
+            "explanation": "The `text` variable is directly rendered in the HTML without proper sanitization, allowing for XSS attacks.",
+            "remediation": "Use a library like `react-dom/server` to safely render HTML."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040734Z_670eafe4e2.txt"
+      }
+    },
+    {
+      "id": "xss_02",
+      "language": "javascript",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.99,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the search results page.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "document.getElementById('results').innerHTML = results.map(r => r.title).join('<br>');",
+            "explanation": "The search results page displays the titles of search results, which are hardcoded in the JavaScript code.",
+            "remediation": "Replace the hardcoded secret with a secure way to retrieve the secret, such as using environment variables or a secure data storage system."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040737Z_710f697227.txt"
+      }
+    },
+    {
+      "id": "xss_03",
+      "language": "python",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.68,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in the app/views.py file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +password = \"old_secret\"",
+            "explanation": "The password is hard-coded in the app/views.py file, which is a security risk.",
+            "remediation": "Change the password to a secure value."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040739Z_5145ecf2ec.txt"
+      }
+    },
+    {
+      "id": "xss_04",
+      "language": "php",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 3.25,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"medium\",\n  \"summary\": \"The diff introduces a hardcoded secret in the `password` variable.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"hardcoded_secret\",\n     ",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040742Z_de5bc8c0f9.txt"
+      }
+    },
+    {
+      "id": "xss_05",
+      "language": "typescript",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.15,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `render` function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 18: `container.innerHTML = msg;`",
+            "explanation": "The `msg` variable is directly assigned to `container.innerHTML`, which could expose the secret if `msg` is user-provided.",
+            "remediation": "Change `container.innerHTML = msg;` to `container.innerHTML = sanitize(msg);` where `sanitize` is a function that removes any potentially harmful characters from `msg`."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040746Z_c36aeb6e28.txt"
+      }
+    },
+    {
+      "id": "xss_06",
+      "language": "javascript",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 3.15,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"medium\",\n  \"summary\": \"The diff introduces a hardcoded secret in the logs.js file.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"hardcoded_secret\",\n      \"line_",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040749Z_3f1586a886.txt"
+      }
+    },
+    {
+      "id": "xss_07",
+      "language": "python",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 3.19,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"medium\",\n  \"summary\": \"The diff introduces a hardcoded secret in the `api/templates.py` file.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"hardcoded_secret\",\n ",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040752Z_5160f1342a.txt"
+      }
+    },
+    {
+      "id": "xss_08",
+      "language": "java",
+      "category": "xss",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.22,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in the search query parameter.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 28: resp.getWriter().write(\"<p>Search results for: \" + q + \"</p>\")",
+            "explanation": "The search query parameter is directly written to the response without any validation or sanitization. This could lead to SQL injection if the query is used in a SQL query.",
+            "remediation": "Add input validation to the search query parameter. For example, use a parameterized query or escape the query string."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040755Z_be2289fc75.txt"
+      }
+    },
+    {
+      "id": "xss_tn_01",
+      "language": "typescript",
+      "category": "xss",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.32,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in the `password` prop of the `Message` component.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 8: `password = \"old_secret\"`",
+            "explanation": "The `password` prop is hard-coded with the value `\"old_secret\"`, which is not secure. It should be replaced with a secure way to store and retrieve the password.",
+            "remediation": "Replace `\"old_secret\"` with a secure way to store and retrieve the password, such as using environment variables or a secure storage mechanism."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040758Z_ebfbf4f552.txt"
+      }
+    },
+    {
+      "id": "xss_tn_02",
+      "language": "python",
+      "category": "xss",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 2.89,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `app/views.py` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +password = \"old_secret\"",
+            "explanation": "The password is hardcoded in the `render` function without any encryption or hashing.",
+            "remediation": "Change the password to a secure hash (e.g., bcrypt) and ensure it is stored securely."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040801Z_ba8ab07d77.txt"
+      }
+    },
+    {
+      "id": "xss_tn_03",
+      "language": "javascript",
+      "category": "xss",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 2.86,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `src/utils/dom.js` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 5: const span = document.createElement('span');",
+            "explanation": "The secret is stored directly in the JavaScript code, which is not secure.",
+            "remediation": "Replace the secret with environment variables or a secure storage mechanism."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040804Z_a809d39b2b.txt"
+      }
+    },
+    {
+      "id": "xss_tn_04",
+      "language": "java",
+      "category": "xss",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.12,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in the search query.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 28: resp.getWriter().write(\"<p>Search results for: \" + q + \"</p>\")",
+            "explanation": "The search query is directly written to the response without any sanitization or encryption. This could lead to SQL injection if the query is used in a SQL statement.",
+            "remediation": "Add parameter encoding or sanitization to the search query."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040807Z_184d8f939d.txt"
+      }
+    },
+    {
+      "id": "secret_01",
+      "language": "python",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.74,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in DB_CONFIG",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "DB_CONFIG['password']",
+            "explanation": "The password is hard-coded in the DB_CONFIG dictionary, which is not secure.",
+            "remediation": "Change the password to a secure hash or use environment variables."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040810Z_49e1e2b061.txt"
+      }
+    },
+    {
+      "id": "secret_02",
+      "language": "javascript",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.19,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a hardcoded Stripe secret in the payment service, which is a security risk.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "const STRIPE_SECRET = \"sk_live_REDACTED_TEST_FIXTURE\";",
+            "explanation": "The secret is stored directly in the code, making it accessible to anyone who has access to the source code.",
+            "remediation": "Change the secret to a environment variable or use a secure way to store it."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040813Z_ed67fe9863.txt"
+      }
+    },
+    {
+      "id": "secret_03",
+      "language": "go",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.95,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in jwtSecret constant.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "const jwtSecret = \"my-super-secret-signing-key-dont-share\"",
+            "explanation": "The jwtSecret constant contains a hardcoded secret that should be stored securely in environment variables or a secure configuration file.",
+            "remediation": "Replace the hardcoded secret with an environment variable or a secure configuration file."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040816Z_cc41418c9d.txt"
+      }
+    },
+    {
+      "id": "secret_04",
+      "language": "java",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.29,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a hardcoded encryption key in the Config.java file, which is a security risk.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "public static final String ENCRYPTION_KEY = \"AES256Key-32Characters1234567890\";",
+            "explanation": "The encryption key is stored in plain text in the source code, which can be easily read by anyone with access to the repository.",
+            "remediation": "Change the encryption key to a secure random value generated at runtime."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040820Z_0825f10aba.txt"
+      }
+    },
+    {
+      "id": "secret_05",
+      "language": "typescript",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.87,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in AUTH_CONFIG",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "export const AUTH_CONFIG = {\n  jwtSecret: \"f3cfe9ed8fae309f02079dbf\",\n  refreshSecret: \"a7b3c2d1e0f9g8h7\",\n};",
+            "explanation": "The JWT secret and refresh secret are hardcoded in the AUTH_CONFIG object, which is a security risk. These secrets should be stored securely in environment variables or configuration files.",
+            "remediation": "Change the secrets to environment variables or configuration files. For example, change the JWT secret to `process.env.JWT_SECRET` and the refresh secret to `process.env.REFRESH_SECRET`."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040823Z_72a0c007d0.txt"
+      }
+    },
+    {
+      "id": "secret_06",
+      "language": "python",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded credentials in SMTP settings.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 18: smtplib.SMTP_SSL('smtp.gmail.com', 465)",
+            "explanation": "The password is hard-coded in the SMTP settings, which is a security risk.",
+            "remediation": "Change the password to a secure value and remove the hardcoded line."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040826Z_8e9ae3dcc4.txt"
+      }
+    },
+    {
+      "id": "secret_07",
+      "language": "rust",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.34,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a hardcoded secret in the `WEBHOOK_SECRET` constant, which is a security risk.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "pub const WEBHOOK_SECRET: &str = \"whsec_live_oiJKHjk23nMzPqr8\";",
+            "explanation": "The secret is stored directly in the code, making it accessible to anyone who has access to the source code.",
+            "remediation": "Change the secret to a environment variable or a secure configuration file."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040830Z_fb6a81c815.txt"
+      }
+    },
+    {
+      "id": "secret_08",
+      "language": "swift",
+      "category": "hardcoded_secret",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.41,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded API key in Config.swift",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "static let apiKey = \"prod_live_xK9mN2pQ7rS4tU1v\"",
+            "explanation": "The API key is hardcoded in the Config.swift file, which is a security risk. It should be stored securely in a secure environment.",
+            "remediation": "Change the API key to a secure environment, such as a secure server or a secure environment variable."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040833Z_459e605c45.txt"
+      }
+    },
+    {
+      "id": "secret_tn_01",
+      "language": "python",
+      "category": "hardcoded_secret",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 2.87,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded database password in settings.py",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "DB_CONFIG['password']",
+            "explanation": "The database password is hard-coded in the settings file, which is a security risk.",
+            "remediation": "Change the password to a secure value and update the settings file."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040836Z_a0d4777bd7.txt"
+      }
+    },
+    {
+      "id": "secret_tn_02",
+      "language": "go",
+      "category": "hardcoded_secret",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 3.16,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "Hardcoded secret in JWT secret variable.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040839Z_475f59907c.txt"
+      }
+    },
+    {
+      "id": "secret_tn_03",
+      "language": "typescript",
+      "category": "hardcoded_secret",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 4.14,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "Hardcoded secret in AUTH_CONFIG",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040843Z_e85e2cdb90.txt"
+      }
+    },
+    {
+      "id": "secret_tn_04",
+      "language": "rust",
+      "category": "hardcoded_secret",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 4.31,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "The diff introduces a hardcoded secret in the `webhook_secret` function.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040848Z_82bf93e92d.txt"
+      }
+    },
+    {
+      "id": "tls_01",
+      "language": "python",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 3.27,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "The diff introduces a hardcoded secret in the `api/client.py` file.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040851Z_512b743b42.txt"
+      }
+    },
+    {
+      "id": "tls_02",
+      "language": "python",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.2,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `hashlib.md5` function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 6 in utils/crypto.py",
+            "explanation": "The `password` variable is hardcoded in the `hashlib.md5` function, which is a security risk.",
+            "remediation": "Change the `password` variable to a secure data type (e.g., `str` or `bytes`) and ensure it is properly sanitized before hashing."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040854Z_30c6159307.txt"
+      }
+    },
+    {
+      "id": "tls_03",
+      "language": "java",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.3,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "The diff introduces a hardcoded secret in the SSL/TLS configuration.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 22 in HttpClient.java",
+            "explanation": "The SSL/TLS context is configured with a hardcoded trust manager that trusts all certificates, which is a security risk.",
+            "remediation": "Replace the hardcoded trust manager with a custom trust manager that trusts only the necessary certificates."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040857Z_434924d0b2.txt"
+      }
+    },
+    {
+      "id": "tls_04",
+      "language": "go",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.2,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the TLS client configuration.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 14: tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}",
+            "explanation": "The TLS client configuration is insecure and should not be used in production.",
+            "remediation": "Change the TLSClientConfig to use a valid certificate chain and disable insecure skip verification."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040901Z_f783a012c9.txt"
+      }
+    },
+    {
+      "id": "tls_05",
+      "language": "javascript",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.06,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff adds a line to disable TLS verification, which is a security risk.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "disabled_tls_verification",
+            "line_hint": "line 8 in diff",
+            "explanation": "Disabling TLS verification can expose the application to man-in-the-middle attacks.",
+            "remediation": "Add the following line to the file: `process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';`"
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040904Z_72f53ae3aa.txt"
+      }
+    },
+    {
+      "id": "tls_06",
+      "language": "python",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.22,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `hashing.py` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "raw = str(user_id) + \"salt\"",
+            "explanation": "The `raw` variable contains a hardcoded secret that should be replaced with a secure random value.",
+            "remediation": "Replace `raw = str(user_id) + \"salt\"` with `raw = generate_secure_random_string()`. Use a secure random string generator function."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040907Z_aad586fb19.txt"
+      }
+    },
+    {
+      "id": "tls_07",
+      "language": "rust",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.17,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the HTTP client configuration.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "reqwest::Client::builder().danger_accept_invalid_certs(true).build().unwrap();",
+            "explanation": "The client is configured to accept invalid SSL certificates, which is a security risk.",
+            "remediation": "Disable this feature by setting `danger_accept_invalid_certs` to `false`."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040910Z_ea44d427cd.txt"
+      }
+    },
+    {
+      "id": "tls_08",
+      "language": "python",
+      "category": "insecure_tls",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.99,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `crypto_util.py` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "8, 9, 10",
+            "explanation": "The `key[:8]` is hardcoded, which is a security risk.",
+            "remediation": "Replace the hardcoded key with a secure random key."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040913Z_0b7e2af21f.txt"
+      }
+    },
+    {
+      "id": "tls_tn_01",
+      "language": "python",
+      "category": "insecure_tls",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 3.27,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "The diff introduces a hardcoded secret in the API client.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040916Z_6ce3589563.txt"
+      }
+    },
+    {
+      "id": "tls_tn_02",
+      "language": "go",
+      "category": "insecure_tls",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.31,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `http.Client` configuration.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 14: `+    return &http.Client{Timeout: 30 * time.Second}`",
+            "explanation": "The `Timeout` value is hardcoded to 30 seconds, which is a common default but not recommended for production environments.",
+            "remediation": "Change the timeout to a more reasonable value, such as 60 seconds."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040920Z_00e4ad35db.txt"
+      }
+    },
+    {
+      "id": "tls_tn_03",
+      "language": "python",
+      "category": "insecure_tls",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.05,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `hash_password` function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 10 in hashing.py",
+            "explanation": "The function `hash_password` uses a hardcoded secret for hashing passwords, which is a security risk.",
+            "remediation": "Replace the hardcoded secret with a secure random secret generated using `bcrypt.gensalt()`."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040923Z_028cc157d5.txt"
+      }
+    },
+    {
+      "id": "tls_tn_04",
+      "language": "rust",
+      "category": "insecure_tls",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.15,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the HTTP client configuration.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "reqwest::Client::builder().timeout(Duration::from_secs(30)).build().unwrap();",
+            "explanation": "The client configuration includes a hardcoded timeout value of 30 seconds, which is not recommended for production environments.",
+            "remediation": "Change the timeout value to a more reasonable value, such as 60 seconds."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040926Z_2fb4994e16.txt"
+      }
+    },
+    {
+      "id": "path_01",
+      "language": "python",
+      "category": "path_traversal",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.33,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `open` function, which is a security risk.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 14: `path = '/var/uploads/' + filename`",
+            "explanation": "The `path` variable is constructed by concatenating a hardcoded string with the `filename` variable, which could be manipulated by an attacker to access sensitive files.",
+            "remediation": "Change the hardcoded string to a variable that is controlled by the user input."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040929Z_ff7435407d.txt"
+      }
+    },
+    {
+      "id": "path_02",
+      "language": "go",
+      "category": "path_traversal",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.99,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "Hardcoded secret in file reading logic.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +data, _ := os.ReadFile(`/srv/files/` + name)",
+            "explanation": "The file path is hardcoded, which makes it vulnerable to path traversal attacks.",
+            "remediation": "Change the file path to use environment variables or a secure configuration file."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040932Z_4257a037f9.txt"
+      }
+    },
+    {
+      "id": "path_03",
+      "language": "java",
+      "category": "path_traversal",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.04,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in file upload path",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "Files.readAllBytes(f.toPath());",
+            "explanation": "The file upload path is hardcoded in the code, which is a security risk. The path should be read from a configuration file or environment variable.",
+            "remediation": "Change the file upload path to read from a configuration file or environment variable."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040935Z_ce60720f45.txt"
+      }
+    },
+    {
+      "id": "path_04",
+      "language": "javascript",
+      "category": "path_traversal",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.51,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `filePath` variable, which could be used for unauthorized access to the uploaded files.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 11: const filePath = path.join(__dirname, 'uploads', req.query.file);",
+            "explanation": "The `filePath` is constructed using `req.query.file`, which could be controlled by an attacker to access files outside the expected directory.",
+            "remediation": "Change the `filePath` construction to use a secure method, such as `path.join(__dirname, 'uploads', req.query.file, 'safe_file')`."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040939Z_de0bab81cb.txt"
+      }
+    },
+    {
+      "id": "path_05",
+      "language": "php",
+      "category": "path_traversal",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 3.23,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"medium\",\n  \"summary\": \"The diff introduces a hardcoded secret in the file path.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"hardcoded_secret\",\n      \"line_hin",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040942Z_ee36d7904e.txt"
+      }
+    },
+    {
+      "id": "path_06",
+      "language": "python",
+      "category": "path_traversal",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.18,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `base` variable of the `storage.py` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "base = '/app/templates/'",
+            "explanation": "The `base` variable is set to a hardcoded path, which could be used for directory traversal or other security issues.",
+            "remediation": "Change the `base` variable to a variable that is set dynamically based on user input or configuration."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040945Z_58b2bed17c.txt"
+      }
+    },
+    {
+      "id": "path_tn_01",
+      "language": "python",
+      "category": "path_traversal",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.75,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `safe` variable, which is not properly validated or sanitized. This could lead to unauthorized access if the secret is exposed in the application.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +safe = os.path.basename(filename)",
+            "explanation": "The `safe` variable is set to the basename of the file, which is directly taken from the filename without any validation. This could allow attackers to inject arbitrary filenames, leading to unauthorized access.",
+            "remediation": "Add a validation step to ensure that the `safe` variable only contains valid filenames. For example, use `os.path.basename(filename)` only if the filename is a valid file name."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040949Z_4a06981223.txt"
+      }
+    },
+    {
+      "id": "path_tn_02",
+      "language": "go",
+      "category": "path_traversal",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.21,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "Hardcoded secret in file handling logic.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +safe := filepath.Join(`/srv/files`, name)",
+            "explanation": "The file path is constructed using user-provided input (`name`), which could be manipulated to include malicious characters.",
+            "remediation": "Use a safer function to construct the file path, such as `filepath.Join` with a fixed directory path."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040952Z_b566e05553.txt"
+      }
+    },
+    {
+      "id": "path_tn_03",
+      "language": "java",
+      "category": "path_traversal",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.08,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in file controller",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "Files.readAllBytes(target);",
+            "explanation": "The file controller reads all bytes from a target path, which could be used for file manipulation or other security issues.",
+            "remediation": "Change the file reading logic to use a secure method, such as `Files.newInputStream(target)`."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040955Z_643cfbca6d.txt"
+      }
+    },
+    {
+      "id": "deser_01",
+      "language": "python",
+      "category": "unsafe_deserialization",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.23,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `load_data` function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +data = secrets.token_hex(32)",
+            "explanation": "The `secrets.token_hex(32)` function generates a random 32-character hexadecimal string, which is hardcoded in the function.",
+            "remediation": "Replace the hardcoded string with a secure random string generated at runtime."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T040958Z_563bf90b7c.txt"
+      }
+    },
+    {
+      "id": "deser_02",
+      "language": "python",
+      "category": "unsafe_deserialization",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.91,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in the API endpoint.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 22 in api/rpc.py",
+            "explanation": "The API endpoint accepts raw body data, which could contain sensitive information like passwords.",
+            "remediation": "Change the API endpoint to accept only JSON data and validate the payload before processing."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041001Z_076deb338e.txt"
+      }
+    },
+    {
+      "id": "deser_03",
+      "language": "java",
+      "category": "unsafe_deserialization",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.01,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "Potential SQL injection vulnerability in the `SessionCache` class.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "line 22 in SessionCache.java",
+            "explanation": "The `data` variable is directly used in the `ObjectInputStream` constructor without proper sanitization.",
+            "remediation": "Add a parameterized query or use a prepared statement to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041004Z_049268d301.txt"
+      }
+    },
+    {
+      "id": "deser_04",
+      "language": "ruby",
+      "category": "unsafe_deserialization",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.95,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "Potential SQL injection vulnerability in the session management code.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "line 10 in lib/session.rb",
+            "explanation": "The session cookie is being decoded directly without proper sanitization, which can lead to SQL injection if the cookie contains malicious SQL code.",
+            "remediation": "Add parameterized queries or prepared statements to sanitize the session cookie."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041007Z_de10c87ebc.txt"
+      }
+    },
+    {
+      "id": "deser_05",
+      "language": "python",
+      "category": "unsafe_deserialization",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.24,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `eval` function, which can be used for unauthorized access.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 32: `+    task = eval(message['code'])`",
+            "explanation": "The `eval` function can execute any Python code, making it vulnerable to code injection attacks.",
+            "remediation": "Replace `eval(message['code'])` with a safer function like `ast.literal_eval` or `json.loads`."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041011Z_aaa8210705.txt"
+      }
+    },
+    {
+      "id": "deser_06",
+      "language": "javascript",
+      "category": "unsafe_deserialization",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 3.58,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"high\",\n  \"summary\": \"The addition of `eval(\"(\" + data + \"))\"` in `src/utils/config.js` introduces a security risk due to the execution of the `data` string as JavaScript code. This ca",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041014Z_ee207559e6.txt"
+      }
+    },
+    {
+      "id": "deser_tn_01",
+      "language": "python",
+      "category": "unsafe_deserialization",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.05,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `load_data` function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 11 in cache/loader.py",
+            "explanation": "The function `load_data` is expected to load data from a JSON file, but the hardcoded secret is directly used without proper validation or encryption.",
+            "remediation": "Replace the hardcoded secret with a secure, encrypted value."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041017Z_8495b1fe03.txt"
+      }
+    },
+    {
+      "id": "deser_tn_02",
+      "language": "python",
+      "category": "unsafe_deserialization",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 3.37,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "Hardcoded secret in the API endpoint.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041021Z_d141c85179.txt"
+      }
+    },
+    {
+      "id": "deser_tn_03",
+      "language": "java",
+      "category": "unsafe_deserialization",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.21,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "Potential SQL injection vulnerability in the `SessionCache` class.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "line 20 in SessionCache.java",
+            "explanation": "The `json` variable is directly used in the `readValue` method without proper sanitization.",
+            "remediation": "Add a parameter to the `readValue` method to specify the type of object to be deserialized, and use a library like `javax.json` for parsing JSON."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041024Z_9992a06543.txt"
+      }
+    },
+    {
+      "id": "race_01",
+      "language": "python",
+      "category": "race_condition",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.15,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The addition of a global variable `counter` without any initialization or synchronization mechanism can lead to race conditions if multiple threads access it concurrently.",
+        "findings": [
+          {
+            "category": "bug_risk",
+            "type": "race_condition",
+            "line_hint": "line 10 in counter.py",
+            "explanation": "The `counter` variable is being modified without proper synchronization, which can result in unpredictable behavior.",
+            "remediation": "Add a lock or synchronization mechanism to protect the `counter` variable."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041027Z_9278ef8c14.txt"
+      }
+    },
+    {
+      "id": "race_02",
+      "language": "go",
+      "category": "race_condition",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.88,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `cache` map.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 12: var cache = map[string]string{}",
+            "explanation": "The `cache` map is initialized with a hardcoded secret.",
+            "remediation": "Change the secret to a secure value."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041030Z_94c12f13ce.txt"
+      }
+    },
+    {
+      "id": "race_03",
+      "language": "java",
+      "category": "race_condition",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.05,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in RequestCounter.java",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 7: private static int count = 0;",
+            "explanation": "The count variable is hardcoded with the value 0, which is not secure. It should be initialized to a default value or read from a configuration file.",
+            "remediation": "Change the line to: private static int count = 1;"
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041033Z_7a2460937c.txt"
+      }
+    },
+    {
+      "id": "race_04",
+      "language": "rust",
+      "category": "race_condition",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.05,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `new_cache` function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 7: `+use std::collections::HashMap;`",
+            "explanation": "The `HashMap` is being used without any protection against unauthorized access.",
+            "remediation": "Add a secure data structure like `Arc<HashMap<String, String>>` to ensure thread safety."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041036Z_1c4d4c88bf.txt"
+      }
+    },
+    {
+      "id": "race_05",
+      "language": "python",
+      "category": "race_condition",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.57,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in rate_limiter.py",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "request_counts = {}",
+            "explanation": "The request_counts dictionary is being initialized with an empty dictionary, which means it will store user IDs as keys and their corresponding request counts as values. If an attacker can control the user ID, they can set the request count to 100 or more, triggering the RateLimitError exception.",
+            "remediation": "Change the initialization of request_counts to use a different data structure that does not store user IDs as keys, such as a set or a dictionary with a different key type."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041039Z_9ac47c27c2.txt"
+      }
+    },
+    {
+      "id": "race_06",
+      "language": "go",
+      "category": "race_condition",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.01,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "Potential SQL injection vulnerability in the `GetJob` function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_injection",
+            "line_hint": "line 22 in pool.go",
+            "explanation": "The function `GetJob` does not properly sanitize the input parameter `jobID` before using it in a SQL query.",
+            "remediation": "Add parameter sanitization to the SQL query."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041042Z_5ffe18d30d.txt"
+      }
+    },
+    {
+      "id": "race_tn_01",
+      "language": "go",
+      "category": "race_condition",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 2.9,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in the cache store.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 12: var mu sync.RWMutex",
+            "explanation": "The secret is hardcoded in the `mu` variable, which is not secure.",
+            "remediation": "Change the secret to a secure value, such as a hashed value."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041045Z_385f5f1529.txt"
+      }
+    },
+    {
+      "id": "race_tn_02",
+      "language": "java",
+      "category": "race_condition",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.08,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in RequestCounter.java",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 7: private static final AtomicInteger count = new AtomicInteger(0);",
+            "explanation": "The count variable is hard-coded with the initial value 0. This is a security risk as it can be manipulated by attackers.",
+            "remediation": "Change the initial value to a random number or use a secure random number generator."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041048Z_c82b038b46.txt"
+      }
+    },
+    {
+      "id": "race_tn_03",
+      "language": "rust",
+      "category": "race_condition",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.12,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `new_cache` function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 7: `+use std::collections::HashMap;`",
+            "explanation": "The `HashMap` is being used without any protection against unauthorized access.",
+            "remediation": "Add a `RwLock` around the `HashMap` to ensure thread safety."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041052Z_e7d22d765e.txt"
+      }
+    },
+    {
+      "id": "logic_01",
+      "language": "python",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.27,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `utils/pagination.py` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 8: `password = \"old_secret\"`",
+            "explanation": "The password is hardcoded in the `start` variable, which is used in the `end` calculation. This is a security risk as it exposes the password to anyone who can access the code.",
+            "remediation": "Change the password to a secure value, such as a hashed version."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041055Z_fc78c5ff8c.txt"
+      }
+    },
+    {
+      "id": "logic_02",
+      "language": "javascript",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 3.01,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "The diff introduces a hardcoded secret in the `getRandomItems` function.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041058Z_0e32f37207.txt"
+      }
+    },
+    {
+      "id": "logic_03",
+      "language": "go",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.4,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The function `Backoff` in `backoff.go` has a hardcoded secret in the `maxAttempts` variable.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 14 of backoff.go",
+            "explanation": "The `maxAttempts` variable is hardcoded to 10, which is a common default value for backoff strategies. This value should be configurable to avoid hardcoding secrets.",
+            "remediation": "Change the value of `maxAttempts` to a configurable value, such as an environment variable or a configuration file."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041101Z_ee136a5f51.txt"
+      }
+    },
+    {
+      "id": "logic_04",
+      "language": "python",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.08,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `permissions.py` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +    if not user.role != \"admin\":",
+            "explanation": "The secret is hardcoded in the condition to check if the user is an admin.",
+            "remediation": "Change the condition to use a different secret or remove the condition entirely if it's not needed."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041104Z_c479386ea5.txt"
+      }
+    },
+    {
+      "id": "logic_05",
+      "language": "rust",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.96,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `slice.rs` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 8: `password = \"old_secret\"`",
+            "explanation": "The secret `old_secret` is hardcoded in the `password` variable.",
+            "remediation": "Change the secret to a secure value."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041107Z_eec1afd6f5.txt"
+      }
+    },
+    {
+      "id": "logic_06",
+      "language": "java",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.97,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `Validator.java` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 14: `password = \"old_secret\"`",
+            "explanation": "The password is hardcoded in the `Validator.java` file, which is a security risk.",
+            "remediation": "Change the password to a secure value."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041110Z_767780bc81.txt"
+      }
+    },
+    {
+      "id": "logic_07",
+      "language": "typescript",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.07,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `expiryDate` variable.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 10 in src/utils/date.ts",
+            "explanation": "The `expiryDate` variable is being set to the current time minus 1 hour, which is hardcoded in the code.",
+            "remediation": "Change the hardcoded value to a variable that is set elsewhere in the code."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041113Z_f5ab6a6cc8.txt"
+      }
+    },
+    {
+      "id": "logic_08",
+      "language": "python",
+      "category": "logic_bug",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.15,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `calculate_discount` function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +discount_pct = total * discount_pct / 100",
+            "explanation": "The `discount_pct` variable is hardcoded with a value that could be used for unauthorized access.",
+            "remediation": "Change the hardcoded value to a secure random value or prompt the user for input."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041116Z_3e4a325729.txt"
+      }
+    },
+    {
+      "id": "logic_tn_01",
+      "language": "python",
+      "category": "logic_bug",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.2,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `utils/pagination.py` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 8: `start = page * page_size`",
+            "explanation": "The `start` variable is hardcoded with the product of `page` and `page_size`, which could be easily manipulated by an attacker.",
+            "remediation": "Change the hardcoded value to a variable that is set based on user input or a configuration file."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041120Z_b71e179b26.txt"
+      }
+    },
+    {
+      "id": "logic_tn_02",
+      "language": "go",
+      "category": "logic_bug",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.74,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The function `backoff` in `backoff.go` has a hardcoded secret that could be exposed if the function is called with a different value for `maxAttempts`.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 14: `maxAttempts`",
+            "explanation": "The function `backoff` is hardcoded to use `maxAttempts` as the number of attempts. If `maxAttempts` is set to a lower value, the function will not backoff and will immediately return the error.",
+            "remediation": "Change the hardcoded value of `maxAttempts` to a higher value or remove the hardcoded value and use a configuration file to set the value."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041123Z_80e054b373.txt"
+      }
+    },
+    {
+      "id": "logic_tn_03",
+      "language": "python",
+      "category": "logic_bug",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.22,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "Hardcoded secret in `permissions.py`.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 19: `+    return user.role == \"admin\"`",
+            "explanation": "The `user.role` is hard-coded as 'admin', which is not secure. It should be retrieved from a secure source.",
+            "remediation": "Change the line to use a secure method to retrieve the role, such as querying a database."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041127Z_2ac70c20ec.txt"
+      }
+    },
+    {
+      "id": "logic_tn_04",
+      "language": "typescript",
+      "category": "logic_bug",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.08,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `expiryDate` variable.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 8 in src/utils/date.ts",
+            "explanation": "The `expiryDate` variable is being set to the current time plus the expiry duration, but the secret is hardcoded in the line.",
+            "remediation": "Change the hardcoded secret to a variable or environment variable."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041130Z_53433c683a.txt"
+      }
+    },
+    {
+      "id": "exc_01",
+      "language": "python",
+      "category": "unhandled_exception",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 3.26,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"medium\",\n  \"summary\": \"SQL command injection vulnerability introduced in the `api/users.py` file.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"sql_command_inje",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041133Z_04fd532a6e.txt"
+      }
+    },
+    {
+      "id": "exc_02",
+      "language": "javascript",
+      "category": "unhandled_exception",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.93,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in fetch.js",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 9: const resp = await fetch(`/api/users/${id}`);",
+            "explanation": "The secret is hardcoded in the fetch request URL.",
+            "remediation": "Replace the secret with environment variables or a secure configuration file."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041136Z_855cdb5450.txt"
+      }
+    },
+    {
+      "id": "exc_03",
+      "language": "go",
+      "category": "unhandled_exception",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.31,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `ReadFile` function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +data, _ := os.ReadFile(path)",
+            "explanation": "The function reads a file from the specified path and stores the data in the `data` variable. The path is hardcoded, which makes it vulnerable to attackers who can manipulate the path to read sensitive files.",
+            "remediation": "Change the hardcoded path to a variable that is set at runtime or use environment variables to store the path."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041139Z_d91bbce550.txt"
+      }
+    },
+    {
+      "id": "exc_04",
+      "language": "java",
+      "category": "unhandled_exception",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 3.91,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"high\",\n  \"summary\": \"Hardcoded secret in the `parse` method of `Parser.java`.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"hardcoded_secret\",\n      \"line_hint\"",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041143Z_1e58c92189.txt"
+      }
+    },
+    {
+      "id": "exc_05",
+      "language": "typescript",
+      "category": "unhandled_exception",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.08,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `config` service.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "return JSON.parse(raw) as Config;",
+            "explanation": "The `raw` variable is directly parsed without any validation or sanitization, which could lead to security vulnerabilities.",
+            "remediation": "Add a check to ensure the `raw` data is safe before parsing it."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041146Z_280d79eecf.txt"
+      }
+    },
+    {
+      "id": "exc_06",
+      "language": "python",
+      "category": "unhandled_exception",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.22,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the Stripe integration.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 28: stripe.Charge.create(amount=amount, currency='usd', source=token)",
+            "explanation": "The token is hardcoded in the Stripe integration, which is a security risk.",
+            "remediation": "Replace the token with a secure way to obtain it, such as environment variables or a secure API key."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041149Z_8311a4ef08.txt"
+      }
+    },
+    {
+      "id": "exc_tn_01",
+      "language": "python",
+      "category": "unhandled_exception",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.32,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `users.py` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +password = \"new_hardcoded\"",
+            "explanation": "The password is hard-coded in the `users.py` file, which is a security risk.",
+            "remediation": "Change the password to a secure value."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041153Z_c7119fa094.txt"
+      }
+    },
+    {
+      "id": "exc_tn_02",
+      "language": "go",
+      "category": "unhandled_exception",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.01,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "Hardcoded secret in os.ReadFile",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +data, err := os.ReadFile(path)",
+            "explanation": "The file path is hardcoded in the os.ReadFile function, which is a security risk.",
+            "remediation": "Change the file path to a variable or environment variable."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041156Z_87a22750a9.txt"
+      }
+    },
+    {
+      "id": "exc_tn_03",
+      "language": "typescript",
+      "category": "unhandled_exception",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.34,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The JSON parsing in the config service is vulnerable to JSON injection attacks due to the lack of proper sanitization.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql/command/xss_injection",
+            "line_hint": "line 7 in config.ts",
+            "explanation": "The JSON.parse function is used to parse the raw string, which can lead to JSON injection if the raw string is not properly sanitized.",
+            "remediation": "Use a safer JSON parsing method that properly sanitizes the input, such as JSON.parse(JSON.parse(raw)) or a library that provides better JSON parsing."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041159Z_b59d916fc4.txt"
+      }
+    },
+    {
+      "id": "dead_01",
+      "language": "python",
+      "category": "dead_code",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 3.34,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"medium\",\n  \"summary\": \"The diff introduces a hardcoded secret in the `format_date` function.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"hardcoded_secret\",\n  ",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041202Z_753113f6f7.txt"
+      }
+    },
+    {
+      "id": "dead_02",
+      "language": "go",
+      "category": "dead_code",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.03,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The `normalise` function is using `strings.ToLower` without checking if the input is not empty or `nil`.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "unused_variable",
+            "line_hint": "line 24 in strings.go",
+            "explanation": "The `normalise` function is not used anywhere in the codebase.",
+            "remediation": "Remove the unused function."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041205Z_46d836f152.txt"
+      }
+    },
+    {
+      "id": "dead_03",
+      "language": "typescript",
+      "category": "dead_code",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.67,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `formatCurrency` function, which is a security issue.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +export function formatCurrency(amount: number): string { return `$${amount.toFixed(2)}`; }",
+            "explanation": "The function `formatCurrency` returns a string with a hardcoded currency symbol, which is not secure. It should use environment variables or configuration files to store sensitive information.",
+            "remediation": "Change the function to use environment variables or configuration files to store the currency symbol. For example, use `process.env.CURRENCY_SYMBOL` instead of hardcoding the string."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041209Z_9453884c36.txt"
+      }
+    },
+    {
+      "id": "dead_04",
+      "language": "java",
+      "category": "dead_code",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 3.24,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"medium\",\n  \"summary\": \"The diff introduces a hardcoded secret in the `sanitize` method.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"hardcoded_secret\",\n      \"",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041212Z_a0583869ac.txt"
+      }
+    },
+    {
+      "id": "dead_05",
+      "language": "python",
+      "category": "dead_code",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.32,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `health_check_v1` function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +@app.route('/api/v1/health')\n+def health_check_v1():\n+    return {'status': 'ok'}",
+            "explanation": "The secret 'old_secret' is hardcoded in the function, which is a security risk.",
+            "remediation": "Change the secret to a secure value, such as a hashed value."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041216Z_4bbd004ba2.txt"
+      }
+    },
+    {
+      "id": "dead_06",
+      "language": "rust",
+      "category": "dead_code",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.77,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `format_bytes` function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +fn format_bytes_old(n: u64) -> String { format!(\"{} bytes\", n) }",
+            "explanation": "The function `format_bytes_old` uses a hardcoded string `\"{} bytes\"` which is not secure. It should use a parameterized query or a secure format string.",
+            "remediation": "Change the function to use a parameterized query or a secure format string. For example, use `format!(\"{} bytes\", n)` instead of `format!(\"{} bytes\", n)`."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041219Z_5de09bbb04.txt"
+      }
+    },
+    {
+      "id": "dead_tn_01",
+      "language": "python",
+      "category": "dead_code",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.05,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `format_date` function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 45 in utils/helpers.py",
+            "explanation": "The function `format_date` uses a hardcoded string for the date format, which is not secure.",
+            "remediation": "Replace the hardcoded string with a configuration file or environment variable."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041222Z_2f24bd719d.txt"
+      }
+    },
+    {
+      "id": "dead_tn_02",
+      "language": "go",
+      "category": "dead_code",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.85,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The `Normalise` function in `strings.go` is using `strings.TrimSpace` and `strings.ToLower` without checking if the input string is empty or `nil`. This can lead to unexpected behavior if the input is `nil` or empty, potentially causing crashes or incorrect results.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 22 in strings.go",
+            "explanation": "The function is using `strings.TrimSpace` and `strings.ToLower` without checking if the input string is empty or `nil`. This can lead to unexpected behavior if the input is `nil` or empty, potentially causing crashes or incorrect results.",
+            "remediation": "Add checks for `nil` or empty input before calling `strings.TrimSpace` and `strings.ToLower`."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041226Z_008d97cbb7.txt"
+      }
+    },
+    {
+      "id": "dead_tn_03",
+      "language": "typescript",
+      "category": "dead_code",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.87,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `formatCurrency` function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +export function formatCurrency(amount: number): string {+  return new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\" }).format(amount);+}",
+            "explanation": "The function `formatCurrency` returns a formatted currency string using `Intl.NumberFormat`, which uses the `en-US` locale. The currency code is hardcoded as 'USD', which is not secure for international use.",
+            "remediation": "Change the currency code to a secure value, such as 'USD' for the United States, 'EUR' for the European Union, etc."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041230Z_4b8b282e68.txt"
+      }
+    },
+    {
+      "id": "edge_removal_01",
+      "language": "python",
+      "category": "edge_removal",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 2.83,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "Hardcoded secret in settings.py",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "password = 'old_secret'",
+            "explanation": "The password is hard-coded in the settings file, which is a security risk.",
+            "remediation": "Change the password to a secure value."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041233Z_efdd8fc72b.txt"
+      }
+    },
+    {
+      "id": "edge_removal_02",
+      "language": "javascript",
+      "category": "edge_removal",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 2.84,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the fetch URL.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 9: return fetch(url);",
+            "explanation": "The URL is hard-coded with a secret that should be stored securely.",
+            "remediation": "Replace the URL with a secure environment variable or a configuration file."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041236Z_1dffed3e8f.txt"
+      }
+    },
+    {
+      "id": "edge_removal_03",
+      "language": "go",
+      "category": "edge_removal",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 2.91,
+      "advisory_error": null,
+      "response": {
+        "severity": "clean",
+        "summary": "SQL command injection vulnerability introduced in the `QueryRow` function.",
+        "findings": [],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041239Z_74cc5c6a2e.txt"
+      }
+    },
+    {
+      "id": "edge_removal_04",
+      "language": "python",
+      "category": "edge_removal",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 2.94,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `task.py` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 32: `password = \"old_secret\"`",
+            "explanation": "The password is hardcoded in the `task.py` file, which is a security risk.",
+            "remediation": "Change the password to a secure value."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041242Z_07afb24bdb.txt"
+      }
+    },
+    {
+      "id": "edge_multifile_01",
+      "language": "python",
+      "category": "multi_file",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 3.72,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"medium\",\n  \"summary\": \"SQL command injection vulnerability introduced in the `get_by_name` method of the `User` model.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"typ",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041245Z_aaa0b5d1e9.txt"
+      }
+    },
+    {
+      "id": "edge_multifile_02",
+      "language": "go",
+      "category": "multi_file",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.11,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in dbPassword constant.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "const dbPassword = \"prod_password_2024\"",
+            "explanation": "The dbPassword constant contains a hardcoded password, which is a security risk.",
+            "remediation": "Change the dbPassword constant to use environment variables or a secure configuration file."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041249Z_e26f3da515.txt"
+      }
+    },
+    {
+      "id": "edge_multifile_03",
+      "language": "python",
+      "category": "multi_file",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.23,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `user.py` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "diff line: +    def __repr__(self):",
+            "explanation": "The `__repr__` method uses the `id` and `email` attributes of the `User` object, which are hardcoded in the file.",
+            "remediation": "Change the `__repr__` method to use environment variables or a configuration file."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041252Z_8b9566dc2f.txt"
+      }
+    },
+    {
+      "id": "edge_obfuscated_01",
+      "language": "python",
+      "category": "obfuscated",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.09,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "Hardcoded secret in StripeClient constructor",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 7 in utils/init.py",
+            "explanation": "The secret key is hard-coded in the constructor of StripeClient, which is not secure.",
+            "remediation": "Replace the hard-coded secret with a secure environment variable or a configuration file."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041255Z_cac9f3754d.txt"
+      }
+    },
+    {
+      "id": "edge_obfuscated_02",
+      "language": "javascript",
+      "category": "obfuscated",
+      "should_flag": true,
+      "flagged": false,
+      "elapsed_s": 3.66,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"high\",\n  \"summary\": \"Hardcoded secret in config.js\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"hardcoded_secret\",\n      \"line_hint\": \"const awsKey = _cfg;\",\n ",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041259Z_7b4f544ded.txt"
+      }
+    },
+    {
+      "id": "edge_obfuscated_03",
+      "language": "python",
+      "category": "obfuscated",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.97,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in JWT configuration.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "app.config['JWT_SECRET'] = JWT_SECRET",
+            "explanation": "The JWT secret is hardcoded in the application configuration, which is a security risk.",
+            "remediation": "Change the secret to a secure random value."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041302Z_a2ef60243f.txt"
+      }
+    },
+    {
+      "id": "edge_large_01",
+      "language": "python",
+      "category": "large_diff",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.78,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in SQL command.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_command",
+            "line_hint": "line 1",
+            "explanation": "The SQL command directly includes the user name, which is a security risk.",
+            "remediation": "Use parameterized queries or prepared statements to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041305Z_97f79d3440.txt"
+      }
+    },
+    {
+      "id": "edge_large_02",
+      "language": "go",
+      "category": "large_diff",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.96,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in GetUser function.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 14",
+            "explanation": "The function GetUser is using a hardcoded password from the database without proper validation or sanitization.",
+            "remediation": "Replace the hardcoded password with a secure, hashed version and ensure that the password is validated before use."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041309Z_f6b5ecbe5a.txt"
+      }
+    },
+    {
+      "id": "edge_clean_py",
+      "language": "python",
+      "category": "clean",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 2.91,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"high\",\n  \"summary\": \"Hardcoded secret in the health endpoint.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"hardcoded_secret\",\n      \"line_hint\": \"diff line: +@",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041312Z_699ada8a09.txt"
+      }
+    },
+    {
+      "id": "edge_clean_ts",
+      "language": "typescript",
+      "category": "clean",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.07,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in logger.ts",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "logger.info('This is an info message')",
+            "explanation": "The logger.info function logs an info message, which contains the hardcoded secret 'old_secret'.",
+            "remediation": "Change the secret to a new value, e.g., 'new_hardcoded'."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041315Z_78b6eb4ea0.txt"
+      }
+    },
+    {
+      "id": "edge_clean_go",
+      "language": "go",
+      "category": "clean",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 2.83,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The logging middleware is not properly configured to log the request duration.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "unused_variable",
+            "line_hint": "line 10",
+            "explanation": "The `start` variable is not used after its initialization.",
+            "remediation": "Remove the unused variable."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041318Z_ea85a9439b.txt"
+      }
+    },
+    {
+      "id": "edge_clean_rust",
+      "language": "rust",
+      "category": "clean",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 3.16,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the `User` struct.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "pub password: String,",
+            "explanation": "The `password` field is hard-coded with the value 'old_secret'. This is a security risk as it exposes the password to anyone who has access to the codebase.",
+            "remediation": "Change the password to a secure value, such as a hashed version of the password."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041321Z_6f19ac1b20.txt"
+      }
+    },
+    {
+      "id": "edge_clean_java",
+      "language": "java",
+      "category": "clean",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 2.91,
+      "advisory_error": null,
+      "response": {
+        "severity": "high",
+        "summary": "Hardcoded secret in the HealthController.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "src/main/java/com/api/HealthController.java:8",
+            "explanation": "The password is hardcoded in the `health` method.",
+            "remediation": "Change the password to a secure value."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041324Z_74b55d9890.txt"
+      }
+    },
+    {
+      "id": "edge_clean_swift",
+      "language": "swift",
+      "category": "clean",
+      "should_flag": false,
+      "flagged": true,
+      "elapsed_s": 2.85,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "The diff introduces a hardcoded secret in the User model.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "hardcoded_secret",
+            "line_hint": "line 5 of User.swift",
+            "explanation": "The secret 'old_secret' is hard-coded in the User model.",
+            "remediation": "Change the secret to a secure value."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041327Z_67439687bd.txt"
+      }
+    },
+    {
+      "id": "edge_refactor_01",
+      "language": "python",
+      "category": "refactor",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 3.24,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"medium\",\n  \"summary\": \"The diff introduces a hardcoded secret in the `get_user` function.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"hardcoded_secret\",\n     ",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041330Z_01a3a66d07.txt"
+      }
+    },
+    {
+      "id": "edge_refactor_02",
+      "language": "typescript",
+      "category": "refactor",
+      "should_flag": false,
+      "flagged": false,
+      "elapsed_s": 3.27,
+      "advisory_error": null,
+      "response": {
+        "severity": "low",
+        "summary": "Advisory engine returned unstructured output for this chunk.",
+        "findings": [
+          {
+            "category": "quality",
+            "type": "parse_error",
+            "line_hint": "",
+            "explanation": "{\n  \"severity\": \"medium\",\n  \"summary\": \"The diff introduces a hardcoded secret in the `validateToken` function.\",\n  \"findings\": [\n    {\n      \"category\": \"security\",\n      \"type\": \"hardcoded_secret\",\n",
+            "remediation": "Review this diff chunk manually."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041334Z_3eb45c06d7.txt"
+      }
+    },
+    {
+      "id": "edge_mixed_01",
+      "language": "python",
+      "category": "mixed",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 2.96,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "SQL command injection vulnerability in search.py",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_command",
+            "line_hint": "exact added line from diff",
+            "explanation": "The query is directly constructed from user input without proper sanitization.",
+            "remediation": "Use parameterized queries or ORM libraries to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041336Z_84890d3f40.txt"
+      }
+    },
+    {
+      "id": "edge_mixed_02",
+      "language": "go",
+      "category": "mixed",
+      "should_flag": true,
+      "flagged": true,
+      "elapsed_s": 3.01,
+      "advisory_error": null,
+      "response": {
+        "severity": "medium",
+        "summary": "SQL command injection vulnerability introduced in the `user.go` file.",
+        "findings": [
+          {
+            "category": "security",
+            "type": "sql_command",
+            "line_hint": "line 14 in `user.go`",
+            "explanation": "The SQL query is constructed directly from user input without proper sanitization.",
+            "remediation": "Use prepared statements or parameterized queries to prevent SQL injection."
+          }
+        ],
+        "report_path": "/Users/stal/.localforge/reports/commit_20260621T041339Z_3d57e5441b.txt"
+      }
+    }
+  ]
+}
