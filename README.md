@@ -6,13 +6,13 @@
 
 ### a rust-native security gateway that reviews your code before git does
 
-[![Platform](https://img.shields.io/badge/platform-Apple%20Silicon-black?style=flat-square&logo=apple)](https://github.com/stalzkie/local-forge/releases)
-[![macOS](https://img.shields.io/badge/macOS-14%2B-blue?style=flat-square&logo=apple)](https://github.com/stalzkie/local-forge/releases)
+[![CI](https://github.com/stalzkie/local-forge-production/actions/workflows/ci.yml/badge.svg)](https://github.com/stalzkie/local-forge-production/actions/workflows/ci.yml)
+[![Platform](https://img.shields.io/badge/platform-Apple%20Silicon-black?style=flat-square&logo=apple)](https://github.com/stalzkie/local-forge-production/releases)
+[![macOS](https://img.shields.io/badge/macOS-14%2B-blue?style=flat-square&logo=apple)](https://github.com/stalzkie/local-forge-production/releases)
 [![Rust](https://img.shields.io/badge/rust-1.78%2B-orange?style=flat-square&logo=rust)](https://www.rust-lang.org)
 [![Swift](https://img.shields.io/badge/swift-6.0-red?style=flat-square&logo=swift)](https://swift.org)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-43%20passing-brightgreen?style=flat-square)](https://github.com/stalzkie/local-forge)
-[![MCP](https://img.shields.io/badge/MCP-compliant-purple?style=flat-square)](https://github.com/stalzkie/local-forge)
+[![MCP](https://img.shields.io/badge/MCP-compliant-purple?style=flat-square)](https://github.com/stalzkie/local-forge-production)
 
 </div>
 
@@ -88,15 +88,15 @@ Layers 1 and 2 **block** the commit on a positive. Layer 3 always runs in the ba
 
 | Asset | Description |
 |---|---|
-| [LocalForge-v2.1.3-arm64.dmg](https://github.com/stalzkie/local-forge/releases/latest/download/LocalForge-v2.1.3-arm64.dmg) | macOS app — drag to Applications, double-click to open |
-| [localforge-v2.1.3-macos-arm64](https://github.com/stalzkie/local-forge/releases/latest/download/localforge-v2.1.3-macos-arm64) | CLI binary only — for terminal/script installs |
+| [LocalForge-v2.1.3-arm64.dmg](https://github.com/stalzkie/local-forge-production/releases/latest/download/LocalForge-v2.1.3-arm64.dmg) | macOS app — drag to Applications, double-click to open |
+| [localforge-v2.1.3-macos-arm64](https://github.com/stalzkie/local-forge-production/releases/latest/download/localforge-v2.1.3-macos-arm64) | CLI binary only — for terminal/script installs |
 
 > **First launch:** macOS will say the app is from an unidentified developer. Right-click → Open → Open to bypass Gatekeeper once. This is standard for unsigned apps — full notarization is coming in a future release.
 
 **CLI quick-install (no clone required):**
 
 ```bash
-curl -L https://github.com/stalzkie/local-forge/releases/latest/download/localforge-v2.1.3-macos-arm64 \
+curl -L https://github.com/stalzkie/local-forge-production/releases/latest/download/localforge-v2.1.3-macos-arm64 \
   -o /tmp/localforge && chmod +x /tmp/localforge && /tmp/localforge --install
 ```
 
@@ -114,7 +114,7 @@ curl -L https://github.com/stalzkie/local-forge/releases/latest/download/localfo
 ### 1. Clone and build
 
 ```bash
-git clone https://github.com/stalzkie/local-forge.git
+git clone https://github.com/stalzkie/local-forge-production.git
 cd local-forge
 source "$HOME/.cargo/env"   # load Rust if freshly installed
 cargo build --release
@@ -162,7 +162,7 @@ localforge --install /path/to/another/project
 
 ### 5. Download the macOS app (optional)
 
-**Easiest:** download the DMG from the [Releases page](https://github.com/stalzkie/local-forge/releases/latest), open it, drag **LocalForge.app** to Applications, and double-click.
+**Easiest:** download the DMG from the [Releases page](https://github.com/stalzkie/local-forge-production/releases/latest), open it, drag **LocalForge.app** to Applications, and double-click.
 
 > First launch: right-click → Open → Open to bypass Gatekeeper (unsigned app warning).
 
@@ -342,7 +342,7 @@ localforge --install-org /path/to/your/repo
 bash localforge-install-org.sh
 
 # Or add to your dev setup doc as a one-liner:
-curl -fsSL https://github.com/stalzkie/local-forge/releases/latest/download/localforge-install-org.sh | bash
+curl -fsSL https://github.com/stalzkie/local-forge-production/releases/latest/download/localforge-install-org.sh | bash
 ```
 
 The generated script downloads the binary, sets up `~/.localforge/`, adds PATH to the shell profile, and installs the hook — no admin rights required.
@@ -644,14 +644,9 @@ LocalForge processes your code exclusively on your device. No diff, file, or fin
 
 ## Contributing
 
-Pull requests are welcome. Keep changes focused — one feature or fix per PR.
+Pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full development guide — setup, test commands, how to add Layer 1 patterns, the version-sync invariant, and the PR checklist.
 
-**Before submitting:**
-- [ ] `cargo test` passes (all 43 tests)
-- [ ] New Layer 1 patterns include a detection test and a false-positive guard test
-- [ ] No real secrets in test fixtures — use runtime-constructed strings (`format!("AKIA{}", ...)`)
-- [ ] Update `.localforgeignore` if your files contain intentional fake keys
-- [ ] If retraining Layer 2, run `python3 coreml/build_model.py` and commit updated artifacts
+For security vulnerabilities, see [SECURITY.md](SECURITY.md) — please do not open a public issue.
 
 ---
 
@@ -663,7 +658,9 @@ MIT — see [LICENSE](LICENSE)
 
 <div align="center">
 
-Built by [Stalingrad Dollosa](https://github.com/stalzkie) · Apple Silicon M4 · June 2026
+Built by [Stalingrad Dollosa](https://github.com/stalzkie) · Apple Silicon M4 · 2026
+
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa?style=flat-square)](CODE_OF_CONDUCT.md)
 
 *LocalForge — your last line of defence before git history.*
 
