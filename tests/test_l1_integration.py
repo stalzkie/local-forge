@@ -55,8 +55,8 @@ def _find_binary() -> Path:
 
 def _make_diff(filename: str, added: list[str], removed: list[str] | None = None) -> str:
     """Minimal unified diff with proper + / - lines."""
-    plus  = "\n".join(f"+{l}" for l in added)
-    minus = "\n".join(f"-{l}" for l in (removed or []))
+    plus  = "\n".join(f"+{line}" for line in added)
+    minus = "\n".join(f"-{line}" for line in (removed or []))
     n_add = len(added)
     n_rem = len(removed) if removed else 0
     return (

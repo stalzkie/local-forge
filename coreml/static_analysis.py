@@ -22,7 +22,6 @@ import os
 import re
 import shutil
 import subprocess
-import sys
 import tempfile
 from pathlib import Path
 
@@ -100,7 +99,6 @@ def _run_bandit(source: str, filepath: str) -> list:
         )
         data = json.loads(result.stdout) if result.stdout.strip() else {}
         for issue in data.get("results", []):
-            sev  = issue.get("issue_severity", "LOW").lower()
             text = issue.get("issue_text", "")
             line = issue.get("line_number", "")
             test = issue.get("test_id", "")
@@ -134,7 +132,7 @@ def _run_pylint(source: str, filepath: str) -> list:
             f.write(source)
             tmp = f.name
         result = subprocess.run(
-            ["pylint", f"--disable=all", f"--enable={_PYLINT_CODES}",
+            ["pylint", "--disable=all", f"--enable={_PYLINT_CODES}",
              "--output-format=json", tmp],
             capture_output=True, text=True, timeout=15,
         )
@@ -180,7 +178,7 @@ def _run_eslint(source: str, filepath: str, is_ts: bool) -> list:
             tmp = f.name
         cmd = [
             "eslint", "--format", "json",
-            "--rule", f"no-unused-vars: warn",
+            "--rule", "no-unused-vars: warn",
             "--rule", "no-eval: error",
             "--rule", "no-implied-eval: error",
             "--env", "browser,node,es2022",

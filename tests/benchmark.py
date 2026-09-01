@@ -18,9 +18,9 @@ import subprocess
 import time
 import json
 import sys
-import os
 import argparse
 import statistics
+import re as _re
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent
@@ -30,11 +30,11 @@ ADV_PY    = REPO_ROOT / "coreml" / "advisory.py"
 OUT_DIR   = REPO_ROOT / "tests" / "benchmark_results"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import numpy as np
+import matplotlib  # noqa: E402
+
+matplotlib.use("Agg")  # must run before pyplot import
+import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
 
 # ── Color palette ──────────────────────────────────────────────────────────────
 C = {
@@ -168,8 +168,6 @@ SAMPLES = [
 # BENCHMARK RUNNERS
 # ══════════════════════════════════════════════════════════════════════════════
 
-import re as _re
-
 # Compile L1 patterns once — mirrors ast_validator.rs exactly
 _L1_PATTERNS = [
     _re.compile(r"AKIA[0-9A-Z]{16}"),
@@ -276,7 +274,7 @@ def run_benchmark(skip_qwen=False):
         l3_tag = f"L3:{l3_severity}" if l3_severity else ""
         print(f"L1:{l1_ms:.1f}µs {status} {l3_tag}")
 
-    print(f"\n  All samples complete. Generating graphs...\n")
+    print("\n  All samples complete. Generating graphs...\n")
     return results
 
 
@@ -307,7 +305,7 @@ def graph_l1_latency(results):
     # Box plot per label
     label_order = ["clean", "security", "bug_risk", "quality"]
     colors_map  = {"clean": C["green"], "security": C["red"], "bug_risk": C["yellow"], "quality": C["purple"]}
-    data_by_label = [by_label.get(l, []) for l in label_order]
+    data_by_label = [by_label.get(label, []) for label in label_order]
     bp = ax2.boxplot(data_by_label, patch_artist=True, medianprops={"color": C["white"], "linewidth": 2})
     for patch, lbl in zip(bp["boxes"], label_order):
         patch.set_facecolor(colors_map[lbl])
@@ -349,12 +347,18 @@ def graph_l2_accuracy(results):
     for r in l2_results:
         is_risky_gt    = r["label"] == "security"
         is_risky_pred  = r["l2_score"] >= THRESHOLD
-        if is_risky_gt:  scores_risky.append(r["l2_score"])
-        else:            scores_clean.append(r["l2_score"])
-        if is_risky_gt and is_risky_pred:     tp += 1
-        elif not is_risky_gt and is_risky_pred: fp += 1
-        elif is_risky_gt and not is_risky_pred: fn += 1
-        else:                                   tn += 1
+        if is_risky_gt:
+            scores_risky.append(r["l2_score"])
+        else:
+            scores_clean.append(r["l2_score"])
+        if is_risky_gt and is_risky_pred:
+            tp += 1
+        elif not is_risky_gt and is_risky_pred:
+            fp += 1
+        elif is_risky_gt and not is_risky_pred:
+            fn += 1
+        else:
+            tn += 1
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
     style_fig(fig, [ax1, ax2])
@@ -363,14 +367,15 @@ def graph_l2_accuracy(results):
     # Confusion matrix heatmap
     cm = np.array([[tp, fp], [fn, tn]])
     labels = [["TP", "FP"], ["FN", "TN"]]
-    im = ax1.imshow(cm, cmap="Blues", vmin=0)
+    ax1.imshow(cm, cmap="Blues", vmin=0)
     for i in range(2):
         for j in range(2):
             ax1.text(j, i, f"{labels[i][j]}\n{cm[i][j]}",
                      ha="center", va="center",
                      color=C["white"] if cm[i][j] > cm.max()/2 else C["bg"],
                      fontsize=14, fontweight="bold")
-    ax1.set_xticks([0, 1]); ax1.set_yticks([0, 1])
+    ax1.set_xticks([0, 1])
+    ax1.set_yticks([0, 1])
     ax1.set_xticklabels(["Predicted Risky", "Predicted Clean"])
     ax1.set_yticklabels(["Actually Risky", "Actually Clean"])
     precision = tp / (tp + fp) if (tp + fp) else 0
@@ -416,7 +421,7 @@ def graph_l3_quality(results):
     sev_colors = {"high": C["red"], "medium": C["yellow"], "low": C["blue"], "clean": C["green"], "unknown": C["gray"]}
     labels = list(sev_counts.keys())
     sizes  = list(sev_counts.values())
-    colors = [sev_colors.get(l, C["gray"]) for l in labels]
+    colors = [sev_colors.get(lbl, C["gray"]) for lbl in labels]
     wedges, texts, autotexts = ax1.pie(sizes, labels=labels, colors=colors, autopct="%1.0f%%",
                                         startangle=90, textprops={"color": C["white"], "fontsize": 9})
     for at in autotexts:
@@ -426,16 +431,15 @@ def graph_l3_quality(results):
 
     # Category detection rate per ground-truth label
     label_order = ["clean", "security", "bug_risk", "quality"]
-    cat_map     = {"security": C["red"], "bug_risk": C["yellow"], "quality": C["purple"], None: C["gray"]}
-    detection_by_label = {l: {"found": 0, "total": 0} for l in label_order}
+    detection_by_label = {label: {"found": 0, "total": 0} for label in label_order}
     for r in l3_results:
         lbl = r["label"]
         detection_by_label[lbl]["total"] += 1
         if r["l3_findings"] > 0 and r["l3_severity"] not in ("clean", None):
             detection_by_label[lbl]["found"] += 1
 
-    rates  = [detection_by_label[l]["found"] / detection_by_label[l]["total"]
-              if detection_by_label[l]["total"] else 0 for l in label_order]
+    rates  = [detection_by_label[label]["found"] / detection_by_label[label]["total"]
+              if detection_by_label[label]["total"] else 0 for label in label_order]
     bar_colors = [C["green"], C["red"], C["yellow"], C["purple"]]
     bars = ax2.bar(label_order, rates, color=bar_colors, alpha=0.85, edgecolor=C["bg"])
     for bar, rate in zip(bars, rates):
@@ -447,13 +451,13 @@ def graph_l3_quality(results):
     ax2.axhline(1.0, color=C["border"], linewidth=0.8, linestyle="--")
 
     # Inference time box plot
-    l3_times_by_label = {l: [] for l in label_order}
+    l3_times_by_label = {label: [] for label in label_order}
     for r in l3_results:
         if r["l3_ms"] > 0:
             l3_times_by_label[r["label"]].append(r["l3_ms"] / 1000)  # → seconds
-    data   = [l3_times_by_label[l] for l in label_order]
+    data   = [l3_times_by_label[label] for label in label_order]
     data   = [d for d in data if d]
-    labels_with_data = [l for l, d in zip(label_order, [l3_times_by_label[l] for l in label_order]) if d]
+    labels_with_data = [label for label, d in zip(label_order, [l3_times_by_label[label] for label in label_order]) if d]
     if data:
         bp = ax3.boxplot(data, patch_artist=True,
                          medianprops={"color": C["white"], "linewidth": 2})
@@ -563,7 +567,7 @@ def graph_security_coverage(results):
 
     cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
         "lf", [C["panel"], C["red"], C["green"]])
-    im = ax.imshow(matrix, cmap=cmap, vmin=0, vmax=1, aspect="auto")
+    ax.imshow(matrix, cmap=cmap, vmin=0, vmax=1, aspect="auto")
 
     for i in range(len(patterns)):
         for j in range(len(variants)):
@@ -632,13 +636,13 @@ def graph_false_positives(results):
     # FP rate by language for L1 + L2
     x = np.arange(len(langs))
     width = 0.35
-    l1_by_lang = [fp_rate([r for r in clean if r["lang"] == l], lambda r: r["l1_blocked"]) for l in langs]
-    l2_by_lang = [fp_rate([r for r in clean if r["lang"] == l],
-                           lambda r: r["l2_score"] is not None and r["l2_score"] >= 0.5) for l in langs]
+    l1_by_lang = [fp_rate([r for r in clean if r["lang"] == lang], lambda r: r["l1_blocked"]) for lang in langs]
+    l2_by_lang = [fp_rate([r for r in clean if r["lang"] == lang],
+                           lambda r: r["l2_score"] is not None and r["l2_score"] >= 0.5) for lang in langs]
     ax2.bar(x - width/2, l1_by_lang, width, color=C["cyan"],   alpha=0.85, label="L1 AST",    edgecolor=C["bg"])
     ax2.bar(x + width/2, l2_by_lang, width, color=C["blue"],   alpha=0.85, label="L2 CoreML", edgecolor=C["bg"])
     ax2.set_xticks(x)
-    ax2.set_xticklabels([l.upper() for l in langs])
+    ax2.set_xticklabels([lang.upper() for lang in langs])
     ax2.set_ylim(0, 1.0)
     ax2.set_ylabel("False Positive Rate")
     ax2.set_title("FP Rate by Language (L1 vs L2)", color=C["white"])
@@ -660,11 +664,9 @@ def print_summary(results):
 
     clean    = [r for r in results if r["label"] == "clean"]
     security = [r for r in results if r["label"] == "security"]
-    bug      = [r for r in results if r["label"] == "bug_risk"]
-    quality  = [r for r in results if r["label"] == "quality"]
 
     l1_times = [r["l1_ms"] for r in results]  # stored in µs
-    print(f"\n  Layer 1 — AST Regex")
+    print("\n  Layer 1 — AST Regex")
     print(f"    Avg latency : {statistics.mean(l1_times):.2f}µs")
     print(f"    p99 latency : {sorted(l1_times)[int(len(l1_times)*0.99)]:.2f}µs")
     print(f"    Detection   : {sum(1 for r in security if r['l1_blocked'])}/{len(security)} security samples blocked")
@@ -675,7 +677,7 @@ def print_summary(results):
         l2_times = [r["l2_ms"] for r in l2_scored]
         l2_detected = sum(1 for r in security if r.get("l2_score") is not None and r["l2_score"] >= 0.5)
         l2_fp = sum(1 for r in clean if r.get("l2_score") is not None and r["l2_score"] >= 0.5)
-        print(f"\n  Layer 2 — CoreML/ANE")
+        print("\n  Layer 2 — CoreML/ANE")
         print(f"    Avg latency : {statistics.mean(l2_times):.0f}ms")
         print(f"    Detection   : {l2_detected}/{len(security)} security samples flagged (≥0.5)")
         print(f"    False pos.  : {l2_fp}/{len(clean)} clean samples incorrectly flagged")
@@ -683,7 +685,7 @@ def print_summary(results):
     l3_scored = [r for r in results if r["l3_severity"] is not None]
     if l3_scored:
         l3_times = [r["l3_ms"]/1000 for r in l3_scored if r["l3_ms"] > 0]
-        print(f"\n  Layer 3 — Qwen Advisory")
+        print("\n  Layer 3 — Qwen Advisory")
         if l3_times:
             print(f"    Avg inference : {statistics.mean(l3_times):.1f}s")
         actionable = [r for r in l3_scored if r["l3_severity"] in ("high", "medium")]

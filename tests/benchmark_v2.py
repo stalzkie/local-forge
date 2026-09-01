@@ -9,13 +9,11 @@ Usage:
 """
 
 import json
-import os
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-import matplotlib.gridspec as gridspec
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent
@@ -87,7 +85,8 @@ def chart_before_after():
     b1 = ax.bar(x - w/2, old_vals, w, color=C["dim"],    label="v2.0", zorder=3)
     b2 = ax.bar(x + w/2, new_vals, w, color=C["cyan"],   label="v2.1", zorder=3)
     ax.set_title("Dataset Growth", color=C["white"], pad=10)
-    ax.set_xticks(x); ax.set_xticklabels(categories, color=C["white"])
+    ax.set_xticks(x)
+    ax.set_xticklabels(categories, color=C["white"])
     ax.yaxis.grid(True, color=C["border"], zorder=0)
     ax.set_axisbelow(True)
     for bar, val in zip(b1, old_vals):
@@ -194,14 +193,6 @@ def chart_score_distribution():
 
 def chart_language_heatmap():
     # Manually categorize the 33 verification cases by language
-    lang_results = {
-        "Python":     {"risky": [], "clean": []},
-        "JavaScript": {"risky": [], "clean": []},
-        "Java":       {"risky": [], "clean": []},
-        "Go":         {"risky": [], "clean": []},
-        "PHP":        {"risky": [], "clean": []},
-    }
-
     lang_hints = {
         "password = 'hunter2'":                                          ("Python",     1),
         "eval(request.GET['cmd'])":                                      ("Python",     1),
@@ -250,17 +241,21 @@ def chart_language_heatmap():
         got = c["label"]
         if lang not in lang_stats:
             lang_stats[lang] = {"tp": 0, "fp": 0, "tn": 0, "fn": 0}
-        if expected == 1 and got == 1: lang_stats[lang]["tp"] += 1
-        elif expected == 1 and got == 0: lang_stats[lang]["fn"] += 1
-        elif expected == 0 and got == 0: lang_stats[lang]["tn"] += 1
-        elif expected == 0 and got == 1: lang_stats[lang]["fp"] += 1
+        if expected == 1 and got == 1:
+            lang_stats[lang]["tp"] += 1
+        elif expected == 1 and got == 0:
+            lang_stats[lang]["fn"] += 1
+        elif expected == 0 and got == 0:
+            lang_stats[lang]["tn"] += 1
+        elif expected == 0 and got == 1:
+            lang_stats[lang]["fp"] += 1
 
     langs = list(lang_stats.keys())
     metrics = ["Precision", "Recall", "F1"]
     data = []
     for lang in langs:
         s = lang_stats[lang]
-        tp, fp, tn, fn = s["tp"], s["fp"], s["tn"], s["fn"]
+        tp, fp, _tn, fn = s["tp"], s["fp"], s["tn"], s["fn"]
         prec = tp / (tp + fp) if (tp + fp) > 0 else 0.0
         rec  = tp / (tp + fn) if (tp + fn) > 0 else 0.0
         f1   = 2 * prec * rec / (prec + rec) if (prec + rec) > 0 else 0.0

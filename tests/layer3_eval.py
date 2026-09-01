@@ -18,7 +18,6 @@ import json
 import os
 import subprocess
 import sys
-import tempfile
 import time
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -28,7 +27,6 @@ try:
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    import matplotlib.colors as mcolors
     import numpy as np
     _HAS_MPL = True
 except ImportError:
@@ -312,7 +310,7 @@ def generate_charts(
 
     # ── 4. FPR bar chart by language ──────────────────────────────────────────
     langs   = list(by_language.keys())
-    fpr_vals = [by_language[l]["fpr"] for l in langs]
+    fpr_vals = [by_language[lang]["fpr"] for lang in langs]
     colors   = ["#D0021B" if v > 0.2 else "#F5A623" if v > 0.05 else "#7ED321" for v in fpr_vals]
 
     fig, ax = plt.subplots(figsize=(max(7, len(langs) * 0.9), 4))
