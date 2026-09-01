@@ -45,5 +45,15 @@ tests/layer3_eval_corpus.py
 tests/layer3_eval.py
 tests/benchmark_results/
 
+# L1 integration test — contains fake-but-pattern-matching keys for golden TP/FP set
+tests/test_l1_integration.py
+tests/check_corpus.py
+
 # Static analysis shim — contains tool invocation patterns
 coreml/static_analysis.py
+
+# Walkthrough — intentionally vulnerable demo code
+walkthrough/
+
+# Demo scan targets — contain fake credentials for testing
+tests/localforge_demo_target.py
