@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LocalForge pre-commit hook
-# LOCALFORGE_HOOK_VERSION=4
+# LOCALFORGE_HOOK_VERSION=5
 set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
@@ -30,6 +30,30 @@ lf_log() {
 if [ -z "$BINARY" ]; then
   lf_log "WARNING: localforge binary not found. Run: ./scripts/install_hook.sh"
   exit 0
+fi
+
+# ── Dependency health check ────────────────────────────────────────────────────
+# Warn immediately if Python deps are missing so the user knows which layers
+# are degraded before the commit proceeds — not after a cryptic shim failure.
+LAYER2_READY=1
+LAYER3_READY=1
+
+if command -v python3 &>/dev/null; then
+  if ! python3 -c "import coremltools" 2>/dev/null; then
+    lf_log "WARNING: Layer 2 (CoreML) disabled — coremltools not installed."
+    lf_log "         Fix: pip3 install coremltools scikit-learn numpy"
+    lf_log "         Then run: localforge --install to redeploy the model."
+    LAYER2_READY=0
+  fi
+  if ! python3 -c "import mlx_lm" 2>/dev/null; then
+    lf_log "WARNING: Layer 3 (Qwen) disabled — mlx_lm not installed."
+    lf_log "         Fix: pip3 install mlx-lm"
+    LAYER3_READY=0
+  fi
+else
+  lf_log "WARNING: python3 not found — Layers 2 and 3 are disabled."
+  LAYER2_READY=0
+  LAYER3_READY=0
 fi
 
 # Build a filtered diff: strip hunks whose file path matches .localforgeignore patterns
@@ -87,10 +111,8 @@ else
   ADVISORY_SCRIPT="$REPO_ROOT/coreml/advisory.py"
 fi
 
-if [ "$CODE_REVIEW_ON" = "1" ] && command -v python3 &>/dev/null && [ -f "$ADVISORY_SCRIPT" ]; then
+if [ "$CODE_REVIEW_ON" = "1" ] && [ "$LAYER3_READY" = "1" ] && command -v python3 &>/dev/null && [ -f "$ADVISORY_SCRIPT" ]; then
   lf_log "Scan passed — running Qwen code review (async)..."
-  mkdir -p "$REPORTS_DIR"
-  # Write commit header into the single shared report file before spawning advisory
   mkdir -p "$REPORTS_DIR"
   {
     printf '%.0s=' {1..70}; echo
@@ -129,6 +151,8 @@ for f in d.get('findings', []):
 else
   if [ "$CODE_REVIEW_ON" != "1" ]; then
     lf_log "Scan passed — code review disabled."
+  elif [ "$LAYER3_READY" = "0" ]; then
+    lf_log "Scan passed — committing. (Layer 3 unavailable: install mlx-lm to enable)"
   else
     lf_log "Scan passed — committing."
   fi

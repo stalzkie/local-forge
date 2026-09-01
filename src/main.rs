@@ -9,7 +9,7 @@ use std::io::Read;
 
 /// Bump this whenever the hook interface changes (new env vars, new exit codes,
 /// new log format). The hook embeds the same number as LOCALFORGE_HOOK_VERSION.
-const EXPECTED_HOOK_VERSION: u32 = 4;
+const EXPECTED_HOOK_VERSION: u32 = 5;
 
 const EMBEDDED_HOOK:     &str = include_str!("../hooks/pre-commit");
 const EMBEDDED_INFER:    &str = include_str!("../coreml/infer.py");
