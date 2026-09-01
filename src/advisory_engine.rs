@@ -16,20 +16,20 @@ pub enum Severity {
 impl Severity {
     pub fn from_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
-            "high"   => Self::High,
+            "high" => Self::High,
             "medium" => Self::Medium,
-            "low"    => Self::Low,
-            "clean"  => Self::Clean,
-            _        => Self::Unknown,
+            "low" => Self::Low,
+            "clean" => Self::Clean,
+            _ => Self::Unknown,
         }
     }
 
     pub fn label(&self) -> &'static str {
         match self {
-            Self::High    => "HIGH",
-            Self::Medium  => "MEDIUM",
-            Self::Low     => "LOW",
-            Self::Clean   => "CLEAN",
+            Self::High => "HIGH",
+            Self::Medium => "MEDIUM",
+            Self::Low => "LOW",
+            Self::Clean => "CLEAN",
             Self::Unknown => "UNKNOWN",
         }
     }
@@ -41,18 +41,18 @@ impl Severity {
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Finding {
-    pub category:     Option<String>, // "security" | "quality" | "bug_risk"
-    pub r#type:       String,
-    pub line_hint:    String,
-    pub explanation:  String,
-    pub remediation:  String,
+    pub category: Option<String>, // "security" | "quality" | "bug_risk"
+    pub r#type: String,
+    pub line_hint: String,
+    pub explanation: String,
+    pub remediation: String,
 }
 
 #[derive(Debug, Clone)]
 pub struct AdvisoryResult {
-    pub severity:    Severity,
-    pub summary:     String,
-    pub findings:    Vec<Finding>,
+    pub severity: Severity,
+    pub summary: String,
+    pub findings: Vec<Finding>,
     pub report_path: String,
 }
 
@@ -71,15 +71,16 @@ pub async fn await_with_timeout(
     handle: tokio::task::JoinHandle<Option<AdvisoryResult>>,
     timeout_secs: u64,
 ) -> Option<AdvisoryResult> {
-    match tokio::time::timeout(
-        std::time::Duration::from_secs(timeout_secs),
-        handle,
-    )
-    .await
-    {
+    match tokio::time::timeout(std::time::Duration::from_secs(timeout_secs), handle).await {
         Ok(Ok(result)) => result,
-        Ok(Err(e))     => { eprintln!("[Advisory] Task panicked: {e}"); None }
-        Err(_)         => { eprintln!("[Advisory] Timed out after {timeout_secs}s"); None }
+        Ok(Err(e)) => {
+            eprintln!("[Advisory] Task panicked: {e}");
+            None
+        }
+        Err(_) => {
+            eprintln!("[Advisory] Timed out after {timeout_secs}s");
+            None
+        }
     }
 }
 
@@ -91,7 +92,7 @@ async fn run_advisory(diff: &str) -> Option<AdvisoryResult> {
         return None;
     }
 
-    let log_dir    = resolve_log_dir();
+    let log_dir = resolve_log_dir();
     let report_file = resolve_report_path(diff);
 
     let output = Command::new("python3")
@@ -126,44 +127,59 @@ async fn run_advisory(diff: &str) -> Option<AdvisoryResult> {
         return None;
     }
 
-    let severity = Severity::from_str(
-        json["severity"].as_str().unwrap_or("unknown")
-    );
-    let summary     = json["summary"].as_str().unwrap_or("").to_string();
+    let severity = Severity::from_str(json["severity"].as_str().unwrap_or("unknown"));
+    let summary = json["summary"].as_str().unwrap_or("").to_string();
     let report_path = json["report_path"].as_str().unwrap_or("").to_string();
-    let findings: Vec<Finding> = serde_json::from_value(
-        json["findings"].clone()
-    ).unwrap_or_default();
+    let findings: Vec<Finding> =
+        serde_json::from_value(json["findings"].clone()).unwrap_or_default();
 
-    Some(AdvisoryResult { severity, summary, findings, report_path })
+    Some(AdvisoryResult {
+        severity,
+        summary,
+        findings,
+        report_path,
+    })
 }
 
 fn resolve_shim_path() -> PathBuf {
     // 1. Canonical installed location
     if let Ok(home) = std::env::var("HOME") {
         let installed = PathBuf::from(home).join(".localforge/coreml/advisory.py");
-        if installed.exists() { return installed; }
+        if installed.exists() {
+            return installed;
+        }
     }
 
     // 2. App bundle Resources
     if let Ok(exe) = std::env::current_exe() {
         if let Some(macos) = exe.parent() {
             let bundled = macos
-                .parent().unwrap_or(macos)
+                .parent()
+                .unwrap_or(macos)
                 .join("Resources/coreml/advisory.py");
-            if bundled.exists() { return bundled; }
+            if bundled.exists() {
+                return bundled;
+            }
         }
     }
 
     // 3. Repo-relative (dev context)
     let cwd = PathBuf::from("coreml/advisory.py");
-    if cwd.exists() { return cwd; }
+    if cwd.exists() {
+        return cwd;
+    }
 
     // 4. Legacy: two levels up from the binary
     if let Ok(exe) = std::env::current_exe() {
-        if let Some(p) = exe.parent().and_then(|p| p.parent()).and_then(|p| p.parent()) {
+        if let Some(p) = exe
+            .parent()
+            .and_then(|p| p.parent())
+            .and_then(|p| p.parent())
+        {
             let candidate = p.join("coreml/advisory.py");
-            if candidate.exists() { return candidate; }
+            if candidate.exists() {
+                return candidate;
+            }
         }
     }
     cwd
@@ -203,11 +219,11 @@ mod tests {
 
     #[test]
     fn severity_parsing() {
-        assert_eq!(Severity::from_str("high"),   Severity::High);
-        assert_eq!(Severity::from_str("HIGH"),   Severity::High);
+        assert_eq!(Severity::from_str("high"), Severity::High);
+        assert_eq!(Severity::from_str("HIGH"), Severity::High);
         assert_eq!(Severity::from_str("medium"), Severity::Medium);
-        assert_eq!(Severity::from_str("clean"),  Severity::Clean);
-        assert_eq!(Severity::from_str("???"),    Severity::Unknown);
+        assert_eq!(Severity::from_str("clean"), Severity::Clean);
+        assert_eq!(Severity::from_str("???"), Severity::Unknown);
     }
 
     #[test]

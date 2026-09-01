@@ -501,7 +501,7 @@ def _is_safe_false_positive(finding: dict, diff_text: str) -> bool:
     }
 
     relevance_pat = RELEVANCE.get(category)
-    relevant_lines = [l for l in added if relevance_pat and relevance_pat.search(l)] if relevance_pat else added
+    relevant_lines = [line for line in added if relevance_pat and relevance_pat.search(line)] if relevance_pat else added
 
     if not relevant_lines:
         return False

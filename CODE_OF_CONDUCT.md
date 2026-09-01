@@ -36,7 +36,7 @@ This Code of Conduct applies within all community spaces — GitHub Issues, Pull
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behaviour may be reported to the maintainer at **fantasy.grimdark@gmail.com**. All complaints will be reviewed and investigated promptly and fairly. The maintainer is obligated to respect the privacy and security of the reporter of any incident.
+Instances of abusive, harassing, or otherwise unacceptable behaviour may be reported to the maintainer at **dstalingrad@gmail.com**. All complaints will be reviewed and investigated promptly and fairly. The maintainer is obligated to respect the privacy and security of the reporter of any incident.
 
 ## Enforcement Guidelines
 

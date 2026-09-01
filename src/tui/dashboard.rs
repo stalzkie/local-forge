@@ -26,27 +26,52 @@ pub enum LogLevel {
 }
 
 pub struct LogEntry {
-    pub level:   LogLevel,
+    pub level: LogLevel,
     pub message: String,
 }
 
 impl LogEntry {
-    pub fn info(msg: impl Into<String>)     -> Self { Self { level: LogLevel::Info,     message: msg.into() } }
-    pub fn warn(msg: impl Into<String>)     -> Self { Self { level: LogLevel::Warn,     message: msg.into() } }
+    pub fn info(msg: impl Into<String>) -> Self {
+        Self {
+            level: LogLevel::Info,
+            message: msg.into(),
+        }
+    }
+    pub fn warn(msg: impl Into<String>) -> Self {
+        Self {
+            level: LogLevel::Warn,
+            message: msg.into(),
+        }
+    }
     #[allow(dead_code)]
-    pub fn error(msg: impl Into<String>)    -> Self { Self { level: LogLevel::Error,    message: msg.into() } }
-    pub fn success(msg: impl Into<String>)  -> Self { Self { level: LogLevel::Success,  message: msg.into() } }
-    pub fn advisory(msg: impl Into<String>) -> Self { Self { level: LogLevel::Advisory, message: msg.into() } }
+    pub fn error(msg: impl Into<String>) -> Self {
+        Self {
+            level: LogLevel::Error,
+            message: msg.into(),
+        }
+    }
+    pub fn success(msg: impl Into<String>) -> Self {
+        Self {
+            level: LogLevel::Success,
+            message: msg.into(),
+        }
+    }
+    pub fn advisory(msg: impl Into<String>) -> Self {
+        Self {
+            level: LogLevel::Advisory,
+            message: msg.into(),
+        }
+    }
 }
 
 // ── Rendering helpers ─────────────────────────────────────────────────────────
 
 fn level_color_tag(level: &LogLevel) -> (Color, &'static str) {
     match level {
-        LogLevel::Info     => (Color::Cyan,    " INFO "),
-        LogLevel::Warn     => (Color::Yellow,  " WARN "),
-        LogLevel::Error    => (Color::Red,     " ERR  "),
-        LogLevel::Success  => (Color::Green,   "  OK  "),
+        LogLevel::Info => (Color::Cyan, " INFO "),
+        LogLevel::Warn => (Color::Yellow, " WARN "),
+        LogLevel::Error => (Color::Red, " ERR  "),
+        LogLevel::Success => (Color::Green, "  OK  "),
         LogLevel::Advisory => (Color::Magenta, " ADV  "),
     }
 }
@@ -104,27 +129,37 @@ fn load_recent_advisories(max: usize) -> Vec<LogEntry> {
 
     entries.sort_by(|a, b| b.0.cmp(&a.0));
 
-    entries.into_iter().take(max).filter_map(|(_, path)| {
-        let content = std::fs::read_to_string(&path).ok()?;
-        let json: serde_json::Value = serde_json::from_str(&content).ok()?;
+    entries
+        .into_iter()
+        .take(max)
+        .filter_map(|(_, path)| {
+            let content = std::fs::read_to_string(&path).ok()?;
+            let json: serde_json::Value = serde_json::from_str(&content).ok()?;
 
-        let severity = json["analysis"]["severity"].as_str().unwrap_or("unknown").to_uppercase();
-        let summary  = json["analysis"]["summary"].as_str().unwrap_or("").to_string();
-        let preview  = json["diff_preview"].as_str().unwrap_or("").to_string();
-        let fname    = path.file_name()?.to_string_lossy().to_string();
+            let severity = json["analysis"]["severity"]
+                .as_str()
+                .unwrap_or("unknown")
+                .to_uppercase();
+            let summary = json["analysis"]["summary"]
+                .as_str()
+                .unwrap_or("")
+                .to_string();
+            let preview = json["diff_preview"].as_str().unwrap_or("").to_string();
+            let fname = path.file_name()?.to_string_lossy().to_string();
 
-        let level = match severity.as_str() {
-            "HIGH"   => LogLevel::Error,
-            "MEDIUM" => LogLevel::Warn,
-            "LOW"    => LogLevel::Advisory,
-            _        => LogLevel::Info,
-        };
+            let level = match severity.as_str() {
+                "HIGH" => LogLevel::Error,
+                "MEDIUM" => LogLevel::Warn,
+                "LOW" => LogLevel::Advisory,
+                _ => LogLevel::Info,
+            };
 
-        Some(LogEntry {
-            level,
-            message: format!("[{severity}] {summary}  |  diff: {preview:.50}  |  {fname}"),
+            Some(LogEntry {
+                level,
+                message: format!("[{severity}] {summary}  |  diff: {preview:.50}  |  {fname}"),
+            })
         })
-    }).collect()
+        .collect()
 }
 
 // ── Main loop ─────────────────────────────────────────────────────────────────
@@ -153,8 +188,9 @@ pub fn run() -> anyhow::Result<()> {
         if tick % 300 == 0 {
             let recent = load_recent_advisories(5);
             if !recent.is_empty() {
-                logs.retain(|e| !matches!(e.level, LogLevel::Advisory)
-                    || !e.message.starts_with('['));
+                logs.retain(|e| {
+                    !matches!(e.level, LogLevel::Advisory) || !e.message.starts_with('[')
+                });
                 logs.push(LogEntry::info("--- Recent Qwen Advisories ---"));
                 logs.extend(recent);
                 // Keep last 200 entries
@@ -177,7 +213,11 @@ pub fn run() -> anyhow::Result<()> {
             // ── Main log panel ─────────────────────────────────────────────
             let log_block = Block::default()
                 .title("  LocalForge Security Shield v2.0   [3-Layer Hybrid · ANE+MLX] ")
-                .title_style(Style::default().fg(Color::Blue).add_modifier(Modifier::BOLD))
+                .title_style(
+                    Style::default()
+                        .fg(Color::Blue)
+                        .add_modifier(Modifier::BOLD),
+                )
                 .borders(Borders::ALL)
                 .border_style(Style::default().fg(Color::Blue));
 
@@ -185,10 +225,13 @@ pub fn run() -> anyhow::Result<()> {
 
             // ── Status bar ─────────────────────────────────────────────────
             let status = Paragraph::new(
-                " [q] Quit   [c] Clear log   |   L1:AST  L2:CoreML/ANE  L3:Qwen/MLX "
+                " [q] Quit   [c] Clear log   |   L1:AST  L2:CoreML/ANE  L3:Qwen/MLX ",
             )
-            .block(Block::default().borders(Borders::ALL)
-                .border_style(Style::default().fg(Color::DarkGray)))
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(Color::DarkGray)),
+            )
             .style(Style::default().fg(Color::DarkGray))
             .wrap(Wrap { trim: true });
             f.render_widget(status, chunks[1]);
@@ -196,12 +239,12 @@ pub fn run() -> anyhow::Result<()> {
 
         if events::poll(Duration::from_millis(16))? {
             match events::read()? {
-                events::Event::Quit  => break,
+                events::Event::Quit => break,
                 events::Event::Clear => {
                     logs.clear();
                     logs.extend(startup_entries());
                 }
-                events::Event::None  => {}
+                events::Event::None => {}
             }
         }
     }

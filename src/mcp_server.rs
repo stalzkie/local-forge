@@ -44,16 +44,16 @@ struct McpResult {
 
 #[derive(Serialize)]
 struct AdvisoryPayload {
-    severity:    String,
-    summary:     String,
-    findings:    Vec<FindingPayload>,
+    severity: String,
+    summary: String,
+    findings: Vec<FindingPayload>,
     report_path: String,
 }
 
 #[derive(Serialize)]
 struct FindingPayload {
-    r#type:      String,
-    line_hint:   String,
+    r#type: String,
+    line_hint: String,
     explanation: String,
     remediation: String,
 }
@@ -99,7 +99,9 @@ async fn handle_connection(socket: tokio::net::TcpStream) -> Result<()> {
 
     while let Ok(Some(line)) = lines.next_line().await {
         let line = line.trim().to_string();
-        if line.is_empty() { continue; }
+        if line.is_empty() {
+            continue;
+        }
 
         let response = handle_message(line).await;
         writer.write_all(response.as_bytes()).await?;
@@ -117,7 +119,10 @@ async fn handle_message(raw: String) -> String {
         Err(e) => {
             let err = McpErrorResponse {
                 jsonrpc: "2.0",
-                error: McpError { code: -32700, message: format!("Parse error: {e}") },
+                error: McpError {
+                    code: -32700,
+                    message: format!("Parse error: {e}"),
+                },
                 id: serde_json::Value::Null,
             };
             return serde_json::to_string(&err).unwrap();
@@ -127,7 +132,10 @@ async fn handle_message(raw: String) -> String {
     if req.jsonrpc != "2.0" {
         let err = McpErrorResponse {
             jsonrpc: "2.0",
-            error: McpError { code: -32600, message: "jsonrpc must be \"2.0\"".into() },
+            error: McpError {
+                code: -32600,
+                message: "jsonrpc must be \"2.0\"".into(),
+            },
             id: req.id,
         };
         return serde_json::to_string(&err).unwrap();
@@ -136,10 +144,13 @@ async fn handle_message(raw: String) -> String {
     match req.method.as_str() {
         "scan" => handle_scan(req).await,
         "ping" => handle_ping(req),
-        other  => {
+        other => {
             let err = McpErrorResponse {
                 jsonrpc: "2.0",
-                error: McpError { code: -32601, message: format!("Method not found: {other}") },
+                error: McpError {
+                    code: -32601,
+                    message: format!("Method not found: {other}"),
+                },
                 id: req.id,
             };
             serde_json::to_string(&err).unwrap()
@@ -154,9 +165,13 @@ async fn handle_scan(req: McpRequest) -> String {
 
     // Layer 1: AST regex
     if crate::ast_validator::scan(diff) {
-        eprintln!("[MCP] scan — file: {}  blocked_by: layer1", req.params.file_path);
+        eprintln!(
+            "[MCP] scan — file: {}  blocked_by: layer1",
+            req.params.file_path
+        );
         let advisory_handle = crate::advisory_engine::spawn(diff.clone());
-        let advisory = crate::advisory_engine::await_with_timeout(advisory_handle, 30).await
+        let advisory = crate::advisory_engine::await_with_timeout(advisory_handle, 30)
+            .await
             .map(|r| advisory_to_payload(&r));
 
         let response = McpResponse {
@@ -178,13 +193,17 @@ async fn handle_scan(req: McpRequest) -> String {
     // Layer 2: CoreML classifier
     let (layer2_blocked, layer2_score) = match crate::ane_bridge::analyse(diff) {
         Ok(Some(r)) => (r.risk_label == 1, Some(r.risk_score)),
-        _           => (false, None),
+        _ => (false, None),
     };
 
     if layer2_blocked {
-        eprintln!("[MCP] scan — file: {}  blocked_by: layer2  score: {:?}", req.params.file_path, layer2_score);
+        eprintln!(
+            "[MCP] scan — file: {}  blocked_by: layer2  score: {:?}",
+            req.params.file_path, layer2_score
+        );
         let advisory_handle = crate::advisory_engine::spawn(diff.clone());
-        let advisory = crate::advisory_engine::await_with_timeout(advisory_handle, 30).await
+        let advisory = crate::advisory_engine::await_with_timeout(advisory_handle, 30)
+            .await
             .map(|r| advisory_to_payload(&r));
 
         let response = McpResponse {
@@ -204,9 +223,13 @@ async fn handle_scan(req: McpRequest) -> String {
     }
 
     // Layer 3: Qwen advisory (async, never blocks)
-    eprintln!("[MCP] scan — file: {}  layers 1&2 clean, running Qwen advisory", req.params.file_path);
+    eprintln!(
+        "[MCP] scan — file: {}  layers 1&2 clean, running Qwen advisory",
+        req.params.file_path
+    );
     let advisory_handle = crate::advisory_engine::spawn(diff.clone());
-    let advisory = crate::advisory_engine::await_with_timeout(advisory_handle, 30).await
+    let advisory = crate::advisory_engine::await_with_timeout(advisory_handle, 30)
+        .await
         .map(|r| advisory_to_payload(&r));
 
     let response = McpResponse {
@@ -227,15 +250,19 @@ async fn handle_scan(req: McpRequest) -> String {
 
 fn advisory_to_payload(r: &crate::advisory_engine::AdvisoryResult) -> AdvisoryPayload {
     AdvisoryPayload {
-        severity:    r.severity.label().to_string(),
-        summary:     r.summary.clone(),
+        severity: r.severity.label().to_string(),
+        summary: r.summary.clone(),
         report_path: r.report_path.clone(),
-        findings: r.findings.iter().map(|f| FindingPayload {
-            r#type:      f.r#type.clone(),
-            line_hint:   f.line_hint.clone(),
-            explanation: f.explanation.clone(),
-            remediation: f.remediation.clone(),
-        }).collect(),
+        findings: r
+            .findings
+            .iter()
+            .map(|f| FindingPayload {
+                r#type: f.r#type.clone(),
+                line_hint: f.line_hint.clone(),
+                explanation: f.explanation.clone(),
+                remediation: f.remediation.clone(),
+            })
+            .collect(),
     }
 }
 
@@ -243,15 +270,26 @@ fn advisory_to_payload(r: &crate::advisory_engine::AdvisoryResult) -> AdvisoryPa
 
 fn handle_ping(req: McpRequest) -> String {
     #[derive(Serialize)]
-    struct PingResult  { status: &'static str, version: &'static str }
+    struct PingResult {
+        status: &'static str,
+        version: &'static str,
+    }
     #[derive(Serialize)]
-    struct PingResponse { jsonrpc: &'static str, result: PingResult, id: serde_json::Value }
+    struct PingResponse {
+        jsonrpc: &'static str,
+        result: PingResult,
+        id: serde_json::Value,
+    }
 
     serde_json::to_string(&PingResponse {
         jsonrpc: "2.0",
-        result: PingResult { status: "ok", version: "2.0.0" },
+        result: PingResult {
+            status: "ok",
+            version: "2.0.0",
+        },
         id: req.id,
-    }).unwrap()
+    })
+    .unwrap()
 }
 
 // ── Unit tests ────────────────────────────────────────────────────────────────
@@ -271,7 +309,8 @@ mod tests {
         let resp = send(serde_json::json!({
             "jsonrpc": "2.0", "method": "scan", "id": 1,
             "params": {"file_path": "f.py", "staged_diff_content": "AKIAIIIIIIIIIIIIIIII"}
-        })).await;
+        }))
+        .await;
         assert_eq!(resp["result"]["blocked"], true);
         assert_eq!(resp["result"]["blocked_by"], "layer1_ast");
     }
@@ -281,7 +320,8 @@ mod tests {
         let resp = send(serde_json::json!({
             "jsonrpc": "2.0", "method": "scan", "id": 2,
             "params": {"file_path": "f.rs", "staged_diff_content": "fn main() {}"}
-        })).await;
+        }))
+        .await;
         assert_eq!(resp["result"]["blocked"], false);
     }
 
@@ -290,7 +330,8 @@ mod tests {
         let resp = send(serde_json::json!({
             "jsonrpc": "2.0", "method": "ping", "id": 99,
             "params": {"file_path": "", "staged_diff_content": ""}
-        })).await;
+        }))
+        .await;
         assert_eq!(resp["result"]["status"], "ok");
     }
 
@@ -299,7 +340,8 @@ mod tests {
         let resp = send(serde_json::json!({
             "jsonrpc": "2.0", "method": "explode", "id": 3,
             "params": {"file_path": "", "staged_diff_content": ""}
-        })).await;
+        }))
+        .await;
         assert_eq!(resp["error"]["code"], -32601);
     }
 

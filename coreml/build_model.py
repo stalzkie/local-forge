@@ -9,11 +9,11 @@ Produces:
 """
 
 import os
-import sys
 import json
 import time
 import pickle
 import datetime
+import threading
 import numpy as np
 import coremltools as ct
 from coremltools.models import MLModel
@@ -22,7 +22,7 @@ import coremltools.models.datatypes as datatypes
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import StratifiedKFold, cross_val_score
+from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import classification_report, confusion_matrix
 
 OUTPUT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -474,14 +474,14 @@ SAMPLES = [
 # ── Progress display ──────────────────────────────────────────────────────────
 
 texts  = [s for s, _ in SAMPLES]
-labels = np.array([l for _, l in SAMPLES])
+labels = np.array([label for _, label in SAMPLES])
 n_risky = int(np.sum(labels == 1))
 n_clean = int(np.sum(labels == 0))
 
 section("LocalForge Layer 2 — Model Training")
 print(f"  Dataset      : {len(texts)} samples  ({n_risky} risky  /  {n_clean} clean)")
 print(f"  Architecture : TF-IDF char_wb (3-5gram, {N_FEATURES} features) + Logistic Regression → CoreML")
-print(f"  Target       : CPU_AND_NE  (Apple Neural Engine)")
+print("  Target       : CPU_AND_NE  (Apple Neural Engine)")
 
 # ── Step 1: Fit TF-IDF vectorizer ────────────────────────────────────────────
 
@@ -505,8 +505,6 @@ t0 = time.time()
 clf = LogisticRegression(C=1.5, max_iter=3000, class_weight="balanced", random_state=42, verbose=0)
 
 # Manual epoch-like progress: fit in one shot but stream dots while waiting
-import threading
-
 done = threading.Event()
 def progress_printer():
     chars = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
@@ -571,14 +569,14 @@ cv_f1_std  = float(np.std(fold_scores))
 print(f"\n  CV F1 (5-fold) : {cv_f1_mean:.3f} ± {cv_f1_std:.3f}  (took {time.time()-t0:.2f}s)")
 
 # Full classification report on training set
-print(f"\n  Classification report (train set):")
+print("\n  Classification report (train set):")
 report_lines = classification_report(labels, train_preds, target_names=["clean","risky"]).split("\n")
 for line in report_lines:
     if line.strip():
         print(f"    {line}")
 
 cm = confusion_matrix(labels, train_preds)
-print(f"\n  Confusion matrix (train):")
+print("\n  Confusion matrix (train):")
 print(f"    TN={cm[0][0]}  FP={cm[0][1]}")
 print(f"    FN={cm[1][0]}  TP={cm[1][1]}")
 
@@ -678,7 +676,8 @@ for text, expected in TEST_CASES:
     score  = float(np.array(result["risk_score"]).flatten()[0])
     got    = 1 if score > THRESHOLD else 0
     ok     = got == expected
-    if ok: passed += 1
+    if ok:
+        passed += 1
     status = "✓ PASS" if ok else "✗ FAIL"
     tag    = "RISKY" if expected == 1 else "CLEAN"
     print(f"  [{status}]  score={score:.3f}  [{tag}]  {text[:60]}")
@@ -689,7 +688,7 @@ failures = [r for r in results_log if not r["pass"]]
 
 print(f"\n  Verification: {passed}/{len(TEST_CASES)} passed  ({verify_accuracy:.0%})")
 if failures:
-    print(f"\n  Failed cases:")
+    print("\n  Failed cases:")
     for f in failures:
         tag = "RISKY" if f["expected"] == 1 else "CLEAN"
         print(f"    score={f['score']:.3f} expected=[{tag}]  {f['text'][:60]}")
@@ -732,9 +731,9 @@ print(f"  Train accuracy  : {train_accuracy:.2%}")
 print(f"  CV F1 (5-fold)  : {cv_f1_mean:.3f} ± {cv_f1_std:.3f}")
 print(f"  Verification    : {passed}/{len(TEST_CASES)} ({verify_accuracy:.0%})")
 print(f"  Samples         : {len(texts)} ({n_risky} risky / {n_clean} clean)")
-print(f"  Languages       : Python, JS/TS, Java, Go, Rust, C#, PHP, Ruby, Swift, Kotlin, SQL")
+print("  Languages       : Python, JS/TS, Java, Go, Rust, C#, PHP, Ruby, Swift, Kotlin, SQL")
 print(f"  Features        : {N_FEATURES}")
-print(f"  Compute unit    : CPU_AND_NE (Apple Neural Engine)")
+print("  Compute unit    : CPU_AND_NE (Apple Neural Engine)")
 print(f"  Metadata        : {META_PATH}")
-print(f"\n  Model ready. Copy to ~/.localforge/ with:")
-print(f"    localforge --install")
+print("\n  Model ready. Copy to ~/.localforge/ with:")
+print("    localforge --install")

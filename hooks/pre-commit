@@ -35,6 +35,8 @@ fi
 # ── Dependency health check ────────────────────────────────────────────────────
 # Warn immediately if Python deps are missing so the user knows which layers
 # are degraded before the commit proceeds — not after a cryptic shim failure.
+# LAYER2_READY is log-only; Layer 2 gating happens inside the binary's --scan
+# shellcheck disable=SC2034
 LAYER2_READY=1
 LAYER3_READY=1
 
@@ -43,6 +45,7 @@ if command -v python3 &>/dev/null; then
     lf_log "WARNING: Layer 2 (CoreML) disabled — coremltools not installed."
     lf_log "         Fix: pip3 install coremltools scikit-learn numpy"
     lf_log "         Then run: localforge --install to redeploy the model."
+    # shellcheck disable=SC2034
     LAYER2_READY=0
   fi
   if ! python3 -c "import mlx_lm" 2>/dev/null; then
@@ -52,6 +55,7 @@ if command -v python3 &>/dev/null; then
   fi
 else
   lf_log "WARNING: python3 not found — Layers 2 and 3 are disabled."
+  # shellcheck disable=SC2034
   LAYER2_READY=0
   LAYER3_READY=0
 fi

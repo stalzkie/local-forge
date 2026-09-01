@@ -4,7 +4,7 @@ use std::process::Command;
 /// Result from the ANE inference shim.
 pub struct AneResult {
     pub risk_score: f32,
-    pub risk_label: u8,        // 0 = clean, 1 = risky
+    pub risk_label: u8, // 0 = clean, 1 = risky
     pub advisory: Option<String>,
 }
 
@@ -26,12 +26,15 @@ pub fn analyse(diff: &str) -> anyhow::Result<Option<AneResult>> {
     //   3. next to infer.py                         (dev sibling)
     //   4. coreml/ relative to cwd                 (dev context)
     let model_path = {
-        let home_model = std::env::var("HOME").ok()
+        let home_model = std::env::var("HOME")
+            .ok()
             .map(|h| PathBuf::from(h).join(".localforge/LocalForgeModel.mlpackage"));
 
         let bundle_model = std::env::current_exe().ok().and_then(|exe| {
             exe.parent().map(|macos| {
-                macos.parent().unwrap_or(macos)
+                macos
+                    .parent()
+                    .unwrap_or(macos)
                     .join("Resources/LocalForgeModel.mlpackage")
             })
         });
@@ -55,10 +58,7 @@ pub fn analyse(diff: &str) -> anyhow::Result<Option<AneResult>> {
         return Ok(None);
     }
 
-    let output = Command::new("python3")
-        .arg(&shim)
-        .arg(diff)
-        .output()?;
+    let output = Command::new("python3").arg(&shim).arg(diff).output()?;
 
     // Exit codes: 0 = clean, 2 = risky, 1 = internal error
     if output.status.code() == Some(1) {
@@ -77,9 +77,13 @@ pub fn analyse(diff: &str) -> anyhow::Result<Option<AneResult>> {
 
     let risk_score = json["risk_score"].as_f64().unwrap_or(0.0) as f32;
     let risk_label = json["risk_label"].as_u64().unwrap_or(0) as u8;
-    let advisory   = json["advisory"].as_str().map(|s| s.to_string());
+    let advisory = json["advisory"].as_str().map(|s| s.to_string());
 
-    Ok(Some(AneResult { risk_score, risk_label, advisory }))
+    Ok(Some(AneResult {
+        risk_score,
+        risk_label,
+        advisory,
+    }))
 }
 
 /// Resolve coreml/infer.py using a priority chain:
@@ -100,7 +104,8 @@ fn resolve_shim_path() -> anyhow::Result<PathBuf> {
     if let Ok(exe) = std::env::current_exe() {
         if let Some(macos) = exe.parent() {
             let bundled = macos
-                .parent().unwrap_or(macos)  // Contents/
+                .parent()
+                .unwrap_or(macos) // Contents/
                 .join("Resources/coreml/infer.py");
             if bundled.exists() {
                 return Ok(bundled);
@@ -116,7 +121,11 @@ fn resolve_shim_path() -> anyhow::Result<PathBuf> {
 
     // 4. Legacy: two levels up from the binary
     if let Ok(exe) = std::env::current_exe() {
-        if let Some(parent) = exe.parent().and_then(|p| p.parent()).and_then(|p| p.parent()) {
+        if let Some(parent) = exe
+            .parent()
+            .and_then(|p| p.parent())
+            .and_then(|p| p.parent())
+        {
             let candidate = parent.join("coreml/infer.py");
             if candidate.exists() {
                 return Ok(candidate);

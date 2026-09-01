@@ -11,12 +11,16 @@ use std::io::Read;
 /// new log format). The hook embeds the same number as LOCALFORGE_HOOK_VERSION.
 const EXPECTED_HOOK_VERSION: u32 = 5;
 
-const EMBEDDED_HOOK:     &str = include_str!("../hooks/pre-commit");
-const EMBEDDED_INFER:    &str = include_str!("../coreml/infer.py");
+const EMBEDDED_HOOK: &str = include_str!("../hooks/pre-commit");
+const EMBEDDED_INFER: &str = include_str!("../coreml/infer.py");
 const EMBEDDED_ADVISORY: &str = include_str!("../coreml/advisory.py");
 
 #[derive(Parser)]
-#[command(name = "localforge", version = "2.1.3", about = "LocalForge Security Shield")]
+#[command(
+    name = "localforge",
+    version = "2.1.3",
+    about = "LocalForge Security Shield"
+)]
 struct Cli {
     /// Read a staged diff from stdin; exits 1 if blocked, 0 if clean
     #[arg(long)]
@@ -66,6 +70,14 @@ struct Cli {
     /// Output path for --export-report (default: ./localforge-report.<ext>)
     #[arg(long, value_name = "PATH")]
     out: Option<String>,
+
+    /// Scan the diff between BASE and HEAD and print findings as JSON.
+    /// Exits 1 if Layer 1 detects secrets, 0 if clean.
+    /// Respects .localforgeignore. Use in CI to scan PRs without the hook.
+    ///
+    /// Example: localforge --scan-pr main feature/my-branch
+    #[arg(long, value_names = ["BASE", "HEAD"], num_args = 2)]
+    scan_pr: Option<Vec<String>>,
 }
 
 #[tokio::main]
@@ -99,6 +111,12 @@ async fn main() -> anyhow::Result<()> {
         return run_export_report(&fmt, cli.last, cli.out.as_deref());
     }
 
+    if let Some(refs) = cli.scan_pr {
+        let base = &refs[0];
+        let head = &refs[1];
+        return run_scan_pr(base, head);
+    }
+
     if cli.scan {
         let mut diff = String::new();
         std::io::stdin().read_to_string(&mut diff)?;
@@ -127,7 +145,10 @@ async fn main() -> anyhow::Result<()> {
                 true
             }
             Ok(Some(ref result)) => {
-                eprintln!("[LocalForge] Layer 2 score: {:.3} — clean.", result.risk_score);
+                eprintln!(
+                    "[LocalForge] Layer 2 score: {:.3} — clean.",
+                    result.risk_score
+                );
                 false
             }
             Ok(None) => false,
@@ -190,8 +211,8 @@ async fn run_monitor() -> anyhow::Result<()> {
 
     match ane_bridge::analyse("healthcheck") {
         Ok(Some(_)) => println!("[LocalForge] Layer 2 (CoreML/ANE): ready"),
-        Ok(None)    => println!("[LocalForge] Layer 2 (CoreML/ANE): model not found — skipping"),
-        Err(e)      => println!("[LocalForge] Layer 2 (CoreML/ANE): unavailable ({e})"),
+        Ok(None) => println!("[LocalForge] Layer 2 (CoreML/ANE): model not found — skipping"),
+        Err(e) => println!("[LocalForge] Layer 2 (CoreML/ANE): unavailable ({e})"),
     }
 
     println!("[LocalForge] Layer 3 (Qwen/MLX): advisory engine ready");
@@ -205,9 +226,7 @@ async fn run_monitor() -> anyhow::Result<()> {
     std::fs::create_dir_all(log_path.parent().unwrap()).ok();
 
     // Seek to end so we only show events that happen after the monitor starts
-    let mut pos: u64 = std::fs::metadata(&log_path)
-        .map(|m| m.len())
-        .unwrap_or(0);
+    let mut pos: u64 = std::fs::metadata(&log_path).map(|m| m.len()).unwrap_or(0);
 
     loop {
         sleep(Duration::from_millis(500)).await;
@@ -232,8 +251,8 @@ fn run_install(repo_path: &str) -> anyhow::Result<()> {
     use std::path::PathBuf;
 
     let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
-    let lf_dir   = PathBuf::from(&home).join(".localforge");
-    let bin_dir  = lf_dir.join("bin");
+    let lf_dir = PathBuf::from(&home).join(".localforge");
+    let bin_dir = lf_dir.join("bin");
     let coreml_dir = lf_dir.join("coreml");
 
     // ── 1. Create directory structure ─────────────────────────────────────────
@@ -243,7 +262,7 @@ fn run_install(repo_path: &str) -> anyhow::Result<()> {
 
     // ── 2. Copy binary ────────────────────────────────────────────────────────
     let self_path = std::env::current_exe()?;
-    let bin_dest  = bin_dir.join("localforge");
+    let bin_dest = bin_dir.join("localforge");
     fs::copy(&self_path, &bin_dest)?;
     // Make executable
     #[cfg(unix)]
@@ -264,7 +283,9 @@ fn run_install(repo_path: &str) -> anyhow::Result<()> {
     };
     if let Some(src) = model_src {
         if src != model_dest {
-            if model_dest.exists() { fs::remove_dir_all(&model_dest)?; }
+            if model_dest.exists() {
+                fs::remove_dir_all(&model_dest)?;
+            }
             copy_dir_all(&src, &model_dest)?;
         }
         println!("[LocalForge] ✓ CoreML model     → {}", model_dest.display());
@@ -274,10 +295,16 @@ fn run_install(repo_path: &str) -> anyhow::Result<()> {
     }
 
     // ── 4. Write Python shims (embedded at compile time) ─────────────────────
-    for (shim, content) in [("infer.py", EMBEDDED_INFER), ("advisory.py", EMBEDDED_ADVISORY)] {
+    for (shim, content) in [
+        ("infer.py", EMBEDDED_INFER),
+        ("advisory.py", EMBEDDED_ADVISORY),
+    ] {
         let dest = coreml_dir.join(shim);
         if dest.exists() {
-            println!("[LocalForge] ✓ {shim:<14} → {} (already present)", dest.display());
+            println!(
+                "[LocalForge] ✓ {shim:<14} → {} (already present)",
+                dest.display()
+            );
             continue;
         }
         fs::write(&dest, content)?;
@@ -285,28 +312,44 @@ fn run_install(repo_path: &str) -> anyhow::Result<()> {
     }
 
     // ── 5. Qwen 7B model — prefer 7B, fall back to 1.5B ─────────────────────
-    let qwen_7b_dir  = lf_dir.join("qwen2.5-coder-7b-4bit");
+    let qwen_7b_dir = lf_dir.join("qwen2.5-coder-7b-4bit");
     let qwen_15b_dir = lf_dir.join("qwen2.5-coder-1.5b-4bit");
 
     if qwen_7b_dir.exists() {
-        println!("[LocalForge] ✓ Qwen 7B model     → {}", qwen_7b_dir.display());
+        println!(
+            "[LocalForge] ✓ Qwen 7B model     → {}",
+            qwen_7b_dir.display()
+        );
     } else if qwen_15b_dir.exists() {
         // Upgrade path: 1.5B present, download 7B
         println!("[LocalForge] ℹ Qwen 1.5B found. Downloading 7B for better accuracy...");
-        install_qwen_model(&lf_dir, "mlx-community/Qwen2.5-Coder-7B-Instruct-4bit", "qwen2.5-coder-7b-4bit");
+        install_qwen_model(
+            &lf_dir,
+            "mlx-community/Qwen2.5-Coder-7B-Instruct-4bit",
+            "qwen2.5-coder-7b-4bit",
+        );
     } else {
         // Fresh install: try to find in repo/HF cache first, then download
         let repo_qwen = find_repo_resource("qwen2.5-coder-7b-4bit")
             .or_else(|| find_repo_resource("qwen2.5-coder-1.5b-4bit"));
-        let hf_cache  = find_qwen_in_hf_cache();
+        let hf_cache = find_qwen_in_hf_cache();
         if let Some(src) = repo_qwen.or(hf_cache) {
             if fs::rename(&src, &qwen_7b_dir).is_err() {
                 copy_dir_all(&src, &qwen_7b_dir)?;
             }
-            println!("[LocalForge] ✓ Qwen model moved  → {}", qwen_7b_dir.display());
+            println!(
+                "[LocalForge] ✓ Qwen model moved  → {}",
+                qwen_7b_dir.display()
+            );
         } else {
-            println!("[LocalForge] ℹ Downloading Qwen2.5-Coder-7B (4-bit, ~4GB) for Layer 3 advisory...");
-            install_qwen_model(&lf_dir, "mlx-community/Qwen2.5-Coder-7B-Instruct-4bit", "qwen2.5-coder-7b-4bit");
+            println!(
+                "[LocalForge] ℹ Downloading Qwen2.5-Coder-7B (4-bit, ~4GB) for Layer 3 advisory..."
+            );
+            install_qwen_model(
+                &lf_dir,
+                "mlx-community/Qwen2.5-Coder-7B-Instruct-4bit",
+                "qwen2.5-coder-7b-4bit",
+            );
         }
     }
 
@@ -319,7 +362,10 @@ fn run_install(repo_path: &str) -> anyhow::Result<()> {
     let repo = std::path::Path::new(repo_path);
     let git_hooks = repo.join(".git/hooks");
     if !git_hooks.exists() {
-        println!("[LocalForge] ⚠ Not a git repo: {} — skipping hook install", repo.display());
+        println!(
+            "[LocalForge] ⚠ Not a git repo: {} — skipping hook install",
+            repo.display()
+        );
         println!("             Run inside a git repo or pass the path:");
         println!("             localforge --install /path/to/your/repo");
     } else {
@@ -334,9 +380,9 @@ fn run_install(repo_path: &str) -> anyhow::Result<()> {
 
         // Register repo
         let repos_file = lf_dir.join("repos");
-        let abs_repo   = fs::canonicalize(repo).unwrap_or_else(|_| repo.to_path_buf());
-        let abs_str    = abs_repo.to_string_lossy().to_string();
-        let existing   = fs::read_to_string(&repos_file).unwrap_or_default();
+        let abs_repo = fs::canonicalize(repo).unwrap_or_else(|_| repo.to_path_buf());
+        let abs_str = abs_repo.to_string_lossy().to_string();
+        let existing = fs::read_to_string(&repos_file).unwrap_or_default();
         if !existing.lines().any(|l| l == abs_str) {
             fs::write(&repos_file, format!("{existing}{abs_str}\n"))?;
             println!("[LocalForge] ✓ Registered       → {}", repos_file.display());
@@ -361,11 +407,11 @@ fn run_install(repo_path: &str) -> anyhow::Result<()> {
 fn run_install_org(repo_path: &str) -> anyhow::Result<()> {
     use std::path::PathBuf;
 
-    let repo_abs = std::fs::canonicalize(repo_path)
-        .unwrap_or_else(|_| PathBuf::from(repo_path));
+    let repo_abs = std::fs::canonicalize(repo_path).unwrap_or_else(|_| PathBuf::from(repo_path));
     let repo_display = repo_abs.display();
 
-    let script = format!(r#"#!/usr/bin/env bash
+    let script = format!(
+        r#"#!/usr/bin/env bash
 # LocalForge team install script
 # Generated by: localforge --install-org
 # Repo: {repo_display}
@@ -441,7 +487,8 @@ echo ""
 echo "             To install the Layer 3 Qwen advisory model:"
 echo "               pip3 install mlx-lm"
 echo '               python3 -c "from mlx_lm import load; load(\"Qwen/Qwen2.5-Coder-1.5B-Instruct-4bit\")"'
-"#);
+"#
+    );
 
     let out_path = "localforge-install-org.sh";
     std::fs::write(out_path, &script)?;
@@ -468,13 +515,13 @@ echo '               python3 -c "from mlx_lm import load; load(\"Qwen/Qwen2.5-Co
 
 #[derive(serde::Serialize)]
 struct ReportEntry {
-    filename:  String,
+    filename: String,
     timestamp: String,
     commit_id: String,
-    severity:  String,
-    summary:   String,
-    findings:  usize,
-    raw_path:  String,
+    severity: String,
+    summary: String,
+    findings: usize,
+    raw_path: String,
 }
 
 fn parse_report_file(path: &std::path::Path) -> Option<ReportEntry> {
@@ -484,8 +531,8 @@ fn parse_report_file(path: &std::path::Path) -> Option<ReportEntry> {
     // Parse header lines: "  Key  : Value"
     let mut timestamp = String::from("unknown");
     let mut commit_id = String::from("unknown");
-    let mut severity  = String::from("CLEAN");
-    let mut summary   = String::from("");
+    let mut severity = String::from("CLEAN");
+    let mut summary = String::from("");
 
     for line in content.lines().take(20) {
         let line = line.trim();
@@ -516,7 +563,9 @@ fn parse_report_file(path: &std::path::Path) -> Option<ReportEntry> {
         .lines()
         .filter(|l| {
             let t = l.trim();
-            t.starts_with('[') && t.len() > 3 && t.chars().nth(1).map_or(false, |c| c.is_ascii_digit())
+            t.starts_with('[')
+                && t.len() > 3
+                && t.chars().nth(1).map_or(false, |c| c.is_ascii_digit())
         })
         .count();
 
@@ -575,7 +624,8 @@ fn run_export_report(fmt: &str, last: Option<usize>, out: Option<&str>) -> anyho
 
     match fmt_lower.as_str() {
         "csv" => {
-            let mut csv = String::from("filename,timestamp,commit_id,severity,summary,findings,raw_path\n");
+            let mut csv =
+                String::from("filename,timestamp,commit_id,severity,summary,findings,raw_path\n");
             for r in &records {
                 csv.push_str(&format!(
                     "{},{},{},{},{},{},{}\n",
@@ -597,14 +647,25 @@ fn run_export_report(fmt: &str, last: Option<usize>, out: Option<&str>) -> anyho
         }
     }
 
-    println!("[LocalForge] ✓ Exported {} report(s) → {}", records.len(), out_path);
+    println!(
+        "[LocalForge] ✓ Exported {} report(s) → {}",
+        records.len(),
+        out_path
+    );
     println!();
 
     // Print summary table to terminal
-    println!("  {:<40}  {:<8}  {:<8}  {}", "Commit", "Severity", "Findings", "Summary");
+    println!(
+        "  {:<40}  {:<8}  {:<8}  {}",
+        "Commit", "Severity", "Findings", "Summary"
+    );
     println!("  {}", "─".repeat(90));
     for r in &records {
-        let short_id = if r.commit_id.len() > 8 { &r.commit_id[..8] } else { &r.commit_id };
+        let short_id = if r.commit_id.len() > 8 {
+            &r.commit_id[..8]
+        } else {
+            &r.commit_id
+        };
         let short_summary = if r.summary.len() > 40 {
             format!("{}…", &r.summary[..39])
         } else {
@@ -624,12 +685,12 @@ fn run_uninstall(repo_path: &str) -> anyhow::Result<()> {
     use std::fs;
     use std::path::PathBuf;
 
-    let home   = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
     let lf_dir = PathBuf::from(&home).join(".localforge");
 
     // ── Remove hook from repo ─────────────────────────────────────────────────
-    let repo     = std::path::Path::new(repo_path);
-    let hook     = repo.join(".git/hooks/pre-commit");
+    let repo = std::path::Path::new(repo_path);
+    let hook = repo.join(".git/hooks/pre-commit");
     if hook.exists() {
         // Only remove if it's a LocalForge hook
         let content = fs::read_to_string(&hook).unwrap_or_default();
@@ -637,7 +698,10 @@ fn run_uninstall(repo_path: &str) -> anyhow::Result<()> {
             fs::remove_file(&hook)?;
             println!("[LocalForge] ✓ Hook removed from {}", hook.display());
         } else {
-            println!("[LocalForge] ⚠ Hook at {} is not a LocalForge hook — skipping", hook.display());
+            println!(
+                "[LocalForge] ⚠ Hook at {} is not a LocalForge hook — skipping",
+                hook.display()
+            );
         }
     }
 
@@ -645,9 +709,10 @@ fn run_uninstall(repo_path: &str) -> anyhow::Result<()> {
     let repos_file = lf_dir.join("repos");
     if repos_file.exists() {
         let abs_repo = fs::canonicalize(repo).unwrap_or_else(|_| repo.to_path_buf());
-        let abs_str  = abs_repo.to_string_lossy().to_string();
+        let abs_str = abs_repo.to_string_lossy().to_string();
         let existing = fs::read_to_string(&repos_file).unwrap_or_default();
-        let filtered: String = existing.lines()
+        let filtered: String = existing
+            .lines()
             .filter(|l| *l != abs_str)
             .map(|l| format!("{l}\n"))
             .collect();
@@ -664,7 +729,7 @@ fn run_uninstall(repo_path: &str) -> anyhow::Result<()> {
 fn run_list_repos() -> anyhow::Result<()> {
     use std::path::PathBuf;
 
-    let home       = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
     let repos_file = PathBuf::from(&home).join(".localforge/repos");
 
     if !repos_file.exists() {
@@ -684,8 +749,8 @@ fn run_list_repos() -> anyhow::Result<()> {
     println!();
 
     for repo in repos {
-        let path   = std::path::Path::new(repo);
-        let hook   = path.join(".git/hooks/pre-commit");
+        let path = std::path::Path::new(repo);
+        let hook = path.join(".git/hooks/pre-commit");
         let exists = path.exists();
 
         let hook_status = if !exists {
@@ -720,7 +785,7 @@ fn run_list_repos() -> anyhow::Result<()> {
 fn run_upgrade_all() -> anyhow::Result<()> {
     use std::path::PathBuf;
 
-    let home       = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
     let repos_file = PathBuf::from(&home).join(".localforge/repos");
 
     if !repos_file.exists() {
@@ -740,10 +805,10 @@ fn run_upgrade_all() -> anyhow::Result<()> {
     println!();
 
     let mut upgraded = 0;
-    let mut skipped  = 0;
+    let mut skipped = 0;
 
     for repo in &repos {
-        let path      = std::path::Path::new(repo);
+        let path = std::path::Path::new(repo);
         let git_hooks = path.join(".git/hooks");
 
         if !git_hooks.exists() {
@@ -758,7 +823,10 @@ fn run_upgrade_all() -> anyhow::Result<()> {
                 #[cfg(unix)]
                 {
                     use std::os::unix::fs::PermissionsExt;
-                    let _ = std::fs::set_permissions(&hook_dest, std::fs::Permissions::from_mode(0o755));
+                    let _ = std::fs::set_permissions(
+                        &hook_dest,
+                        std::fs::Permissions::from_mode(0o755),
+                    );
                 }
                 println!("  ✓ {} — hook upgraded to v{EXPECTED_HOOK_VERSION}", repo);
                 upgraded += 1;
@@ -781,11 +849,11 @@ fn check_hook_version() {
     // Read the hook from the current repo's .git/hooks/pre-commit
     let hook_path = match find_current_hook() {
         Some(p) => p,
-        None    => return, // no hook found — nothing to check
+        None => return, // no hook found — nothing to check
     };
 
     let content = match std::fs::read_to_string(&hook_path) {
-        Ok(c)  => c,
+        Ok(c) => c,
         Err(_) => return,
     };
 
@@ -803,7 +871,9 @@ fn check_hook_version() {
             eprintln!(
                 "[LocalForge] ⚠ Hook version v{v} is newer than binary v{EXPECTED_HOOK_VERSION}."
             );
-            eprintln!("[LocalForge]   Update binary: cargo build --release && localforge --install");
+            eprintln!(
+                "[LocalForge]   Update binary: cargo build --release && localforge --install"
+            );
         }
     }
     // If no version line found, hook predates versioning — silently skip
@@ -823,8 +893,12 @@ fn find_current_hook() -> Option<std::path::PathBuf> {
     let mut dir = std::env::current_dir().ok()?;
     loop {
         let hook = dir.join(".git/hooks/pre-commit");
-        if hook.exists() { return Some(hook); }
-        if !dir.pop() { return None; }
+        if hook.exists() {
+            return Some(hook);
+        }
+        if !dir.pop() {
+            return None;
+        }
     }
 }
 
@@ -842,10 +916,13 @@ fn find_bundled_resource(relative: &str) -> Option<std::path::PathBuf> {
     if let Ok(exe) = std::env::current_exe() {
         if let Some(macos) = exe.parent() {
             let candidate = macos
-                .parent().unwrap_or(macos)
+                .parent()
+                .unwrap_or(macos)
                 .join("Resources")
                 .join(relative);
-            if candidate.exists() { return Some(candidate); }
+            if candidate.exists() {
+                return Some(candidate);
+            }
         }
     }
     None
@@ -855,21 +932,29 @@ fn find_bundled_resource(relative: &str) -> Option<std::path::PathBuf> {
 fn find_repo_resource(relative: &str) -> Option<std::path::PathBuf> {
     if let Ok(exe) = std::env::current_exe() {
         // target/release/localforge → go up to repo root
-        if let Some(p) = exe.parent().and_then(|p| p.parent()).and_then(|p| p.parent()) {
+        if let Some(p) = exe
+            .parent()
+            .and_then(|p| p.parent())
+            .and_then(|p| p.parent())
+        {
             let candidate = p.join(relative);
-            if candidate.exists() { return Some(candidate); }
+            if candidate.exists() {
+                return Some(candidate);
+            }
         }
     }
     // cwd-relative fallback
     let cwd = std::path::PathBuf::from(relative);
-    if cwd.exists() { return Some(cwd); }
+    if cwd.exists() {
+        return Some(cwd);
+    }
     None
 }
 
 /// Search the HuggingFace hub cache for the Qwen2.5-Coder snapshot directory.
 fn find_qwen_in_hf_cache() -> Option<std::path::PathBuf> {
     let home = dirs::home_dir()?;
-    let hub  = home.join(".cache/huggingface/hub");
+    let hub = home.join(".cache/huggingface/hub");
     // Look for models--Qwen--Qwen2.5-Coder* directories
     let rd = std::fs::read_dir(&hub).ok()?;
     for entry in rd.flatten() {
@@ -897,7 +982,7 @@ fn copy_dir_all(src: &std::path::Path, dst: &std::path::Path) -> anyhow::Result<
     std::fs::create_dir_all(dst)?;
     for entry in std::fs::read_dir(src)? {
         let entry = entry?;
-        let ty    = entry.file_type()?;
+        let ty = entry.file_type()?;
         if ty.is_dir() {
             copy_dir_all(&entry.path(), &dst.join(entry.file_name()))?;
         } else {
@@ -980,7 +1065,14 @@ fn install_static_tools() {
             .status()
             .map(|s| s.success())
             .unwrap_or(false);
-        println!("{}", if ok { "✓" } else { "⚠ failed (pip3 install bandit)" });
+        println!(
+            "{}",
+            if ok {
+                "✓"
+            } else {
+                "⚠ failed (pip3 install bandit)"
+            }
+        );
     }
 
     // ── pylint (Python quality) ───────────────────────────────────────────────
@@ -994,7 +1086,14 @@ fn install_static_tools() {
             .status()
             .map(|s| s.success())
             .unwrap_or(false);
-        println!("{}", if ok { "✓" } else { "⚠ failed (pip3 install pylint)" });
+        println!(
+            "{}",
+            if ok {
+                "✓"
+            } else {
+                "⚠ failed (pip3 install pylint)"
+            }
+        );
     }
 
     // ── eslint (JS/TS) ────────────────────────────────────────────────────────
@@ -1031,7 +1130,14 @@ fn install_static_tools() {
                 .status()
                 .map(|s| s.success())
                 .unwrap_or(false);
-            println!("{}", if ok { "✓" } else { "⚠ failed (go install staticcheck)" });
+            println!(
+                "{}",
+                if ok {
+                    "✓"
+                } else {
+                    "⚠ failed (go install staticcheck)"
+                }
+            );
         } else {
             // Try brew
             let brew_ok = which_tool("brew");
@@ -1074,7 +1180,14 @@ fn install_static_tools() {
                 .status()
                 .map(|s| s.success())
                 .unwrap_or(false);
-            println!("{}", if ok { "✓" } else { "⚠ failed (rustup component add clippy)" });
+            println!(
+                "{}",
+                if ok {
+                    "✓"
+                } else {
+                    "⚠ failed (rustup component add clippy)"
+                }
+            );
         }
     } else {
         println!("[LocalForge] ℹ cargo not found — Rust static analysis will be skipped.");
@@ -1093,14 +1206,14 @@ fn print_advisory(report: &advisory_engine::AdvisoryResult) {
     eprintln!(
         "[LocalForge] Qwen [{severity}] {summary}",
         severity = report.severity.label(),
-        summary  = report.summary,
+        summary = report.summary,
     );
     for (i, f) in report.findings.iter().enumerate() {
         let cat = f.category.as_deref().unwrap_or("general").to_uppercase();
         eprintln!(
             "[LocalForge]   [{cat}] Finding {n}: {t} — {exp}",
-            n   = i + 1,
-            t   = f.r#type,
+            n = i + 1,
+            t = f.r#type,
             exp = f.explanation,
         );
         eprintln!("[LocalForge]   Fix: {}", f.remediation);
@@ -1108,4 +1221,121 @@ fn print_advisory(report: &advisory_engine::AdvisoryResult) {
     if !report.report_path.is_empty() {
         eprintln!("[LocalForge]   Full report: {}", report.report_path);
     }
+}
+
+// ── --scan-pr ─────────────────────────────────────────────────────────────────
+
+/// Strip diff hunks for files that match any .localforgeignore pattern.
+/// Mirrors the awk logic in the pre-commit hook (substring match per line).
+fn apply_localforgeignore(diff: &str) -> (String, Vec<String>) {
+    let ignore_path = std::path::Path::new(".localforgeignore");
+    let patterns: Vec<String> = if ignore_path.exists() {
+        std::fs::read_to_string(ignore_path)
+            .unwrap_or_default()
+            .lines()
+            .filter(|l| !l.trim_start().starts_with('#') && !l.trim().is_empty())
+            .map(|l| l.to_string())
+            .collect()
+    } else {
+        vec![]
+    };
+
+    if patterns.is_empty() {
+        return (diff.to_string(), vec![]);
+    }
+
+    let mut out = String::new();
+    let mut ignored_files: Vec<String> = vec![];
+    let mut skip = false;
+    let mut current_file = String::new();
+
+    for line in diff.lines() {
+        if line.starts_with("diff --git ") {
+            let file = line
+                .split_whitespace()
+                .last()
+                .unwrap_or("")
+                .trim_start_matches("b/")
+                .to_string();
+            skip = patterns.iter().any(|p| file.contains(p.as_str()));
+            if skip {
+                ignored_files.push(file.clone());
+            }
+            current_file = file;
+            let _ = current_file; // used above; suppress lint
+        }
+        if !skip {
+            out.push_str(line);
+            out.push('\n');
+        }
+    }
+
+    (out, ignored_files)
+}
+
+fn run_scan_pr(base: &str, head: &str) -> anyhow::Result<()> {
+    // ── Collect diff ──────────────────────────────────────────────────────────
+    let diff_out = std::process::Command::new("git")
+        .args(["diff", &format!("{base}..{head}")])
+        .output()
+        .map_err(|e| anyhow::anyhow!("failed to run git diff: {e}"))?;
+
+    if !diff_out.status.success() {
+        let msg = String::from_utf8_lossy(&diff_out.stderr);
+        anyhow::bail!("git diff {base}..{head} failed: {msg}");
+    }
+
+    let raw_diff = String::from_utf8_lossy(&diff_out.stdout).to_string();
+
+    // ── Collect changed file names ────────────────────────────────────────────
+    let names_out = std::process::Command::new("git")
+        .args(["diff", "--name-only", &format!("{base}..{head}")])
+        .output()
+        .map_err(|e| anyhow::anyhow!("failed to run git diff --name-only: {e}"))?;
+    let all_files: Vec<String> = String::from_utf8_lossy(&names_out.stdout)
+        .lines()
+        .filter(|l| !l.is_empty())
+        .map(|l| l.to_string())
+        .collect();
+
+    // ── Apply .localforgeignore ───────────────────────────────────────────────
+    let (filtered_diff, ignored_files) = apply_localforgeignore(&raw_diff);
+    let scanned_files: Vec<&String> = all_files
+        .iter()
+        .filter(|f| !ignored_files.contains(f))
+        .collect();
+
+    // ── Diff stats ────────────────────────────────────────────────────────────
+    let total_lines = filtered_diff.lines().count();
+    let added_lines = filtered_diff
+        .lines()
+        .filter(|l| l.starts_with('+') && !l.starts_with("+++"))
+        .count();
+
+    // ── Layer 1 scan ──────────────────────────────────────────────────────────
+    let findings = if filtered_diff.trim().is_empty() {
+        vec![]
+    } else {
+        ast_validator::scan_findings(&filtered_diff)
+    };
+
+    let blocked = !findings.is_empty();
+
+    // ── JSON output ───────────────────────────────────────────────────────────
+    let result = serde_json::json!({
+        "blocked":       blocked,
+        "blocked_by":    if blocked { serde_json::json!("layer1") } else { serde_json::Value::Null },
+        "base":          base,
+        "head":          head,
+        "findings":      findings.iter().map(|l| serde_json::json!({ "label": l })).collect::<Vec<_>>(),
+        "files_scanned": scanned_files,
+        "files_ignored": ignored_files,
+        "diff_stats": {
+            "total_lines": total_lines,
+            "added_lines": added_lines,
+        },
+    });
+
+    println!("{}", serde_json::to_string_pretty(&result)?);
+    std::process::exit(if blocked { 1 } else { 0 });
 }

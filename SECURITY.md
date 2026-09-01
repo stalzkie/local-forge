@@ -13,7 +13,7 @@ Only the latest release of LocalForge receives security fixes.
 
 **Please do not open a public GitHub issue for security vulnerabilities.**
 
-Report security issues by emailing **fantasy.grimdark@gmail.com** with the subject line `[LocalForge Security]`. You should receive a response within **72 hours**. If you do not, follow up to ensure the original message was received.
+Report security issues by emailing **dstalingrad@gmail.com** with the subject line `[LocalForge Security]`. You should receive a response within **72 hours**. If you do not, follow up to ensure the original message was received.
 
 Include as much of the following as possible:
 
