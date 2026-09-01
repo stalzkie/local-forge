@@ -2,11 +2,22 @@ target/
 __pycache__/
 *.pyc
 .DS_Store
+
 # Qwen MLX model weights — download with: python3 coreml/advisory.py
 coreml/qwen2.5-coder-1.5b-4bit/
 build/
+
+# Generated knowledge graph — rebuild with: graphify . --code-only
+graphify-out/
+
+# Agent skills symlinks — restored with: npx skills install
+.agents/
+
+# Claude Code backup files
+*.graphify-bak
+
 tests/review_target.py
 tests/bad_credential.py
 tests/benchmark_results/advisory_log/
 REDDIT_POST.md
-CLAUDE.md
+docs/

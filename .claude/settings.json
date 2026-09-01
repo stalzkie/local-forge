@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git remote *)",
+      "Bash(sips -z 1024 1024 \"/Users/stal/Desktop/local-forge/ui/assets/localforge-newlogo-inverted.png\" --out /private/tmp/icon_source_1024.png)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(xcodebuild -project LocalForge.xcodeproj -scheme LocalForge -configuration Debug build)",
+      "Bash(screencapture -x /private/tmp/claude-501/-Users-stal-Desktop-local-forge/60f6f4e2-577a-4740-bbe6-f136c30d9c73/scratchpad/localforge_screenshot.png)",
+      "Bash(screencapture /private/tmp/claude-501/-Users-stal-Desktop-local-forge/60f6f4e2-577a-4740-bbe6-f136c30d9c73/scratchpad/localforge_screenshot.png)",
+      "Bash(pkill -x LocalForge)",
+      "Bash(open /Users/stal/Library/Developer/Xcode/DerivedData/LocalForge-duzjtopmbxfngwcxejhviaevmxcr/Build/Products/Debug/LocalForge.app)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "graphify hook-guard search"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "graphify hook-guard read"
+          }
+        ]
+      }
+    ]
+  }
+}
