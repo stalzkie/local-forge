@@ -30,3 +30,4 @@ def is_admin(user_id):
     role = get_user_role(user_id)
     if role == "admin":
         return True
+

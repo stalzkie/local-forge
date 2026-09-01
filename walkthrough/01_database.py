@@ -32,3 +32,4 @@ def delete_user(user_id):
     cursor = conn.cursor()
     cursor.execute("DELETE FROM users WHERE id = " + str(user_id))
     conn.commit()
+

@@ -23,3 +23,4 @@ def notify_webhook(payload):
     url = "https://hooks.internal/payment-events"
     headers = {"Authorization": "Bearer " + AWS_ACCESS_KEY}
     requests.post(url, json=payload, headers=headers, verify=False)
+

@@ -1,0 +1,210 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: write
+
+jobs:
+  # ── Validate tag matches Cargo.toml version ────────────────────────────────
+  validate:
+    name: Validate version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check tag matches Cargo.toml
+        id: ver
+        run: |
+          CARGO_VER=$(grep '^version' Cargo.toml | head -1 \
+                        | sed 's/.*= *"//; s/".*//')
+          TAG_VER="${GITHUB_REF_NAME#v}"
+
+          echo "Cargo.toml : $CARGO_VER"
+          echo "Git tag    : $TAG_VER"
+
+          if [ "$CARGO_VER" != "$TAG_VER" ]; then
+            echo "ERROR: Tag $GITHUB_REF_NAME does not match Cargo.toml version $CARGO_VER."
+            echo "       Bump Cargo.toml (and the three hook-version constants) before tagging."
+            exit 1
+          fi
+          echo "version=$CARGO_VER" >> "$GITHUB_OUTPUT"
+
+  # ── Build, package, notarize, publish ─────────────────────────────────────
+  build-and-release:
+    name: Build & release
+    needs: validate
+    runs-on: macos-15
+    env:
+      VERSION: ${{ needs.validate.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── Rust binary ────────────────────────────────────────────────────────
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build Rust binary (aarch64-apple-darwin)
+        run: cargo build --release --target aarch64-apple-darwin
+
+      # ── Homebrew tarball ───────────────────────────────────────────────────
+      - name: Package Homebrew tarball
+        run: bash scripts/package_homebrew.sh
+
+      - name: Compute tarball SHA-256
+        id: sha
+        run: |
+          TARBALL="build/localforge-v${VERSION}-aarch64-apple-darwin.tar.gz"
+          SHA=$(shasum -a 256 "$TARBALL" | awk '{print $1}')
+          echo "sha256=$SHA"         >> "$GITHUB_OUTPUT"
+          echo "tarball=$TARBALL"   >> "$GITHUB_OUTPUT"
+
+      # ── SwiftUI app ────────────────────────────────────────────────────────
+      - name: Build LocalForge.app (unsigned)
+        run: |
+          mkdir -p build
+          xcodebuild \
+            -project ui/LocalForge.xcodeproj \
+            -scheme LocalForge \
+            -configuration Release \
+            -archivePath build/LocalForge.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            archive 2>&1 | grep -E "(^Build|error:|warning:|Archive)" || true
+
+          mkdir -p build/export
+          cp -r \
+            build/LocalForge.xcarchive/Products/Applications/LocalForge.app \
+            build/export/
+
+          MACOS_DIR="build/export/LocalForge.app/Contents/MacOS"
+          RESOURCES_DIR="build/export/LocalForge.app/Contents/Resources"
+
+          cp target/aarch64-apple-darwin/release/localforge \
+             "$MACOS_DIR/localforge-core"
+          chmod +x "$MACOS_DIR/localforge-core"
+
+          mkdir -p "$RESOURCES_DIR/coreml" "$RESOURCES_DIR/hooks"
+          cp coreml/infer.py coreml/advisory.py "$RESOURCES_DIR/coreml/"
+          cp hooks/pre-commit "$RESOURCES_DIR/hooks/"
+
+      # ── DMG ────────────────────────────────────────────────────────────────
+      - name: Install create-dmg
+        run: brew install create-dmg
+
+      - name: Package DMG
+        id: dmg
+        run: |
+          DMG_NAME="LocalForge-v${VERSION}-arm64.dmg"
+          mkdir -p build/dmg_staging
+          cp -r build/export/LocalForge.app build/dmg_staging/
+
+          # create-dmg exits 1 when unsigned but still produces the file
+          create-dmg \
+            --volname "LocalForge" \
+            --volicon \
+              "ui/LocalForgeApp/Assets.xcassets/AppIcon.appiconset/icon_512.png" \
+            --window-pos 200 120 \
+            --window-size 580 380 \
+            --icon-size 100 \
+            --icon "LocalForge.app" 150 180 \
+            --hide-extension "LocalForge.app" \
+            --app-drop-link 420 180 \
+            "build/$DMG_NAME" \
+            "build/dmg_staging/" || true
+
+          if [ ! -f "build/$DMG_NAME" ]; then
+            echo "ERROR: DMG was not created."
+            exit 1
+          fi
+          echo "dmg_name=$DMG_NAME" >> "$GITHUB_OUTPUT"
+
+      # ── Code signing (optional — requires secrets) ─────────────────────────
+      - name: Import Developer ID certificate
+        if: ${{ secrets.APPLE_CERTIFICATE_BASE64 != '' }}
+        env:
+          CERT_B64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          CERT_PWD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          echo "$CERT_B64" | base64 --decode > /tmp/cert.p12
+          security create-keychain -p "" build.keychain
+          security import /tmp/cert.p12 \
+            -k build.keychain -P "$CERT_PWD" -T /usr/bin/codesign
+          security list-keychains -s build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-key-partition-list \
+            -S apple-tool:,apple: -s -k "" build.keychain
+          rm /tmp/cert.p12
+
+      - name: Sign binary
+        if: ${{ secrets.APPLE_CERTIFICATE_BASE64 != '' }}
+        env:
+          DEVELOPER_ID: ${{ secrets.APPLE_DEVELOPER_ID_NAME }}
+        run: |
+          codesign --force --options runtime \
+            --sign "$DEVELOPER_ID" \
+            "build/export/LocalForge.app/Contents/MacOS/localforge-core"
+          codesign --force --options runtime \
+            --sign "$DEVELOPER_ID" \
+            "build/export/LocalForge.app"
+
+      # ── Notarization (optional — requires Apple credentials secrets) ───────
+      - name: Notarize & staple DMG
+        if: ${{ secrets.APPLE_ID != '' }}
+        env:
+          APPLE_ID:       ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID:  ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PWD:  ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          DMG_PATH="build/${{ steps.dmg.outputs.dmg_name }}"
+          xcrun notarytool submit "$DMG_PATH" \
+            --apple-id    "$APPLE_ID" \
+            --team-id     "$APPLE_TEAM_ID" \
+            --password    "$APPLE_APP_PWD" \
+            --wait
+          xcrun stapler staple "$DMG_PATH"
+          spctl --assess --type open \
+            --context context:primary-signature -v "$DMG_PATH"
+
+      # ── Update Homebrew formula ────────────────────────────────────────────
+      - name: Update Formula/localforge.rb
+        run: |
+          TARBALL_URL="https://github.com/${{ github.repository }}/releases/download/v${VERSION}/localforge-v${VERSION}-aarch64-apple-darwin.tar.gz"
+          SHA="${{ steps.sha.outputs.sha256 }}"
+
+          sed -i '' \
+            "s|version \"[^\"]*\"|version \"${VERSION}\"|" \
+            Formula/localforge.rb
+          sed -i '' \
+            "s|url \"https://github.com/.*/releases/download/.*\"|url \"${TARBALL_URL}\"|" \
+            Formula/localforge.rb
+          sed -i '' \
+            "s|sha256 \"[^\"]*\"|sha256 \"${SHA}\"|" \
+            Formula/localforge.rb
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/localforge.rb
+          git commit -m "chore: bump Homebrew formula to v${VERSION} [skip ci]"
+          git push origin HEAD:main
+
+      # ── GitHub Release ─────────────────────────────────────────────────────
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "LocalForge v${{ env.VERSION }}"
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            ${{ steps.sha.outputs.tarball }}
+            build/${{ steps.dmg.outputs.dmg_name }}

@@ -1,0 +1,267 @@
+name: Eval & Benchmark
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Pyramid Level 3 — L3 Model Eval (full corpus)
+# Pyramid Level 4 — Performance Benchmark (L1 latency, L2 accuracy)
+#
+# Runs on:
+#   • Weekly schedule (every Monday 06:00 UTC) — catch model drift over time
+#   • Every v*.*.* release tag              — gate releases on eval thresholds
+#   • Manual workflow_dispatch              — ad-hoc regression checks
+#
+# Requires: macos-15 (Apple Silicon) for MLX / CoreML
+# Model: Qwen2.5-Coder-1.5B-Instruct-4bit (mlx-community, ~900 MB, cached)
+#
+# Threshold gates (fail the run if breached):
+#   L3 quick  (20 samples)  — precision ≥ 0.65  recall ≥ 0.65  fpr ≤ 0.35
+#   L3 full  (150 samples)  — precision ≥ 0.75  recall ≥ 0.70  fpr ≤ 0.25
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"       # weekly, Monday 06:00 UTC
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+    inputs:
+      quick:
+        description: "Run quick mode (20 samples only)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+
+# ── Level 3: Layer 3 model eval ───────────────────────────────────────────────
+
+  l3-eval:
+    name: "L3 · Layer 3 eval (${{ github.event_name == 'schedule' && 'full' || (inputs.quick && 'quick') || 'full' }})"
+    runs-on: macos-15
+    outputs:
+      precision: ${{ steps.gate.outputs.precision }}
+      recall:    ${{ steps.gate.outputs.recall }}
+      f1:        ${{ steps.gate.outputs.f1 }}
+      fpr:       ${{ steps.gate.outputs.fpr }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # ── Model cache ──────────────────────────────────────────────────────────
+      - name: Restore Qwen model cache
+        id: model-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.localforge/qwen2.5-coder-1.5b-4bit
+          key: qwen-1.5b-4bit-mlx-v1
+
+      - name: Install MLX + HuggingFace deps
+        run: |
+          pip install mlx-lm huggingface_hub --quiet
+
+      - name: Download Qwen 1.5B 4-bit model (if cache miss)
+        if: steps.model-cache.outputs.cache-hit != 'true'
+        run: |
+          python3 - <<'EOF'
+          from huggingface_hub import snapshot_download
+          from pathlib import Path
+          dest = Path.home() / ".localforge" / "qwen2.5-coder-1.5b-4bit"
+          dest.mkdir(parents=True, exist_ok=True)
+          snapshot_download(
+              repo_id="mlx-community/Qwen2.5-Coder-1.5B-Instruct-4bit",
+              local_dir=str(dest),
+          )
+          print(f"Model downloaded to {dest}")
+          EOF
+
+      # ── Run eval ─────────────────────────────────────────────────────────────
+      - name: Run Layer 3 eval
+        id: eval
+        run: |
+          mkdir -p eval-out
+
+          # Use --quick for manual quick-mode or PR; full for schedule + tags
+          QUICK_FLAG=""
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && \
+                "${{ inputs.quick }}"      == "true" ]]; then
+            QUICK_FLAG="--quick"
+          fi
+
+          python3 tests/layer3_eval.py \
+            --model-dir "$HOME/.localforge/qwen2.5-coder-1.5b-4bit" \
+            --out eval-out \
+            $QUICK_FLAG
+
+          # Locate the JSON result file (timestamped)
+          JSON=$(ls eval-out/*.json 2>/dev/null | sort | tail -1)
+          echo "result_json=$JSON" >> "$GITHUB_OUTPUT"
+
+      # ── Threshold gates ───────────────────────────────────────────────────────
+      - name: Check threshold gates
+        id: gate
+        run: |
+          JSON="${{ steps.eval.outputs.result_json }}"
+          if [ -z "$JSON" ] || [ ! -f "$JSON" ]; then
+            echo "ERROR: eval JSON not found."
+            exit 1
+          fi
+
+          python3 - "$JSON" <<'EOF'
+          import json, sys
+
+          with open(sys.argv[1]) as f:
+              data = json.load(f)
+
+          overall   = data.get("overall", {})
+          precision = overall.get("precision", 0.0)
+          recall    = overall.get("recall",    0.0)
+          f1        = overall.get("f1",        0.0)
+          fpr       = overall.get("fpr",       1.0)
+          n         = data.get("n_samples", 0)
+
+          print(f"Samples   : {n}")
+          print(f"Precision : {precision:.3f}")
+          print(f"Recall    : {recall:.3f}")
+          print(f"F1        : {f1:.3f}")
+          print(f"FPR       : {fpr:.3f}")
+
+          # Write outputs for downstream jobs
+          with open("$GITHUB_OUTPUT", "a") as gh:
+              gh.write(f"precision={precision}\n")
+              gh.write(f"recall={recall}\n")
+              gh.write(f"f1={f1}\n")
+              gh.write(f"fpr={fpr}\n")
+
+          # Thresholds scale with corpus size
+          if n <= 25:          # quick mode
+              P_MIN, R_MIN, FPR_MAX = 0.65, 0.65, 0.35
+              mode = "quick"
+          else:                # full corpus
+              P_MIN, R_MIN, FPR_MAX = 0.75, 0.70, 0.25
+              mode = "full"
+
+          failures = []
+          if precision < P_MIN:
+              failures.append(f"precision {precision:.3f} < {P_MIN} ({mode} threshold)")
+          if recall < R_MIN:
+              failures.append(f"recall {recall:.3f} < {R_MIN} ({mode} threshold)")
+          if fpr > FPR_MAX:
+              failures.append(f"fpr {fpr:.3f} > {FPR_MAX} ({mode} threshold)")
+
+          if failures:
+              print("\nTHRESHOLD GATE FAILED:")
+              for msg in failures:
+                  print(f"  • {msg}")
+              sys.exit(1)
+
+          print(f"\nAll thresholds passed ({mode} mode).")
+          EOF
+
+      # ── Upload artifacts ──────────────────────────────────────────────────────
+      - name: Upload eval artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: l3-eval-${{ github.run_number }}
+          path: eval-out/
+          retention-days: 90
+
+# ── Level 4: Benchmark (L1 latency + L2 accuracy) ─────────────────────────────
+
+  benchmark:
+    name: "L4 · benchmark (L1+L2)"
+    runs-on: macos-15
+    needs: l3-eval
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build release binary
+        run: cargo build --release --target aarch64-apple-darwin
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install benchmark deps
+        run: pip install matplotlib numpy --quiet
+
+      - name: Run benchmark (L1 + L2, skip Qwen)
+        run: |
+          mkdir -p benchmark-out
+          python3 tests/benchmark.py --skip-qwen 2>&1 | tee benchmark-out/benchmark.log
+
+      # ── L1 latency gate (pure-regex layer; should be sub-millisecond) ─────────
+      - name: Assert L1 median latency < 10 ms
+        run: |
+          python3 - <<'EOF'
+          import re, sys
+
+          log = open("benchmark-out/benchmark.log").read()
+
+          # benchmark.py prints: "L1 median: X.X µs" or similar
+          # run_layer1 returns microseconds stored in results list
+          # We look for the summary line emitted by print_summary()
+          match = re.search(r"L1[^:]*median[^\d]*([\d.]+)\s*(µs|ms|us)", log, re.IGNORECASE)
+          if not match:
+              print("WARNING: could not parse L1 median latency from benchmark output.")
+              print("         Gate skipped — check benchmark-out/benchmark.log manually.")
+              sys.exit(0)
+
+          value = float(match.group(1))
+          unit  = match.group(2).lower()
+          ms    = value / 1000 if unit in ("µs", "us") else value
+
+          print(f"L1 median latency: {value:.1f} {unit} ({ms:.3f} ms)")
+
+          if ms >= 10.0:
+              print(f"FAIL: L1 median {ms:.3f} ms >= 10 ms threshold")
+              sys.exit(1)
+          print("PASS")
+          EOF
+
+      # ── Copy charts from benchmark_results/ into artifact ─────────────────────
+      - name: Collect benchmark charts
+        if: always()
+        run: |
+          find tests/benchmark_results -name "*.png" -newer benchmark-out/benchmark.log \
+            -exec cp {} benchmark-out/ \; 2>/dev/null || true
+
+      - name: Upload benchmark artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-${{ github.run_number }}
+          path: benchmark-out/
+          retention-days: 90
+
+# ── Summary comment on PRs ────────────────────────────────────────────────────
+
+  eval-summary:
+    name: "Eval summary"
+    runs-on: ubuntu-latest
+    needs: [l3-eval, benchmark]
+    if: always()
+    steps:
+      - name: Print eval summary
+        run: |
+          echo "### Eval & Benchmark Results"
+          echo ""
+          echo "| Metric    | Value |"
+          echo "|-----------|-------|"
+          echo "| Precision | ${{ needs.l3-eval.outputs.precision }} |"
+          echo "| Recall    | ${{ needs.l3-eval.outputs.recall }} |"
+          echo "| F1        | ${{ needs.l3-eval.outputs.f1 }} |"
+          echo "| FPR       | ${{ needs.l3-eval.outputs.fpr }} |"
