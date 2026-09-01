@@ -1,0 +1,23 @@
+# LocalForge custom pattern rules
+# Loaded at scan time alongside the 26 built-in patterns.
+# Patterns are RE2-compatible regular expressions (same engine as the built-ins).
+# Only added lines (+) in the git diff are tested — never removed lines (-).
+#
+# Format:
+#   [[patterns]]
+#   label   = "Human-readable name shown when blocked"
+#   pattern = 'regex'   # use single quotes to avoid TOML escape issues
+#
+# Examples (all commented out — uncomment and adapt for your org):
+
+# [[patterns]]
+# label   = "Internal API Key"
+# pattern = 'MYCO_[A-Za-z0-9]{32}'
+
+# [[patterns]]
+# label   = "Internal Service Account Token"
+# pattern = '(?i)svc_token\s*=\s*[A-Za-z0-9\-_]{24,}'
+
+# [[patterns]]
+# label   = "Private npm Registry Token"
+# pattern = '//npm\.internal\.myco\.com/:_authToken=[A-Za-z0-9\-_]{20,}'

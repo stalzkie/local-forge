@@ -17,6 +17,7 @@ tests/benchmark.py
 # Config/ignore files contain glob patterns that trigger false positives
 .gitignore
 .localforgeignore
+.localforge/patterns.toml
 
 # Xcode project files — pbxproj and Info.plist contain build var strings that score as suspicious
 ui/LocalForge.xcodeproj/project.pbxproj

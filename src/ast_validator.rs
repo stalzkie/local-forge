@@ -1,5 +1,6 @@
 use once_cell::sync::Lazy;
 use regex::Regex;
+use serde::Deserialize;
 
 struct Rule {
     pattern: &'static str,
@@ -95,26 +96,96 @@ static COMPILED: Lazy<Vec<(Regex, &'static str)>> = Lazy::new(|| {
         .collect()
 });
 
-/// Returns true (blocked) if any known secret pattern matches a `+` line in the diff.
-/// Only scans added lines (lines starting with `+` but not `+++`) to avoid
-/// flagging secrets that were already present and are being removed.
-pub fn scan(diff: &str) -> bool {
-    // Extract only added lines from the diff for pattern matching.
-    // Fall back to scanning the whole input if it doesn't look like a diff.
+// ── Custom patterns (.localforge/patterns.toml) ───────────────────────────────
+
+#[derive(Deserialize)]
+struct PatternsFile {
+    #[serde(default)]
+    patterns: Vec<CustomRule>,
+}
+
+#[derive(Deserialize)]
+struct CustomRule {
+    pattern: String,
+    label:   String,
+}
+
+/// Load user-defined patterns from `.localforge/patterns.toml` in the current
+/// working directory (which is always the repo root when invoked by the hook).
+/// Returns an empty vec if the file does not exist — not an error.
+fn load_custom_patterns() -> Vec<(Regex, String)> {
+    let path = std::path::Path::new(".localforge/patterns.toml");
+    if !path.exists() {
+        return vec![];
+    }
+    let content = match std::fs::read_to_string(path) {
+        Ok(c)  => c,
+        Err(e) => {
+            eprintln!("[LocalForge] WARNING: could not read .localforge/patterns.toml: {e}");
+            return vec![];
+        }
+    };
+    let file: PatternsFile = match toml::from_str(&content) {
+        Ok(f)  => f,
+        Err(e) => {
+            eprintln!("[LocalForge] WARNING: failed to parse .localforge/patterns.toml: {e}");
+            return vec![];
+        }
+    };
+    file.patterns
+        .into_iter()
+        .filter_map(|r| match Regex::new(&r.pattern) {
+            Ok(re) => Some((re, r.label)),
+            Err(e) => {
+                eprintln!(
+                    "[LocalForge] WARNING: invalid custom pattern {:?}: {e}",
+                    r.pattern
+                );
+                None
+            }
+        })
+        .collect()
+}
+
+// ── Public API ────────────────────────────────────────────────────────────────
+
+/// Scan `diff` against all built-in and custom patterns.
+/// Returns the matched labels — empty means clean.
+/// Only `+` lines (added lines) are tested; `-` lines are never scanned.
+pub fn scan_findings(diff: &str) -> Vec<String> {
     let target: String = {
-        let added: Vec<&str> = diff.lines()
+        let added: Vec<&str> = diff
+            .lines()
             .filter(|l| l.starts_with('+') && !l.starts_with("+++"))
             .collect();
         if added.is_empty() { diff.to_string() } else { added.join("\n") }
     };
 
+    let mut findings = Vec::new();
+
     for (re, label) in COMPILED.iter() {
         if re.is_match(&target) {
-            eprintln!("[LocalForge] BLOCKED — secret detected: {label}");
-            return true;
+            findings.push(label.to_string());
         }
     }
-    false
+
+    for (re, label) in load_custom_patterns() {
+        if re.is_match(&target) {
+            findings.push(label);
+        }
+    }
+
+    findings
+}
+
+/// Returns true (blocked) if any pattern matches a `+` line in the diff.
+/// Prints each matched label to stderr. Calls `scan_findings` internally.
+pub fn scan(diff: &str) -> bool {
+    let findings = scan_findings(diff);
+    for label in &findings {
+        eprintln!("[LocalForge] BLOCKED — secret detected: {label}");
+    }
+    !findings.is_empty()
 }
 
 #[cfg(test)]
@@ -184,6 +255,19 @@ mod tests {
     fn blocks_added_secret_lines() {
         let diff = format!("+token = '{}'", aws_key());
         assert!(scan(&diff));
+    }
+
+    // ── scan_findings returns labels ──────────────────────────────────────────
+    #[test]
+    fn scan_findings_returns_matched_labels() {
+        let findings = scan_findings(&aws_key());
+        assert!(!findings.is_empty());
+        assert!(findings.iter().any(|l| l.contains("AWS")));
+    }
+
+    #[test]
+    fn scan_findings_empty_on_clean_diff() {
+        assert!(scan_findings("fn main() {}").is_empty());
     }
 
     // ── False positive guards ─────────────────────────────────────────────────
