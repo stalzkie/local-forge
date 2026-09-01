@@ -97,6 +97,10 @@ const RULES: &[Rule] = &[
         pattern: r"sk-[A-Za-z0-9]{48}",
         label: "OpenAI API Key",
     },
+    Rule {
+        pattern: r"sk-proj-[A-Za-z0-9_\-]{20,}",
+        label: "OpenAI Project API Key",
+    },
     // ── Shopify ───────────────────────────────────────────────────────────────
     Rule {
         pattern: r"shpss_[A-Za-z0-9]{32}",
@@ -291,6 +295,9 @@ mod tests {
     fn openai_key() -> String {
         format!("sk-{}", "A".repeat(48))
     }
+    fn openai_project_key() -> String {
+        format!("sk-proj-{}", "A".repeat(20))
+    }
     fn shopify_secret() -> String {
         format!("shpss_{}", "A".repeat(32))
     }
@@ -362,6 +369,10 @@ mod tests {
     #[test]
     fn detects_openai_key() {
         assert!(scan(&openai_key()));
+    }
+    #[test]
+    fn detects_openai_project_key() {
+        assert!(scan(&openai_project_key()));
     }
     #[test]
     fn detects_shopify_secret() {
