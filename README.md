@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="ui/assets/localforge logo.png" alt="LocalForge" width="100" height="100" />
+<img src="ui/assets/localforge new logo.png" alt="LocalForge" width="100" height="100" />
 
 # LocalForge
 

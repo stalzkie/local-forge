@@ -70,7 +70,7 @@ struct ContentView: View {
             Image("LocalForgeLogo")
                 .resizable()
                 .renderingMode(.original)
-                .frame(width: 28, height: 28)
+                .frame(width: 40, height: 40)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text("LocalForge Security Shield")
