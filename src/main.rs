@@ -128,7 +128,7 @@ async fn main() -> anyhow::Result<()> {
         if ast_validator::scan(&diff) {
             // Layer 1 hard-blocks — spawn Layer 3 advisory in background so
             // the developer still gets a Qwen report, but don't wait for it.
-            let _ = advisory_engine::spawn(diff);
+            drop(advisory_engine::spawn(diff));
             std::process::exit(1);
         }
 
@@ -537,11 +537,11 @@ fn parse_report_file(path: &std::path::Path) -> Option<ReportEntry> {
     for line in content.lines().take(20) {
         let line = line.trim();
         if line.starts_with("Severity") {
-            if let Some(v) = line.splitn(2, ':').nth(1) {
+            if let Some(v) = line.split_once(':').map(|x| x.1) {
                 severity = v.trim().to_string();
             }
         } else if line.starts_with("Summary") {
-            if let Some(v) = line.splitn(2, ':').nth(1) {
+            if let Some(v) = line.split_once(':').map(|x| x.1) {
                 summary = v.trim().to_string();
             }
         } else if line.contains("UTC") && line.contains('|') {
@@ -565,7 +565,7 @@ fn parse_report_file(path: &std::path::Path) -> Option<ReportEntry> {
             let t = l.trim();
             t.starts_with('[')
                 && t.len() > 3
-                && t.chars().nth(1).map_or(false, |c| c.is_ascii_digit())
+                && t.chars().nth(1).is_some_and(|c| c.is_ascii_digit())
         })
         .count();
 
@@ -593,7 +593,7 @@ fn run_export_report(fmt: &str, last: Option<usize>, out: Option<&str>) -> anyho
     let mut entries: Vec<std::path::PathBuf> = std::fs::read_dir(&reports_dir)?
         .flatten()
         .filter(|e| {
-            e.path().extension().map_or(false, |x| x == "txt")
+            e.path().extension().is_some_and(|x| x == "txt")
                 && e.file_name().to_string_lossy().starts_with("commit_")
         })
         .map(|e| e.path())
@@ -627,14 +627,15 @@ fn run_export_report(fmt: &str, last: Option<usize>, out: Option<&str>) -> anyho
             let mut csv =
                 String::from("filename,timestamp,commit_id,severity,summary,findings,raw_path\n");
             for r in &records {
+                // Escape commas in summary
+                let summary_escaped = format!("\"{}\"", r.summary.replace('"', "\"\""));
                 csv.push_str(&format!(
                     "{},{},{},{},{},{},{}\n",
                     r.filename,
                     r.timestamp,
                     r.commit_id,
                     r.severity,
-                    // Escape commas in summary
-                    format!("\"{}\"", r.summary.replace('"', "\"\"")),
+                    summary_escaped,
                     r.findings,
                     r.raw_path,
                 ));
@@ -656,8 +657,8 @@ fn run_export_report(fmt: &str, last: Option<usize>, out: Option<&str>) -> anyho
 
     // Print summary table to terminal
     println!(
-        "  {:<40}  {:<8}  {:<8}  {}",
-        "Commit", "Severity", "Findings", "Summary"
+        "  {:<40}  {:<8}  {:<8}  Summary",
+        "Commit", "Severity", "Findings"
     );
     println!("  {}", "─".repeat(90));
     for r in &records {
@@ -975,8 +976,6 @@ fn find_qwen_in_hf_cache() -> Option<std::path::PathBuf> {
     None
 }
 
-/// Find the pre-commit hook source.
-
 /// Recursively copy a directory (used for .mlpackage which is a directory).
 fn copy_dir_all(src: &std::path::Path, dst: &std::path::Path) -> anyhow::Result<()> {
     std::fs::create_dir_all(dst)?;
@@ -1247,7 +1246,6 @@ fn apply_localforgeignore(diff: &str) -> (String, Vec<String>) {
     let mut out = String::new();
     let mut ignored_files: Vec<String> = vec![];
     let mut skip = false;
-    let mut current_file = String::new();
 
     for line in diff.lines() {
         if line.starts_with("diff --git ") {
@@ -1261,8 +1259,6 @@ fn apply_localforgeignore(diff: &str) -> (String, Vec<String>) {
             if skip {
                 ignored_files.push(file.clone());
             }
-            current_file = file;
-            let _ = current_file; // used above; suppress lint
         }
         if !skip {
             out.push_str(line);

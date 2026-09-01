@@ -127,7 +127,7 @@ fn load_recent_advisories(max: usize) -> Vec<LogEntry> {
         })
         .collect();
 
-    entries.sort_by(|a, b| b.0.cmp(&a.0));
+    entries.sort_by_key(|e| std::cmp::Reverse(e.0));
 
     entries
         .into_iter()
@@ -185,7 +185,7 @@ pub fn run() -> anyhow::Result<()> {
     loop {
         // Reload advisory reports every ~5 seconds (300 ticks × 16ms)
         tick += 1;
-        if tick % 300 == 0 {
+        if tick.is_multiple_of(300) {
             let recent = load_recent_advisories(5);
             if !recent.is_empty() {
                 logs.retain(|e| {
