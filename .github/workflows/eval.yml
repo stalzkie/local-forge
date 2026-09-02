@@ -47,7 +47,7 @@ jobs:
       fpr:       ${{ steps.gate.outputs.fpr }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-python@v5
         with:
@@ -180,7 +180,7 @@ jobs:
     needs: l3-eval
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: dtolnay/rust-toolchain@stable
         with:

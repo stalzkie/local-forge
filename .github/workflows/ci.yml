@@ -21,7 +21,7 @@ jobs:
     name: "L0 · cargo fmt"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
@@ -31,7 +31,7 @@ jobs:
     name: "L0 · version sync"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Hook version must match across all three files
         run: |
           MAIN=$(grep -E 'EXPECTED_HOOK_VERSION: u32 = [0-9]+' src/main.rs \
@@ -56,7 +56,7 @@ jobs:
     name: "L0 · shellcheck"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: sudo apt-get install -y shellcheck
       - name: Lint all shell scripts
         run: |
@@ -72,7 +72,7 @@ jobs:
     name: "L0 · ruff"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: astral-sh/ruff-action@v1
         with:
           args: "check coreml/ tests/ walkthrough/ --select E,F,W --ignore E501"
@@ -81,7 +81,7 @@ jobs:
     name: "L0 · corpus integrity"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -102,7 +102,7 @@ jobs:
     runs-on: macos-15
     needs: [cargo-fmt, version-sync, shellcheck, python-lint, corpus-check]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -134,7 +134,7 @@ jobs:
     runs-on: macos-15
     needs: unit
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: dtolnay/rust-toolchain@stable
         with:
