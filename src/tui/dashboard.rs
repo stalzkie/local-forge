@@ -203,7 +203,7 @@ pub fn run() -> anyhow::Result<()> {
         let items: Vec<ListItem> = logs.iter().map(entry_to_list_item).collect();
 
         terminal.draw(|f| {
-            let area = f.size();
+            let area = f.area();
             let chunks = Layout::default()
                 .direction(Direction::Vertical)
                 .margin(1)
