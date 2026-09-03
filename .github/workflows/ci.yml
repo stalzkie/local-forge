@@ -149,10 +149,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Run L1 golden TP/FP set
+      - name: Run L1 + scan-pr integration tests
         run: |
           pip install pytest --quiet
-          pytest tests/test_l1_integration.py -v \
+          pytest tests/test_l1_integration.py tests/test_scan_pr_integration.py -v \
             --tb=short \
             --junit-xml=test-results/l1-integration.xml
 
