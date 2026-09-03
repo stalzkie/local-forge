@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LocalForge pre-commit hook
-# LOCALFORGE_HOOK_VERSION=5
+# LOCALFORGE_HOOK_VERSION=6
 set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
@@ -94,11 +94,17 @@ while IFS= read -r line; do
 done <<< "$SCAN_OUTPUT"
 
 if [ $SCAN_EXIT -ne 0 ]; then
+  if [ -f "$HOME/.localforge/dry_run" ]; then
+    lf_log "[DRY RUN] Would have BLOCKED this commit — a secret was detected in the staged diff."
+    lf_log "[DRY RUN] To suppress a false positive: localforge --allow <file>"
+    lf_log "[DRY RUN] Committing anyway (dry-run mode). Run 'localforge --dry-run off' to enforce blocking."
+    exit 0
+  fi
   lf_log "Commit BLOCKED — a secret was detected in the staged diff."
-  lf_log "To suppress a false positive, add the file path to .localforgeignore"
+  lf_log "To suppress a false positive, run: localforge --allow <file>"
   echo ""
   echo "[LocalForge] Commit BLOCKED — a secret was detected in the staged diff."
-  echo "             To suppress a false positive, add the file path to .localforgeignore"
+  echo "             To suppress a false positive, run: localforge --allow <file>"
   echo "             Remove the real secret, stage the fix, then commit again."
   exit 1
 fi

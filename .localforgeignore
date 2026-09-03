@@ -53,6 +53,9 @@ tests/check_corpus.py
 # --scan-pr integration test — contains a fake-but-pattern-matching key
 tests/test_scan_pr_integration.py
 
+# --allow integration test — contains a fake-but-pattern-matching key
+tests/test_allow_integration.py
+
 # Static analysis shim — contains tool invocation patterns
 coreml/static_analysis.py
 

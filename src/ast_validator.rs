@@ -10,11 +10,11 @@ struct Rule {
 const RULES: &[Rule] = &[
     // ── AWS ───────────────────────────────────────────────────────────────────
     Rule {
-        pattern: r"AKIA[0-9A-Z]{16}",
+        pattern: r"AKIA[0-9A-Z]{16,}",
         label: "AWS Access Key ID",
     },
     Rule {
-        pattern: r#"(?i)(aws_secret|secret_access_key)\s*[=:]\s*['"]?[A-Za-z0-9/+=]{40}['"]?"#,
+        pattern: r#"(?i)(aws_secret|secret_access_key)\s*[=:]\s*['"]?[A-Za-z0-9/+=]{40,}['"]?"#,
         label: "AWS Secret Access Key",
     },
     // ── GCP ───────────────────────────────────────────────────────────────────
@@ -23,7 +23,7 @@ const RULES: &[Rule] = &[
         label: "GCP Service Account JSON",
     },
     Rule {
-        pattern: r"AIza[0-9A-Za-z\-_]{35}",
+        pattern: r"AIza[0-9A-Za-z\-_]{35,}",
         label: "GCP API Key",
     },
     // ── Azure ─────────────────────────────────────────────────────────────────
@@ -42,15 +42,15 @@ const RULES: &[Rule] = &[
     },
     // ── GitHub ────────────────────────────────────────────────────────────────
     Rule {
-        pattern: r"ghp_[A-Za-z0-9]{36}",
+        pattern: r"ghp_[A-Za-z0-9]{36,}",
         label: "GitHub PAT (classic)",
     },
     Rule {
-        pattern: r"github_pat_[A-Za-z0-9_]{82}",
+        pattern: r"github_pat_[A-Za-z0-9_]{82,}",
         label: "GitHub Fine-Grained PAT",
     },
     Rule {
-        pattern: r"ghs_[A-Za-z0-9]{36}",
+        pattern: r"ghs_[A-Za-z0-9]{36,}",
         label: "GitHub Actions Secret",
     },
     // ── Slack ─────────────────────────────────────────────────────────────────
@@ -64,21 +64,21 @@ const RULES: &[Rule] = &[
     },
     // ── Twilio ────────────────────────────────────────────────────────────────
     Rule {
-        pattern: r"AC[0-9a-f]{32}",
+        pattern: r"AC[0-9a-f]{32,}",
         label: "Twilio Account SID",
     },
     Rule {
-        pattern: r"SK[0-9a-f]{32}",
+        pattern: r"SK[0-9a-f]{32,}",
         label: "Twilio API Key",
     },
     // ── SendGrid ──────────────────────────────────────────────────────────────
     Rule {
-        pattern: r"SG\.[A-Za-z0-9\-_]{22}\.[A-Za-z0-9\-_]{43}",
+        pattern: r"SG\.[A-Za-z0-9\-_]{22,}\.[A-Za-z0-9\-_]{43,}",
         label: "SendGrid API Key",
     },
     // ── npm / PyPI / HuggingFace / Anthropic / OpenAI ────────────────────────
     Rule {
-        pattern: r"npm_[A-Za-z0-9]{36}",
+        pattern: r"npm_[A-Za-z0-9]{36,}",
         label: "npm Access Token",
     },
     Rule {
@@ -94,7 +94,7 @@ const RULES: &[Rule] = &[
         label: "Anthropic API Key",
     },
     Rule {
-        pattern: r"sk-[A-Za-z0-9]{48}",
+        pattern: r"sk-[A-Za-z0-9]{48,}",
         label: "OpenAI API Key",
     },
     Rule {

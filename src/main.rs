@@ -9,7 +9,7 @@ use std::io::Read;
 
 /// Bump this whenever the hook interface changes (new env vars, new exit codes,
 /// new log format). The hook embeds the same number as LOCALFORGE_HOOK_VERSION.
-const EXPECTED_HOOK_VERSION: u32 = 5;
+const EXPECTED_HOOK_VERSION: u32 = 6;
 
 const EMBEDDED_HOOK: &str = include_str!("../hooks/pre-commit");
 const EMBEDDED_INFER: &str = include_str!("../coreml/infer.py");
@@ -71,6 +71,21 @@ struct Cli {
     #[arg(long, value_name = "PATH")]
     out: Option<String>,
 
+    /// Toggle dry-run mode: on|off. While on, a blocked commit is logged and
+    /// explained but never actually rejected — lets a team try LocalForge
+    /// against real commits before it starts enforcing blocks.
+    /// With no argument, prints whether dry-run is currently on or off.
+    #[arg(long, value_name = "on|off", num_args = 0..=1, default_missing_value = "status")]
+    dry_run: Option<String>,
+
+    /// Add PATH to .localforgeignore at the repo root, so future scans skip it.
+    /// Use right after a commit is blocked for a known false positive — no need
+    /// to find and hand-edit .localforgeignore yourself.
+    ///
+    /// Example: localforge --allow tests/fixtures/fake_key.py
+    #[arg(long, value_name = "PATH")]
+    allow: Option<String>,
+
     /// Scan the diff between BASE and HEAD and print findings as JSON.
     /// Exits 1 if Layer 1 detects secrets, 0 if clean.
     /// Respects .localforgeignore. Use in CI to scan PRs without the hook.
@@ -109,6 +124,14 @@ async fn main() -> anyhow::Result<()> {
 
     if let Some(fmt) = cli.export_report {
         return run_export_report(&fmt, cli.last, cli.out.as_deref());
+    }
+
+    if let Some(path) = cli.allow {
+        return run_allow(&path);
+    }
+
+    if let Some(mode) = cli.dry_run {
+        return run_dry_run(&mode);
     }
 
     if let Some(refs) = cli.scan_pr {
@@ -1220,6 +1243,82 @@ fn print_advisory(report: &advisory_engine::AdvisoryResult) {
     if !report.report_path.is_empty() {
         eprintln!("[LocalForge]   Full report: {}", report.report_path);
     }
+}
+
+// ── --dry-run ─────────────────────────────────────────────────────────────────
+
+/// Toggle `~/.localforge/dry_run`. Its mere presence tells the pre-commit hook
+/// (LOCALFORGE_HOOK_VERSION >= 6) to log a would-have-blocked commit and let it
+/// through instead of rejecting it.
+fn run_dry_run(mode: &str) -> anyhow::Result<()> {
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
+    let marker = std::path::PathBuf::from(&home).join(".localforge/dry_run");
+
+    match mode {
+        "on" => {
+            if let Some(parent) = marker.parent() {
+                std::fs::create_dir_all(parent)?;
+            }
+            std::fs::write(&marker, "")?;
+            println!(
+                "[LocalForge] Dry-run mode ON — blocked commits will be logged, not rejected."
+            );
+        }
+        "off" => {
+            if marker.exists() {
+                std::fs::remove_file(&marker)?;
+            }
+            println!("[LocalForge] Dry-run mode OFF — blocked commits are rejected as normal.");
+        }
+        "status" => {
+            let state = if marker.exists() { "ON" } else { "OFF" };
+            println!("[LocalForge] Dry-run mode is {state}.");
+        }
+        other => {
+            anyhow::bail!("unknown --dry-run value '{other}' — expected 'on' or 'off'");
+        }
+    }
+    Ok(())
+}
+
+// ── --allow ───────────────────────────────────────────────────────────────────
+
+/// Add `path` to .localforgeignore at the repo root, creating the file if it
+/// doesn't exist yet. No-op (with a message) if the path is already listed.
+fn run_allow(path: &str) -> anyhow::Result<()> {
+    let toplevel_out = std::process::Command::new("git")
+        .args(["rev-parse", "--show-toplevel"])
+        .output()
+        .map_err(|e| anyhow::anyhow!("failed to run git rev-parse: {e}"))?;
+
+    if !toplevel_out.status.success() {
+        anyhow::bail!("not inside a git repository");
+    }
+
+    let repo_root = String::from_utf8_lossy(&toplevel_out.stdout)
+        .trim()
+        .to_string();
+    let ignore_path = std::path::Path::new(&repo_root).join(".localforgeignore");
+
+    let existing = std::fs::read_to_string(&ignore_path).unwrap_or_default();
+    if existing.lines().any(|l| l.trim() == path) {
+        println!("[LocalForge] {path} is already in .localforgeignore — nothing to do.");
+        return Ok(());
+    }
+
+    let mut updated = existing;
+    if !updated.is_empty() && !updated.ends_with('\n') {
+        updated.push('\n');
+    }
+    updated.push_str(path);
+    updated.push('\n');
+
+    std::fs::write(&ignore_path, updated)?;
+    println!("[LocalForge] ✓ Added '{path}' to {}", ignore_path.display());
+    println!(
+        "[LocalForge]   Future scans will skip this path. Stage and commit the ignore file update."
+    );
+    Ok(())
 }
 
 // ── --scan-pr ─────────────────────────────────────────────────────────────────
