@@ -42,6 +42,8 @@ jobs:
     runs-on: macos-15
     env:
       VERSION: ${{ needs.validate.outputs.version }}
+      HAS_APPLE_CERT: ${{ secrets.APPLE_CERTIFICATE_BASE64 != '' }}
+      HAS_APPLE_ID: ${{ secrets.APPLE_ID != '' }}
 
     steps:
       - uses: actions/checkout@v7
@@ -129,7 +131,7 @@ jobs:
 
       # ── Code signing (optional — requires secrets) ─────────────────────────
       - name: Import Developer ID certificate
-        if: ${{ secrets.APPLE_CERTIFICATE_BASE64 != '' }}
+        if: ${{ env.HAS_APPLE_CERT == 'true' }}
         env:
           CERT_B64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
           CERT_PWD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -146,7 +148,7 @@ jobs:
           rm /tmp/cert.p12
 
       - name: Sign binary
-        if: ${{ secrets.APPLE_CERTIFICATE_BASE64 != '' }}
+        if: ${{ env.HAS_APPLE_CERT == 'true' }}
         env:
           DEVELOPER_ID: ${{ secrets.APPLE_DEVELOPER_ID_NAME }}
         run: |
@@ -159,7 +161,7 @@ jobs:
 
       # ── Notarization (optional — requires Apple credentials secrets) ───────
       - name: Notarize & staple DMG
-        if: ${{ secrets.APPLE_ID != '' }}
+        if: ${{ env.HAS_APPLE_ID == 'true' }}
         env:
           APPLE_ID:       ${{ secrets.APPLE_ID }}
           APPLE_TEAM_ID:  ${{ secrets.APPLE_TEAM_ID }}
