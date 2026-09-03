@@ -4,7 +4,7 @@ Thank you for your interest in contributing. LocalForge is a security-sensitive 
 
 ## Before You Start
 
-- Check [open issues](https://github.com/stalzkie/local-forge-production/issues) to avoid duplicating work
+- Check [open issues](https://github.com/stalzkie/local-forge/issues) to avoid duplicating work
 - For significant changes, open an issue first to discuss the approach
 - All contributions are subject to the [Code of Conduct](CODE_OF_CONDUCT.md)
 
@@ -13,8 +13,8 @@ Thank you for your interest in contributing. LocalForge is a security-sensitive 
 **Requirements:** macOS 14+, Apple Silicon, Rust 1.78+, Python 3.11+
 
 ```bash
-git clone https://github.com/stalzkie/local-forge-production.git
-cd local-forge-production
+git clone https://github.com/stalzkie/local-forge.git
+cd local-forge
 
 # Install Rust (if needed)
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh

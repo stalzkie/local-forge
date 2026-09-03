@@ -6,13 +6,13 @@
 
 ### a rust-native security gateway that reviews your code before git does
 
-[![CI](https://github.com/stalzkie/local-forge-production/actions/workflows/ci.yml/badge.svg)](https://github.com/stalzkie/local-forge-production/actions/workflows/ci.yml)
-[![Platform](https://img.shields.io/badge/platform-Apple%20Silicon-black?style=flat-square&logo=apple)](https://github.com/stalzkie/local-forge-production/releases)
-[![macOS](https://img.shields.io/badge/macOS-14%2B-blue?style=flat-square&logo=apple)](https://github.com/stalzkie/local-forge-production/releases)
+[![CI](https://github.com/stalzkie/local-forge/actions/workflows/ci.yml/badge.svg)](https://github.com/stalzkie/local-forge/actions/workflows/ci.yml)
+[![Platform](https://img.shields.io/badge/platform-Apple%20Silicon-black?style=flat-square&logo=apple)](https://github.com/stalzkie/local-forge/releases)
+[![macOS](https://img.shields.io/badge/macOS-14%2B-blue?style=flat-square&logo=apple)](https://github.com/stalzkie/local-forge/releases)
 [![Rust](https://img.shields.io/badge/rust-1.78%2B-orange?style=flat-square&logo=rust)](https://www.rust-lang.org)
 [![Swift](https://img.shields.io/badge/swift-6.0-red?style=flat-square&logo=swift)](https://swift.org)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![MCP](https://img.shields.io/badge/MCP-compliant-purple?style=flat-square)](https://github.com/stalzkie/local-forge-production)
+[![MCP](https://img.shields.io/badge/MCP-compliant-purple?style=flat-square)](https://github.com/stalzkie/local-forge)
 
 </div>
 
@@ -88,15 +88,15 @@ Layers 1 and 2 **block** the commit on a positive. Layer 3 always runs in the ba
 
 | Asset | Description |
 |---|---|
-| [LocalForge-v2.1.3-arm64.dmg](https://github.com/stalzkie/local-forge-production/releases/latest/download/LocalForge-v2.1.3-arm64.dmg) | macOS app — drag to Applications, double-click to open |
-| [localforge-v2.1.3-macos-arm64](https://github.com/stalzkie/local-forge-production/releases/latest/download/localforge-v2.1.3-macos-arm64) | CLI binary only — for terminal/script installs |
+| [LocalForge-v2.1.3-arm64.dmg](https://github.com/stalzkie/local-forge/releases/latest/download/LocalForge-v2.1.3-arm64.dmg) | macOS app — drag to Applications, double-click to open |
+| [localforge-v2.1.3-macos-arm64](https://github.com/stalzkie/local-forge/releases/latest/download/localforge-v2.1.3-macos-arm64) | CLI binary only — for terminal/script installs |
 
 > **First launch:** macOS will say the app is from an unidentified developer. Right-click → Open → Open to bypass Gatekeeper once. This is standard for unsigned apps — full notarization is coming in a future release.
 
 **CLI quick-install (no clone required):**
 
 ```bash
-curl -L https://github.com/stalzkie/local-forge-production/releases/latest/download/localforge-v2.1.3-macos-arm64 \
+curl -L https://github.com/stalzkie/local-forge/releases/latest/download/localforge-v2.1.3-macos-arm64 \
   -o /tmp/localforge && chmod +x /tmp/localforge && /tmp/localforge --install
 ```
 
@@ -114,7 +114,7 @@ curl -L https://github.com/stalzkie/local-forge-production/releases/latest/downl
 ### 1. Clone and build
 
 ```bash
-git clone https://github.com/stalzkie/local-forge-production.git
+git clone https://github.com/stalzkie/local-forge.git
 cd local-forge
 source "$HOME/.cargo/env"   # load Rust if freshly installed
 cargo build --release
@@ -162,7 +162,7 @@ localforge --install /path/to/another/project
 
 ### 5. Download the macOS app (optional)
 
-**Easiest:** download the DMG from the [Releases page](https://github.com/stalzkie/local-forge-production/releases/latest), open it, drag **LocalForge.app** to Applications, and double-click.
+**Easiest:** download the DMG from the [Releases page](https://github.com/stalzkie/local-forge/releases/latest), open it, drag **LocalForge.app** to Applications, and double-click.
 
 > First launch: right-click → Open → Open to bypass Gatekeeper (unsigned app warning).
 
@@ -342,7 +342,7 @@ localforge --install-org /path/to/your/repo
 bash localforge-install-org.sh
 
 # Or add to your dev setup doc as a one-liner:
-curl -fsSL https://github.com/stalzkie/local-forge-production/releases/latest/download/localforge-install-org.sh | bash
+curl -fsSL https://github.com/stalzkie/local-forge/releases/latest/download/localforge-install-org.sh | bash
 ```
 
 The generated script downloads the binary, sets up `~/.localforge/`, adds PATH to the shell profile, and installs the hook — no admin rights required.
