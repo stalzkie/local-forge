@@ -164,6 +164,47 @@ jobs:
           path: test-results/
 
 # ══════════════════════════════════════════════════════════════════════════════
+# PYRAMID LEVEL 3 — LAYER 3 REGRESSION CHECK (informational, not required)
+# Runs a small fixed subset of the Layer 3 eval corpus (tests/layer3_ci_check.py)
+# against a live Qwen/MLX model and compares aggregate precision/recall/F1 to
+# a checked-in baseline. mlx_lm's default sampler is deterministic (argmax),
+# verified empirically, but this stays informational rather than required:
+# a hosted runner's exact Apple Silicon generation can differ from the one
+# that captured the baseline, which can shift floating-point results at the
+# margins even under greedy decoding. continue-on-error keeps that residual
+# risk from blocking unrelated PRs while still surfacing regressions clearly.
+# ══════════════════════════════════════════════════════════════════════════════
+
+  layer3-check:
+    name: "L3 · advisory regression check"
+    runs-on: macos-15
+    needs: unit
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Cache Qwen 1.5B model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface/hub/models--mlx-community--Qwen2.5-Coder-1.5B-Instruct-4bit
+          key: qwen2.5-coder-1.5b-4bit-v1
+
+      - name: Install mlx-lm
+        run: pip install --quiet mlx-lm
+
+      - name: Download model (no-op if cache hit)
+        run: python3 -c "from mlx_lm import load; load('mlx-community/Qwen2.5-Coder-1.5B-Instruct-4bit')"
+
+      - name: Run Layer 3 regression check
+        run: |
+          SNAP=$(find ~/.cache/huggingface/hub/models--mlx-community--Qwen2.5-Coder-1.5B-Instruct-4bit/snapshots -mindepth 1 -maxdepth 1 -type d | head -1)
+          python3 tests/layer3_ci_check.py --model-dir "$SNAP"
+
+# ══════════════════════════════════════════════════════════════════════════════
 # REQUIRED CHECK — gates branch protection
 # ══════════════════════════════════════════════════════════════════════════════
 

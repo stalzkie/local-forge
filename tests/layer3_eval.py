@@ -5,6 +5,10 @@ Runs each labeled diff through the advisory engine and computes
 Precision, Recall, F1, and False Positive Rate — overall and by category/language.
 Writes a timestamped JSON artifact and a text draft report.
 
+For CI, see tests/layer3_ci_check.py instead — this full corpus (145+
+entries) is too slow to run on every push; that script runs a small fixed
+subset and compares against a checked-in baseline.
+
 Usage:
     python3 tests/layer3_eval.py [--model-dir DIR] [--out DIR] [--quick]
 
