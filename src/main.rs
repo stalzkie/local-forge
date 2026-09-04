@@ -101,6 +101,13 @@ struct Cli {
     #[arg(long, value_name = "start|stop", num_args = 0..=1, default_missing_value = "status")]
     daemon: Option<String>,
 
+    /// Validate .localforge/patterns.toml: confirm every custom rule
+    /// compiles, then run its test_positive/test_negative cases against it.
+    /// Exits non-zero if any rule fails to compile or match — safe to wire
+    /// into CI so a bad custom pattern is caught before it's relied on.
+    #[arg(long)]
+    validate_patterns: bool,
+
     /// Scan the diff between BASE and HEAD and print findings as JSON.
     /// Exits 1 if Layer 1 detects secrets, 0 if clean.
     /// Respects .localforgeignore. Use in CI to scan PRs without the hook.
@@ -155,6 +162,10 @@ async fn main() -> anyhow::Result<()> {
 
     if let Some(mode) = cli.daemon {
         return run_daemon_ctl(&mode);
+    }
+
+    if cli.validate_patterns {
+        return run_validate_patterns();
     }
 
     if let Some(refs) = cli.scan_pr {
@@ -1471,6 +1482,55 @@ fn run_daemon_ctl(mode: &str) -> anyhow::Result<()> {
         }
     }
     Ok(())
+}
+
+// ── --validate-patterns ──────────────────────────────────────────────────────
+
+fn run_validate_patterns() -> anyhow::Result<()> {
+    let path = std::path::Path::new(".localforge/patterns.toml");
+    if !path.exists() {
+        println!("[LocalForge] No .localforge/patterns.toml found — nothing to validate.");
+        return Ok(());
+    }
+
+    let results = ast_validator::validate_custom_patterns();
+    if results.is_empty() {
+        println!("[LocalForge] .localforge/patterns.toml defines no patterns.");
+        return Ok(());
+    }
+
+    println!(
+        "[LocalForge] Validating {} custom pattern(s) from .localforge/patterns.toml...",
+        results.len()
+    );
+    println!();
+
+    let mut all_valid = true;
+    for r in &results {
+        if r.is_valid() {
+            println!("  ✓ {}", r.label);
+            continue;
+        }
+        all_valid = false;
+        println!("  ✗ {}  (pattern: {})", r.label, r.pattern);
+        if let Some(err) = &r.compile_error {
+            println!("      Regex failed to compile: {err}");
+        }
+        for s in &r.unmatched_positive {
+            println!("      Expected to match but did not: {s:?}");
+        }
+        for s in &r.falsely_matched_negative {
+            println!("      Expected NOT to match but did: {s:?}");
+        }
+    }
+
+    println!();
+    if all_valid {
+        println!("[LocalForge] ✓ All custom patterns valid.");
+        Ok(())
+    } else {
+        anyhow::bail!("one or more custom patterns in .localforge/patterns.toml failed validation");
+    }
 }
 
 // ── --allow ───────────────────────────────────────────────────────────────────

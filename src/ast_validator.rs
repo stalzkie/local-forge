@@ -244,29 +244,49 @@ struct PatternsFile {
 struct CustomRule {
     pattern: String,
     label: String,
+    /// Strings the pattern is expected to match — checked by
+    /// `--validate-patterns`, ignored during normal scanning.
+    #[serde(default)]
+    test_positive: Vec<String>,
+    /// Strings the pattern is expected NOT to match — checked by
+    /// `--validate-patterns`, ignored during normal scanning.
+    #[serde(default)]
+    test_negative: Vec<String>,
 }
 
-/// Load user-defined patterns from `.localforge/patterns.toml` in the current
-/// working directory (which is always the repo root when invoked by the hook).
-/// Returns an empty vec if the file does not exist — not an error.
-fn load_custom_patterns() -> Vec<(Regex, String)> {
-    let path = std::path::Path::new(".localforge/patterns.toml");
+const PATTERNS_PATH: &str = ".localforge/patterns.toml";
+
+/// Read and parse `.localforge/patterns.toml` from the current working
+/// directory (which is always the repo root when invoked by the hook).
+/// Returns `None` if the file doesn't exist or fails to read/parse — the
+/// latter two print a warning, matching this function's prior behavior when
+/// inlined into `load_custom_patterns`.
+fn read_patterns_file() -> Option<PatternsFile> {
+    let path = std::path::Path::new(PATTERNS_PATH);
     if !path.exists() {
-        return vec![];
+        return None;
     }
     let content = match std::fs::read_to_string(path) {
         Ok(c) => c,
         Err(e) => {
-            eprintln!("[LocalForge] WARNING: could not read .localforge/patterns.toml: {e}");
-            return vec![];
+            eprintln!("[LocalForge] WARNING: could not read {PATTERNS_PATH}: {e}");
+            return None;
         }
     };
-    let file: PatternsFile = match toml::from_str(&content) {
-        Ok(f) => f,
+    match toml::from_str(&content) {
+        Ok(f) => Some(f),
         Err(e) => {
-            eprintln!("[LocalForge] WARNING: failed to parse .localforge/patterns.toml: {e}");
-            return vec![];
+            eprintln!("[LocalForge] WARNING: failed to parse {PATTERNS_PATH}: {e}");
+            None
         }
+    }
+}
+
+/// Load user-defined patterns from `.localforge/patterns.toml`.
+/// Returns an empty vec if the file does not exist — not an error.
+fn load_custom_patterns() -> Vec<(Regex, String)> {
+    let Some(file) = read_patterns_file() else {
+        return vec![];
     };
     file.patterns
         .into_iter()
@@ -279,6 +299,68 @@ fn load_custom_patterns() -> Vec<(Regex, String)> {
                 );
                 None
             }
+        })
+        .collect()
+}
+
+// ── --validate-patterns ────────────────────────────────────────────────────────
+
+/// Result of validating one custom rule: does it compile, and does it match
+/// every `test_positive` case while matching none of the `test_negative` ones.
+pub struct PatternValidation {
+    pub label: String,
+    pub pattern: String,
+    pub compile_error: Option<String>,
+    pub unmatched_positive: Vec<String>,
+    pub falsely_matched_negative: Vec<String>,
+}
+
+impl PatternValidation {
+    pub fn is_valid(&self) -> bool {
+        self.compile_error.is_none()
+            && self.unmatched_positive.is_empty()
+            && self.falsely_matched_negative.is_empty()
+    }
+}
+
+/// Validate every rule in `.localforge/patterns.toml`: confirm it compiles,
+/// then run its `test_positive`/`test_negative` cases against it. Returns an
+/// empty vec if the file doesn't exist or defines no patterns.
+pub fn validate_custom_patterns() -> Vec<PatternValidation> {
+    let Some(file) = read_patterns_file() else {
+        return vec![];
+    };
+    file.patterns
+        .into_iter()
+        .map(|r| match Regex::new(&r.pattern) {
+            Ok(re) => {
+                let unmatched_positive = r
+                    .test_positive
+                    .iter()
+                    .filter(|s| !re.is_match(s))
+                    .cloned()
+                    .collect();
+                let falsely_matched_negative = r
+                    .test_negative
+                    .iter()
+                    .filter(|s| re.is_match(s))
+                    .cloned()
+                    .collect();
+                PatternValidation {
+                    label: r.label,
+                    pattern: r.pattern,
+                    compile_error: None,
+                    unmatched_positive,
+                    falsely_matched_negative,
+                }
+            }
+            Err(e) => PatternValidation {
+                label: r.label,
+                pattern: r.pattern,
+                compile_error: Some(e.to_string()),
+                unmatched_positive: vec![],
+                falsely_matched_negative: vec![],
+            },
         })
         .collect()
 }
