@@ -152,7 +152,7 @@ jobs:
       - name: Run L1 + scan-pr + allow + dry-run integration tests
         run: |
           pip install pytest --quiet
-          pytest tests/test_l1_integration.py tests/test_scan_pr_integration.py tests/test_allow_integration.py tests/test_dry_run_integration.py -v \
+          pytest tests/test_l1_integration.py tests/test_scan_pr_integration.py tests/test_allow_integration.py tests/test_dry_run_integration.py tests/test_status_integration.py -v \
             --tb=short \
             --junit-xml=test-results/l1-integration.xml
 

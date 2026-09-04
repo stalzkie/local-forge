@@ -86,6 +86,36 @@ pub fn analyse(diff: &str) -> anyhow::Result<Option<AneResult>> {
     }))
 }
 
+/// Lightweight availability check for `localforge --status` — resolves the
+/// shim and model paths without spawning Python, unlike `analyse`.
+pub fn is_available() -> bool {
+    let Ok(shim) = resolve_shim_path() else {
+        return false;
+    };
+    if !shim.exists() {
+        return false;
+    }
+
+    let home_model = std::env::var("HOME")
+        .ok()
+        .map(|h| PathBuf::from(h).join(".localforge/LocalForgeModel.mlpackage"));
+    let bundle_model = std::env::current_exe().ok().and_then(|exe| {
+        exe.parent().map(|macos| {
+            macos
+                .parent()
+                .unwrap_or(macos)
+                .join("Resources/LocalForgeModel.mlpackage")
+        })
+    });
+    let sibling_model = shim.parent().map(|p| p.join("LocalForgeModel.mlpackage"));
+    let cwd_model = PathBuf::from("coreml/LocalForgeModel.mlpackage");
+
+    home_model.is_some_and(|p| p.exists())
+        || bundle_model.is_some_and(|p| p.exists())
+        || sibling_model.is_some_and(|p| p.exists())
+        || cwd_model.exists()
+}
+
 /// Resolve coreml/infer.py using a priority chain:
 ///   1. ~/.localforge/coreml/infer.py        (installed via install_hook.sh)
 ///   2. <app bundle>/Contents/Resources/coreml/infer.py  (bundled in .app)

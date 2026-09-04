@@ -84,6 +84,12 @@ pub async fn await_with_timeout(
     }
 }
 
+/// Lightweight availability check for `localforge --status` — resolves the
+/// shim path without spawning Python, unlike `spawn`/`run_advisory`.
+pub fn is_available() -> bool {
+    resolve_shim_path().exists()
+}
+
 // ── Internal ──────────────────────────────────────────────────────────────────
 
 async fn run_advisory(diff: &str) -> Option<AdvisoryResult> {

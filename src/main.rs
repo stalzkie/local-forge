@@ -86,6 +86,12 @@ struct Cli {
     #[arg(long, value_name = "PATH")]
     allow: Option<String>,
 
+    /// Print a quick scriptable summary: hook status for this repo, dry-run
+    /// state, registered repo count, Layer 2/3 availability, and the last
+    /// few scan reports — without launching the full-screen TUI.
+    #[arg(long)]
+    status: bool,
+
     /// Scan the diff between BASE and HEAD and print findings as JSON.
     /// Exits 1 if Layer 1 detects secrets, 0 if clean.
     /// Respects .localforgeignore. Use in CI to scan PRs without the hook.
@@ -132,6 +138,10 @@ async fn main() -> anyhow::Result<()> {
 
     if let Some(mode) = cli.dry_run {
         return run_dry_run(&mode);
+    }
+
+    if cli.status {
+        return run_status();
     }
 
     if let Some(refs) = cli.scan_pr {
@@ -698,6 +708,127 @@ fn run_export_report(fmt: &str, last: Option<usize>, out: Option<&str>) -> anyho
         println!(
             "  {:<40}  {:<8}  {:<8}  {}",
             short_id, r.severity, r.findings, short_summary
+        );
+    }
+    println!();
+
+    Ok(())
+}
+
+fn run_status() -> anyhow::Result<()> {
+    use std::path::PathBuf;
+
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
+    let lf_dir = PathBuf::from(&home).join(".localforge");
+
+    println!("[LocalForge] Status");
+    println!();
+
+    // ── Hook status for the current repo ──────────────────────────────────────
+    let cwd_hook_status = match std::process::Command::new("git")
+        .args(["rev-parse", "--show-toplevel"])
+        .output()
+    {
+        Ok(out) if out.status.success() => {
+            let repo_root = String::from_utf8_lossy(&out.stdout).trim().to_string();
+            let repo = std::path::Path::new(&repo_root);
+            let hook = repo.join(".git/hooks/pre-commit");
+            if !hook.exists() {
+                "⚠ hook missing — run: localforge --install".to_string()
+            } else {
+                let content = std::fs::read_to_string(&hook).unwrap_or_default();
+                if !content.contains("LocalForge") {
+                    "⚠ hook replaced by another tool".to_string()
+                } else {
+                    match hook_version_in_repo(repo) {
+                        Some(v) if v < EXPECTED_HOOK_VERSION => format!(
+                            "⚠ hook v{v} outdated (binary expects v{EXPECTED_HOOK_VERSION}) — run: localforge --install"
+                        ),
+                        Some(v) if v > EXPECTED_HOOK_VERSION => {
+                            format!("⚠ hook v{v} newer than binary v{EXPECTED_HOOK_VERSION} — update binary")
+                        }
+                        Some(v) => format!("✓ active (v{v})"),
+                        None => "✓ active (unversioned)".to_string(),
+                    }
+                }
+            }
+        }
+        _ => "— not inside a git repository".to_string(),
+    };
+    println!("  Hook (this repo):    {cwd_hook_status}");
+
+    // ── Dry-run mode ───────────────────────────────────────────────────────────
+    let dry_run_state = if lf_dir.join("dry_run").exists() {
+        "ON"
+    } else {
+        "OFF"
+    };
+    println!("  Dry-run mode:        {dry_run_state}");
+
+    // ── Registered repos ───────────────────────────────────────────────────────
+    let repos_file = lf_dir.join("repos");
+    let repo_count = std::fs::read_to_string(&repos_file)
+        .unwrap_or_default()
+        .lines()
+        .filter(|l| !l.is_empty())
+        .count();
+    println!("  Registered repos:    {repo_count}");
+
+    // ── Layer availability ─────────────────────────────────────────────────────
+    println!("  Layer 1 (regex):     ✓ always available");
+    println!(
+        "  Layer 2 (CoreML):    {}",
+        if ane_bridge::is_available() {
+            "✓ available"
+        } else {
+            "✗ not built — run: localforge --install"
+        }
+    );
+    println!(
+        "  Layer 3 (Qwen):      {}",
+        if advisory_engine::is_available() {
+            "✓ available"
+        } else {
+            "✗ not built — run: localforge --install"
+        }
+    );
+
+    // ── Recent scans ───────────────────────────────────────────────────────────
+    let reports_dir = lf_dir.join("reports");
+    println!();
+    if !reports_dir.exists() {
+        println!("  No scan reports yet.");
+        println!();
+        return Ok(());
+    }
+
+    let mut entries: Vec<PathBuf> = std::fs::read_dir(&reports_dir)?
+        .flatten()
+        .filter(|e| {
+            e.path().extension().is_some_and(|x| x == "txt")
+                && e.file_name().to_string_lossy().starts_with("commit_")
+        })
+        .map(|e| e.path())
+        .collect();
+    entries.sort_by(|a, b| b.file_name().cmp(&a.file_name()));
+    entries.truncate(5);
+
+    if entries.is_empty() {
+        println!("  No scan reports yet.");
+        println!();
+        return Ok(());
+    }
+
+    println!("  Last {} scan(s):", entries.len());
+    for r in entries.iter().filter_map(|p| parse_report_file(p)) {
+        let short_id = if r.commit_id.len() > 8 {
+            &r.commit_id[..8]
+        } else {
+            &r.commit_id
+        };
+        println!(
+            "    {}  {:<8}  {:<8}  {} finding(s)",
+            r.timestamp, short_id, r.severity, r.findings
         );
     }
     println!();
