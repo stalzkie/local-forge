@@ -146,6 +146,92 @@ static COMPILED: Lazy<Vec<(Regex, &'static str)>> = Lazy::new(|| {
         .collect()
 });
 
+// ── Entropy-based fallback (novel/internal secret formats) ───────────────────
+//
+// The rules above only catch known provider formats. This is a last line of
+// defense: flag an assignment to a secret-ish variable name whose value has
+// high Shannon entropy, even when no dedicated rule recognizes its shape —
+// catches internal token formats and new provider formats before someone has
+// to hit the same gap that OpenAI's sk-proj- keys once left in this repo.
+// Gated on variable name AND entropy AND a mixed character class so it does
+// not fire on English words, numeric IDs, or env-var references.
+
+static ENTROPY_CANDIDATE: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(
+        r#"(?i)\b\w*(?:secret|token|password|passwd|api[_-]?key|credential|auth[_-]?key|access[_-]?key|private[_-]?key|signing[_-]?key|client[_-]?secret)\w*\s*[:=]\s*['"]?([A-Za-z0-9+/=_\-.]{20,})['"]?"#,
+    )
+    .expect("invalid entropy candidate regex")
+});
+
+/// Substrings that mark a captured value as an env-var reference or module
+/// path rather than a literal secret — these can slip past the char-class
+/// filter (e.g. `process.env.SECRET_KEY` is 23 letters/dots, no quotes).
+const ENV_REF_MARKERS: &[&str] = &[
+    "process.env",
+    "os.environ",
+    "os.getenv",
+    "system.getenv",
+    "std::env::var",
+    "env[",
+    "env.get",
+];
+
+fn shannon_entropy(s: &str) -> f64 {
+    use std::collections::HashMap;
+    let len = s.chars().count() as f64;
+    if len == 0.0 {
+        return 0.0;
+    }
+    let mut counts: HashMap<char, u32> = HashMap::new();
+    for c in s.chars() {
+        *counts.entry(c).or_insert(0) += 1;
+    }
+    counts
+        .values()
+        .map(|&count| {
+            let p = f64::from(count) / len;
+            -p * p.log2()
+        })
+        .sum()
+}
+
+/// True if `value` looks like a high-entropy secret rather than a word,
+/// placeholder, numeric ID, or env-var reference.
+fn is_high_entropy_secret(value: &str) -> bool {
+    let lower = value.to_lowercase();
+    if ENV_REF_MARKERS.iter().any(|m| lower.contains(m)) {
+        return false;
+    }
+
+    // Require a mixed character class — plain words, numeric IDs, and
+    // dotted paths rarely satisfy both letters AND digits.
+    let has_digit = value.bytes().any(|b| b.is_ascii_digit());
+    let has_alpha = value.bytes().any(|b| b.is_ascii_alphabetic());
+    if !has_digit || !has_alpha {
+        return false;
+    }
+
+    // Hex strings max out at 4 bits/char (vs ~6 for base64), so they need a
+    // lower absolute threshold to register as "high entropy" at all.
+    let is_hex = value.bytes().all(|b| b.is_ascii_hexdigit());
+    let bits_per_char = shannon_entropy(value);
+
+    if is_hex {
+        bits_per_char > 3.0
+    } else {
+        bits_per_char > 4.0
+    }
+}
+
+/// True if `target` contains any secret-ish assignment whose value scores as
+/// high entropy under `is_high_entropy_secret`.
+fn scan_entropy_fallback(target: &str) -> bool {
+    ENTROPY_CANDIDATE
+        .captures_iter(target)
+        .filter_map(|caps| caps.get(1))
+        .any(|m| is_high_entropy_secret(m.as_str()))
+}
+
 // ── Custom patterns (.localforge/patterns.toml) ───────────────────────────────
 
 #[derive(Deserialize)]
@@ -227,6 +313,10 @@ pub fn scan_findings(diff: &str) -> Vec<String> {
         if re.is_match(&target) {
             findings.push(label);
         }
+    }
+
+    if scan_entropy_fallback(&target) {
+        findings.push("High-Entropy Secret (unrecognized format)".to_string());
     }
 
     findings
@@ -397,6 +487,15 @@ mod tests {
     }
 
     #[test]
+    fn detects_high_entropy_secret_unrecognized_format() {
+        // Not shaped like any provider-specific rule above — this is exactly
+        // the gap the entropy fallback exists to catch.
+        assert!(scan(
+            "internal_api_key = 'Xk9mQzT4wPl7Rj2Nc8Vb5Yd1Hs6Fg3Kw'"
+        ));
+    }
+
+    #[test]
     fn detects_gcp_service_account() {
         assert!(scan(
             r#"{ "type": "service_account", "project_id": "my-proj" }"#
@@ -473,5 +572,28 @@ mod tests {
     #[test]
     fn passes_sk_test_stripe() {
         assert!(!scan("key = sk_test_abc123"));
+    }
+    #[test]
+    fn passes_entropy_env_var_dotted_ref() {
+        // 23 chars, no quotes needed to match the char class — must be
+        // excluded by the env-ref marker check, not just length.
+        assert!(!scan("token: process.env.SECRET_ACCESS_TOKEN_VALUE"));
+    }
+    #[test]
+    fn passes_entropy_numeric_only_value() {
+        // Long and passes length/charset, but has no letters — e.g. a PIN
+        // or numeric ID mistakenly named "secret". Uses a variable name
+        // outside the pre-existing broad .env rule's keyword list (SECRET,
+        // PASSWORD, PASSWD, PWD, API_KEY, AUTH_TOKEN, CREDENTIAL) so this
+        // isolates the entropy fallback's own has_alpha gate.
+        assert!(!scan("access_key = 20240101120000998877665544"));
+    }
+    #[test]
+    fn passes_entropy_low_diversity_repetition() {
+        // Mixed alnum (passes the has_digit/has_alpha gate) but only two
+        // distinct symbols — entropy is far below the threshold. Uses a
+        // variable name outside the pre-existing .env rule's keyword list
+        // to isolate the entropy fallback's own threshold check.
+        assert!(!scan("signing_key=A1A1A1A1A1A1A1A1A1A1A1A1"));
     }
 }
