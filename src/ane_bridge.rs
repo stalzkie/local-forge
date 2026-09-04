@@ -14,6 +14,17 @@ pub struct AneResult {
 /// the AST validator already ran). Returns Ok(Some(result)) otherwise.
 /// Returns Err only on unexpected subprocess failure.
 pub fn analyse(diff: &str) -> anyhow::Result<Option<AneResult>> {
+    crate::daemon_client::ensure_running(&crate::daemon_client::resolve_daemon_script());
+
+    if let Some(json) = crate::daemon_client::request(&serde_json::json!({
+        "cmd": "infer",
+        "diff": diff,
+    })) {
+        if json.get("error").is_none() {
+            return Ok(parse_ane_json(&json));
+        }
+    }
+
     let shim = resolve_shim_path()?;
 
     if !shim.exists() {
@@ -75,15 +86,19 @@ pub fn analyse(diff: &str) -> anyhow::Result<Option<AneResult>> {
 
     let json: serde_json::Value = serde_json::from_str(trimmed)?;
 
+    Ok(parse_ane_json(&json))
+}
+
+fn parse_ane_json(json: &serde_json::Value) -> Option<AneResult> {
     let risk_score = json["risk_score"].as_f64().unwrap_or(0.0) as f32;
     let risk_label = json["risk_label"].as_u64().unwrap_or(0) as u8;
     let advisory = json["advisory"].as_str().map(|s| s.to_string());
 
-    Ok(Some(AneResult {
+    Some(AneResult {
         risk_score,
         risk_label,
         advisory,
-    }))
+    })
 }
 
 /// Lightweight availability check for `localforge --status` — resolves the

@@ -624,97 +624,113 @@ def parse_args():
     return p.parse_args()
 
 
+def run(diff_text, model_dir, log_dir, report_file=None, model=None, tokenizer=None):
+    """
+    Full Layer 3 pipeline for one diff: clean-diff fast path, static analysis,
+    LLM inference (only if `model`/`tokenizer` aren't already loaded — the
+    caller may pass a resident model to skip the load-and-discard cost),
+    finding merge/filter, and report write.
+
+    Returns the same dict shape main() prints to stdout: either
+    {"error": "..."} or {"severity", "summary", "findings", "model"?, "report_path"}.
+    Never raises — model-load and inference failures are caught and returned
+    as an "error" entry so a long-lived caller (the daemon) can't be killed
+    by one bad diff.
+    """
+    try:
+        # ── Fast path: nothing risky in added lines → skip everything ────────
+        if _is_clean_diff(diff_text):
+            clean_result = {
+                "severity": "clean",
+                "summary":  "No risky patterns detected in added lines.",
+                "findings": [],
+            }
+            report_path = write_report(clean_result, diff_text, log_dir, report_file)
+            return {**clean_result, "report_path": report_path}
+
+        # ── Layer 3.5: static analysis (deterministic, <1s, no model needed) ─
+        static_findings: list[dict] = []
+        try:
+            sys.path.insert(0, SCRIPT_DIR)
+            from static_analysis import run_static_analysis
+            static_findings = run_static_analysis(diff_text)
+        except ImportError:
+            pass  # static_analysis.py not present — continue to LLM only
+        except Exception:
+            pass  # never let static analysis crash the advisory pipeline
+
+        # ── Layer 3: LLM inference ────────────────────────────────────────────
+        if not os.path.isdir(model_dir):
+            # No model — if static analysis found something, still report it
+            if static_findings:
+                result = {
+                    "severity": "medium",
+                    "summary":  "Static analysis findings (LLM model not installed).",
+                    "findings": static_findings,
+                }
+                report_path = write_report(result, diff_text, log_dir, report_file)
+                return {**result, "report_path": report_path}
+            return {"error": f"Qwen model not found at {model_dir}"}
+
+        if model is None or tokenizer is None:
+            try:
+                model, tokenizer = load_model(model_dir)
+            except Exception as e:
+                return {"error": f"Model load failed: {e}"}
+
+        languages = detect_languages(diff_text)
+        chunks    = chunk_diff(diff_text)
+        results   = []
+
+        for chunk in chunks:
+            result, raw = run_inference(model, tokenizer, chunk, languages)
+            if result is None:
+                result = {
+                    "severity": "low",
+                    "summary":  "Advisory engine returned unstructured output for this chunk.",
+                    "findings": [{
+                        "category": "quality", "type": "parse_error",
+                        "line_hint": "", "explanation": (raw or "empty")[:200],
+                        "remediation": "Review this diff chunk manually.",
+                    }],
+                }
+            results.append(result)
+
+        merged = filter_false_positives(merge_findings(results), diff_text)
+
+        # Merge static findings in (they go first — deterministic results are highest confidence)
+        all_findings = static_findings + [
+            f for f in merged.get("findings", [])
+            if f.get("type") != "parse_error" or not static_findings
+        ]
+        severity_rank = {"high": 3, "medium": 2, "low": 1, "clean": 0}
+        final_severity = merged.get("severity", "clean")
+        if static_findings:
+            final_severity = max(
+                final_severity, "medium",
+                key=lambda s: severity_rank.get(s, 0),
+            )
+
+        final = {
+            "severity": final_severity,
+            "summary":  merged.get("summary", "Static and LLM analysis complete."),
+            "findings": all_findings[:10],
+            "model":    os.path.basename(model_dir),
+        }
+
+        report_path = write_report(final, diff_text, log_dir, report_file)
+        return {**final, "report_path": report_path}
+    except Exception as e:
+        return {"error": f"Advisory engine error: {e}"}
+
+
 def main():
     args      = parse_args()
-    diff_text = args.diff
     model_dir = _find_model_dir(args.model)
 
-    # ── Fast path: nothing risky in added lines → skip everything ────────────
-    if _is_clean_diff(diff_text):
-        clean_result = {
-            "severity": "clean",
-            "summary":  "No risky patterns detected in added lines.",
-            "findings": [],
-        }
-        report_path = write_report(clean_result, diff_text, args.log_dir, args.report_file)
-        print(json.dumps({**clean_result, "report_path": report_path}))
-        sys.exit(0)
-
-    # ── Layer 3.5: static analysis (deterministic, <1s, no model needed) ─────
-    static_findings: list[dict] = []
-    try:
-        sys.path.insert(0, SCRIPT_DIR)
-        from static_analysis import run_static_analysis
-        static_findings = run_static_analysis(diff_text)
-    except ImportError:
-        pass  # static_analysis.py not present — continue to LLM only
-    except Exception:
-        pass  # never let static analysis crash the advisory pipeline
-
-    # ── Layer 3: LLM inference ────────────────────────────────────────────────
-    if not os.path.isdir(model_dir):
-        # No model — if static analysis found something, still report it
-        if static_findings:
-            result = {
-                "severity": "medium",
-                "summary":  "Static analysis findings (LLM model not installed).",
-                "findings": static_findings,
-            }
-            report_path = write_report(result, diff_text, args.log_dir, args.report_file)
-            print(json.dumps({**result, "report_path": report_path}))
-            sys.exit(0)
-        print(json.dumps({"error": f"Qwen model not found at {model_dir}"}))
-        sys.exit(1)
-
-    try:
-        model, tokenizer = load_model(model_dir)
-    except Exception as e:
-        print(json.dumps({"error": f"Model load failed: {e}"}))
-        sys.exit(1)
-
-    languages = detect_languages(diff_text)
-    chunks    = chunk_diff(diff_text)
-    results   = []
-
-    for chunk in chunks:
-        result, raw = run_inference(model, tokenizer, chunk, languages)
-        if result is None:
-            result = {
-                "severity": "low",
-                "summary":  "Advisory engine returned unstructured output for this chunk.",
-                "findings": [{
-                    "category": "quality", "type": "parse_error",
-                    "line_hint": "", "explanation": (raw or "empty")[:200],
-                    "remediation": "Review this diff chunk manually.",
-                }],
-            }
-        results.append(result)
-
-    merged = filter_false_positives(merge_findings(results), diff_text)
-
-    # Merge static findings in (they go first — deterministic results are highest confidence)
-    all_findings = static_findings + [
-        f for f in merged.get("findings", [])
-        if f.get("type") != "parse_error" or not static_findings
-    ]
-    severity_rank = {"high": 3, "medium": 2, "low": 1, "clean": 0}
-    final_severity = merged.get("severity", "clean")
-    if static_findings:
-        final_severity = max(
-            final_severity, "medium",
-            key=lambda s: severity_rank.get(s, 0),
-        )
-
-    final = {
-        "severity": final_severity,
-        "summary":  merged.get("summary", "Static and LLM analysis complete."),
-        "findings": all_findings[:10],
-        "model":    os.path.basename(model_dir),
-    }
-
-    report_path = write_report(final, diff_text, args.log_dir, args.report_file)
-    print(json.dumps({**final, "report_path": report_path}))
-    sys.exit(0)
+    result = run(args.diff, model_dir, args.log_dir, args.report_file)
+    print(json.dumps(result))
+    sys.exit(1 if "error" in result else 0)
 
 
 if __name__ == "__main__":

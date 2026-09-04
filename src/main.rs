@@ -1,6 +1,7 @@
 mod advisory_engine;
 mod ane_bridge;
 mod ast_validator;
+mod daemon_client;
 mod mcp_server;
 mod tui;
 
@@ -14,6 +15,7 @@ const EXPECTED_HOOK_VERSION: u32 = 6;
 const EMBEDDED_HOOK: &str = include_str!("../hooks/pre-commit");
 const EMBEDDED_INFER: &str = include_str!("../coreml/infer.py");
 const EMBEDDED_ADVISORY: &str = include_str!("../coreml/advisory.py");
+const EMBEDDED_DAEMON: &str = include_str!("../coreml/daemon.py");
 
 #[derive(Parser)]
 #[command(
@@ -92,6 +94,13 @@ struct Cli {
     #[arg(long)]
     status: bool,
 
+    /// Control the warm-model daemon that keeps Layer 2/3 models resident
+    /// across commits: start|stop. With no argument, prints whether it's
+    /// currently running. The daemon is also started automatically (best
+    /// effort, non-blocking) the first time a scan needs Layer 2 or 3.
+    #[arg(long, value_name = "start|stop", num_args = 0..=1, default_missing_value = "status")]
+    daemon: Option<String>,
+
     /// Scan the diff between BASE and HEAD and print findings as JSON.
     /// Exits 1 if Layer 1 detects secrets, 0 if clean.
     /// Respects .localforgeignore. Use in CI to scan PRs without the hook.
@@ -142,6 +151,10 @@ async fn main() -> anyhow::Result<()> {
 
     if cli.status {
         return run_status();
+    }
+
+    if let Some(mode) = cli.daemon {
+        return run_daemon_ctl(&mode);
     }
 
     if let Some(refs) = cli.scan_pr {
@@ -331,6 +344,7 @@ fn run_install(repo_path: &str) -> anyhow::Result<()> {
     for (shim, content) in [
         ("infer.py", EMBEDDED_INFER),
         ("advisory.py", EMBEDDED_ADVISORY),
+        ("daemon.py", EMBEDDED_DAEMON),
     ] {
         let dest = coreml_dir.join(shim);
         if dest.exists() {
@@ -790,6 +804,14 @@ fn run_status() -> anyhow::Result<()> {
             "✓ available"
         } else {
             "✗ not built — run: localforge --install"
+        }
+    );
+    println!(
+        "  Warm-model daemon:   {}",
+        if daemon_client::is_running() {
+            "✓ running"
+        } else {
+            "— not running (starts automatically on next Layer 2/3 scan)"
         }
     );
 
@@ -1407,6 +1429,45 @@ fn run_dry_run(mode: &str) -> anyhow::Result<()> {
         }
         other => {
             anyhow::bail!("unknown --dry-run value '{other}' — expected 'on' or 'off'");
+        }
+    }
+    Ok(())
+}
+
+// ── --daemon ──────────────────────────────────────────────────────────────────
+
+fn run_daemon_ctl(mode: &str) -> anyhow::Result<()> {
+    match mode {
+        "start" => {
+            daemon_client::ensure_running(&daemon_client::resolve_daemon_script());
+            // ensure_running is fire-and-forget; give it a moment to bind
+            // the socket before reporting status back to the user.
+            std::thread::sleep(std::time::Duration::from_millis(500));
+            if daemon_client::is_running() {
+                println!("[LocalForge] ✓ Warm-model daemon is running.");
+            } else {
+                println!(
+                    "[LocalForge] Daemon starting in the background — check again with: localforge --daemon"
+                );
+            }
+        }
+        "stop" => {
+            if daemon_client::request(&serde_json::json!({"cmd": "shutdown"})).is_some() {
+                println!("[LocalForge] ✓ Warm-model daemon stopped.");
+            } else {
+                println!("[LocalForge] Daemon was not running.");
+            }
+        }
+        "status" => {
+            let state = if daemon_client::is_running() {
+                "running"
+            } else {
+                "not running"
+            };
+            println!("[LocalForge] Warm-model daemon is {state}.");
+        }
+        other => {
+            anyhow::bail!("unknown --daemon value '{other}' — expected 'start' or 'stop'");
         }
     }
     Ok(())

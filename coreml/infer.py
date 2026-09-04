@@ -34,30 +34,28 @@ MODEL_PATH = _find_artifact("LocalForgeModel.mlpackage")
 TFIDF_PATH = _find_artifact("tfidf_vectorizer.pkl")
 THRESHOLD  = 0.5
 
-def main():
-    if len(sys.argv) < 2:
-        print(json.dumps({"error": "No diff text provided"}))
-        sys.exit(1)
+def load_ane():
+    """Load the CoreML model + TF-IDF vectorizer. Raises on missing artifacts.
 
-    diff_text = sys.argv[1]
-
-    if not os.path.exists(MODEL_PATH):
-        print(json.dumps({"error": f"Model not found: {MODEL_PATH}. Run: python3 coreml/build_model.py"}))
-        sys.exit(1)
-
-    if not os.path.exists(TFIDF_PATH):
-        print(json.dumps({"error": f"Vectorizer not found: {TFIDF_PATH}. Run: python3 coreml/build_model.py"}))
-        sys.exit(1)
-
+    Kept separate from run_infer() so callers that want to hold the model
+    resident across many diffs (the daemon) load it once and reuse it.
+    """
     # Lazy imports — keep startup fast when model files are missing
     import coremltools as ct
     from coremltools.models import MLModel
 
+    if not os.path.exists(MODEL_PATH):
+        raise FileNotFoundError(f"Model not found: {MODEL_PATH}. Run: python3 coreml/build_model.py")
+    if not os.path.exists(TFIDF_PATH):
+        raise FileNotFoundError(f"Vectorizer not found: {TFIDF_PATH}. Run: python3 coreml/build_model.py")
+
     with open(TFIDF_PATH, "rb") as f:
         tfidf = pickle.load(f)
-
     model = MLModel(MODEL_PATH, compute_units=ct.ComputeUnit.CPU_AND_NE)
+    return model, tfidf
 
+def run_infer(diff_text, model, tfidf):
+    """Score one diff against an already-loaded model + vectorizer."""
     vec    = tfidf.transform([diff_text]).toarray().astype(np.float32)[0]
     result = model.predict({"tfidf_features": vec})
     score  = float(np.array(result["risk_score"]).flatten()[0])
@@ -75,7 +73,22 @@ def main():
     output = {"risk_score": round(score, 4), "risk_label": label}
     if advisory:
         output["advisory"] = advisory
+    return output, label
 
+def main():
+    if len(sys.argv) < 2:
+        print(json.dumps({"error": "No diff text provided"}))
+        sys.exit(1)
+
+    diff_text = sys.argv[1]
+
+    try:
+        model, tfidf = load_ane()
+    except FileNotFoundError as e:
+        print(json.dumps({"error": str(e)}))
+        sys.exit(1)
+
+    output, label = run_infer(diff_text, model, tfidf)
     print(json.dumps(output))
     sys.exit(2 if label == 1 else 0)
 

@@ -93,13 +93,17 @@ pub fn is_available() -> bool {
 // ── Internal ──────────────────────────────────────────────────────────────────
 
 async fn run_advisory(diff: &str) -> Option<AdvisoryResult> {
+    let log_dir = resolve_log_dir();
+    let report_file = resolve_report_path(diff);
+
+    if let Some(result) = try_daemon(diff, &log_dir, &report_file).await {
+        return Some(result);
+    }
+
     let shim = resolve_shim_path();
     if !shim.exists() {
         return None;
     }
-
-    let log_dir = resolve_log_dir();
-    let report_file = resolve_report_path(diff);
 
     let output = Command::new("python3")
         .arg(&shim)
@@ -133,6 +137,10 @@ async fn run_advisory(diff: &str) -> Option<AdvisoryResult> {
         return None;
     }
 
+    parse_advisory_json(&json)
+}
+
+fn parse_advisory_json(json: &serde_json::Value) -> Option<AdvisoryResult> {
     let severity = Severity::from_str(json["severity"].as_str().unwrap_or("unknown"));
     let summary = json["summary"].as_str().unwrap_or("").to_string();
     let report_path = json["report_path"].as_str().unwrap_or("").to_string();
@@ -145,6 +153,38 @@ async fn run_advisory(diff: &str) -> Option<AdvisoryResult> {
         findings,
         report_path,
     })
+}
+
+/// Try the warm-model daemon before falling back to the subprocess shim.
+/// The blocking socket call runs on a `spawn_blocking` thread so a slow
+/// (or model-loading) daemon response never stalls the async runtime.
+async fn try_daemon(
+    diff: &str,
+    log_dir: &std::path::Path,
+    report_file: &std::path::Path,
+) -> Option<AdvisoryResult> {
+    crate::daemon_client::ensure_running(&crate::daemon_client::resolve_daemon_script());
+
+    let diff = diff.to_string();
+    let log_dir = log_dir.to_string_lossy().to_string();
+    let report_file = report_file.to_string_lossy().to_string();
+
+    let json = tokio::task::spawn_blocking(move || {
+        crate::daemon_client::request(&serde_json::json!({
+            "cmd": "advise",
+            "diff": diff,
+            "log_dir": log_dir,
+            "report_file": report_file,
+        }))
+    })
+    .await
+    .ok()??;
+
+    if json.get("error").is_some() {
+        return None;
+    }
+
+    parse_advisory_json(&json)
 }
 
 fn resolve_shim_path() -> PathBuf {
